@@ -41,7 +41,6 @@ alias dev := py_dev
 py_dev:
   nodemon -e py --exec rye run dev
 
-
 rs_dev:
   #!/usr/bin/env bash
   cd rs
@@ -57,6 +56,15 @@ zellij:
 
   zellij -s trading_bot --layout layout.kdl
 
+
+build_pyi:
+  #!/usr/bin/env bash
+  cd rs
+  mkdir _rs
+  cargo build --features pyi
+  cd ../
+  mv ./rs/_rs/_rs.pyi ./src/zenbt/rs.pyi
+  rm -r rs/_rs
 
 
 # ============================================= #
