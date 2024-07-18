@@ -45,7 +45,7 @@ py_dev:
 rs_dev:
   #!/usr/bin/env bash
   cd rs
-  nodemon -w rs -e rs --exec maturin develop --skip-install -r 
+  nodemon -e rs --exec maturin develop --skip-install -r 
 
 zellij:
   #!/usr/bin/env bash

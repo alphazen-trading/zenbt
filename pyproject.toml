@@ -38,6 +38,13 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/zenbt"]
 
+[tool.maturin]
+profile = "release"
+python-source = "src"
+module-name = 'zenbt.rs'
+manifest-path = "rs/Cargo.toml"
+features = ["pyo3/extension-module"]
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
