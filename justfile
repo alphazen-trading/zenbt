@@ -37,13 +37,27 @@ local_docker:
 pre-commit-test:
   rye run pre-commit run
 
-dev:
+alias dev := py_dev
+py_dev:
   nodemon -e py --exec rye run dev
+
 
 rs_dev:
   #!/usr/bin/env bash
   cd rs
-  nodemon -w rs -e rs --exec maturin develop --skip-install -r --uv
+  nodemon -w rs -e rs --exec maturin develop --skip-install -r 
+
+zellij:
+  #!/usr/bin/env bash
+  # Check if a Zellij session named "multi" exists
+  if zellij ls | grep -q "trading_bot"; then
+      zellij kill-session trading_bot
+      zellij delete-session trading_bot
+  fi
+
+  zellij -s trading_bot --layout layout.kdl
+
+
 
 # ============================================= #
 # Custom Section
