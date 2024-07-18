@@ -1,5 +1,5 @@
 [project]
-name = "trading-template"
+name = "zenbt"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
@@ -36,7 +36,7 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/trading_template"]
+packages = ["src/zenbt"]
 
 [tool.pyright]
 venvPath = "."
