@@ -63,3 +63,7 @@ pub struct MyClass {
 
 1. Not all types are implemented yet
 2. This does not work well with `--all-features` flags for other cargo commands
+
+----
+
+Original Reference: https://github.com/PyO3/pyo3/issues/4267
