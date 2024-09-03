@@ -41,11 +41,8 @@ alias dev := py_dev
 py_dev:
   nodemon -e py --exec rye run dev
 
-
 rs_dev:
-  #!/usr/bin/env bash
-  cd rs
-  nodemon -w rs -e rs --exec maturin develop --skip-install -r 
+  nodemon -e rs --exec maturin develop --skip-install -r 
 
 zellij:
   #!/usr/bin/env bash
@@ -57,6 +54,15 @@ zellij:
 
   zellij -s trading_bot --layout layout.kdl
 
+
+build_pyi:
+  #!/usr/bin/env bash
+  cd rs
+  mkdir _rs
+  cargo build --features pyi
+  cd ../
+  mv ./rs/_rs/_rs.pyi ./src/zenbt/rs.pyi
+  rm -r rs/_rs
 
 
 # ============================================= #
