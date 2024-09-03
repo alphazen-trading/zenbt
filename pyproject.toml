@@ -5,7 +5,13 @@ description = "Add your description here"
 authors = [
     { name = "Alpha Zen", email = "" }
 ]
-dependencies = []
+dependencies = [
+    "pyarrow>=17.0.0",
+    "rich>=13.8.0",
+    "pydantic>=2.8.2",
+    "python-okx>=0.3.2",
+    "pandas>=2.2.2",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 license = { text = "MIT" }

@@ -21,3 +21,7 @@ docker/grafana_data/png/*
 .env
 src/zenbt/rs.abi3.so
 rs/pyi-macros/target
+data/okx_trading_history.csv
+data/okx_trading_history.csv.org
+.idea
+src/zenbt/.jukit

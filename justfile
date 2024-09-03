@@ -42,8 +42,6 @@ py_dev:
   nodemon -e py --exec rye run dev
 
 rs_dev:
-  #!/usr/bin/env bash
-  cd rs
   nodemon -e rs --exec maturin develop --skip-install -r 
 
 zellij:
