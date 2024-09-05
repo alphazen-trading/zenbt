@@ -5,3 +5,6 @@ pub mod pnl;
 pub mod stats;
 pub mod ohlc;
 pub mod backtest;
+pub mod signals;
+pub mod order;
+pub mod position;

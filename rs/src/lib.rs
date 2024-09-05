@@ -8,6 +8,7 @@ use sdk::instrument::Instrument;
 use sdk::pnl::PNL;
 use sdk::ohlc::OHLC;
 use sdk::backtest::Backtest;
+use sdk::signals::Signals;
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -19,5 +20,6 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PNL>()?;
     m.add_class::<OHLC>()?;
     m.add_class::<Backtest>()?;
+    m.add_class::<Signals>()?;
     Ok(())
 }
