@@ -3,11 +3,13 @@ use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
+use serde::Serialize;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Position {
+    #[serde(with = "rust_decimal::serde::float")]
     pub index: Decimal,
     pub entry_timestamp: DateTime<Utc>,
     pub exit_timestamp: Option<DateTime<Utc>>,
@@ -37,21 +39,12 @@ impl Position {
             self.max_dd = self.pnl
         }
     }
-    pub fn should_close(&mut self, ohlc: &OHLC) -> bool {
+    pub fn was_sl_hit(&mut self, ohlc: &OHLC) -> bool {
         if self.side == dec!(1.0) {
             if ohlc.low <= self.sl {
                 self.exit_timestamp = Some(ohlc.date);
                 self.exit_price = Some(self.sl);
                 self.close_reason = Some(String::from("stop_loss"));
-                self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
-                self.pnl =
-                    (self.exit_price.unwrap() - self.entry_price) * self.size - self.commission;
-                return true;
-            }
-            if ohlc.high >= self.tp {
-                self.exit_timestamp = Some(ohlc.date);
-                self.exit_price = Some(self.tp);
-                self.close_reason = Some(String::from("take_profit"));
                 self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
                 self.pnl =
                     (self.exit_price.unwrap() - self.entry_price) * self.size - self.commission;
@@ -67,6 +60,21 @@ impl Position {
                     (self.entry_price - self.exit_price.unwrap()) * self.size - self.commission;
                 return true;
             }
+        }
+        return false;
+    }
+    pub fn was_tp_hit(&mut self, ohlc: &OHLC) -> bool {
+        if self.side == dec!(1.0) {
+            if ohlc.high >= self.tp {
+                self.exit_timestamp = Some(ohlc.date);
+                self.exit_price = Some(self.tp);
+                self.close_reason = Some(String::from("take_profit"));
+                self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
+                self.pnl =
+                    (self.exit_price.unwrap() - self.entry_price) * self.size - self.commission;
+                return true;
+            }
+        } else {
             if ohlc.high <= self.tp {
                 self.exit_timestamp = Some(ohlc.date);
                 self.exit_price = Some(self.tp);
@@ -78,6 +86,9 @@ impl Position {
             }
         }
         return false;
+    }
+    pub fn should_close(&mut self, ohlc: &OHLC) -> bool {
+        return self.was_sl_hit(ohlc) || self.was_tp_hit(ohlc);
     }
 
     pub fn print(&self) {
@@ -117,5 +128,12 @@ impl Position {
     #[getter]
     fn commission(&self) -> PyResult<Decimal> {
         Ok(self.commission)
+    }
+
+    pub fn to_json(&self) -> PyResult<String> {
+        match serde_json::to_string(&self) {
+            Ok(json_string) => Ok(json_string),
+            Err(err) => Err(pyo3::exceptions::PyValueError::new_err(err.to_string())),
+        }
     }
 }

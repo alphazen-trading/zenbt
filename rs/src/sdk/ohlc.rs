@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
-use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::Decimal;
+
+use serde::Serialize;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct OHLC {
     pub date: DateTime<Utc>,
     pub open: Decimal,
@@ -27,7 +29,8 @@ impl OHLC {
         close: Decimal,
         volume: Decimal,
     ) -> Self {
-        let date = DateTime::from_timestamp(timestamp.to_i64().unwrap(), 0).expect("Invalid timestamp");
+        let date =
+            DateTime::from_timestamp(timestamp.to_i64().unwrap(), 0).expect("Invalid timestamp");
         OHLC {
             date,
             open,
