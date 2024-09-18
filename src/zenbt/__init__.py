@@ -1,13 +1,21 @@
+import itertools
 # from sdk.logger import print, logger
 
+from zenbt.multi_backtest import multi_backtest
+from binance import Client
+
+from data.binance_klines import fetch_futures_data
 import mplfinance as mpf
-import talib
 from zenbt.rs import BBO, OHLC, Backtest, Signals
 import zenbt.rs as rs
 import numpy as np
 import pandas as pd
 from rich import print as rprint
-from numba import njit
+from tradingtoolbox.utils import resample
+
+from strategy.atr import ATR_Strategy
+
+from sdk.stats import Stats
 
 from data.okx_klines import OKXKlines
 
@@ -35,149 +43,148 @@ def plot(df):
     )
 
 
-@njit
-def create_signal(size, close, atr, atr_multiplier: float, rr: float, tp_distance):
-    limit_orders = np.zeros(((len(atr) - 15) * 2, 6))
-    order_index = 0
-    for i in range(15, len(atr)):
-        # Place Long order
-        entry_price = close[i - 1] - atr[i - 1] * atr_multiplier
-        tp_price = entry_price + (close[i - 1] - entry_price) * tp_distance
-        profit_amount = tp_price - entry_price
-        sl_price = entry_price - profit_amount * rr
-        limit_orders[order_index] = [
-            i,
-            1.0,
-            entry_price,
-            size,
-            sl_price,
-            tp_price,
-        ]
-        order_index += 1
+def run_backtest(df, bt, size, params):
+    st = ATR_Strategy(df, size, params)
+    limit_orders = st.limit_orders
 
-        # Place Short order
-        entry_price = close[i - 1] + atr[i - 1] * atr_multiplier
-        # sl_price = entry_price * (1 + sl_distance)
-        tp_price = entry_price - (entry_price - close[i - 1]) * tp_distance
-        profit_amount = entry_price - tp_price
-        sl_price = entry_price + profit_amount * rr
-        limit_orders[order_index] = [
-            i,
-            0.0,
-            entry_price,
-            size,
-            sl_price,
-            tp_price,
-        ]
-        order_index += 1
-
-    return limit_orders
-
-
-def run_backtest(df, bt, size, atr_multiplier, rr, tp_distance):
-    atr = talib.ATR(
-        df["high"].to_numpy(),
-        df["low"].to_numpy(),
-        df["close"].to_numpy(),
-        timeperiod=14,
-    )
-
-    limit_orders = create_signal(
-        size, df["close"].to_numpy(), atr, atr_multiplier, rr, tp_distance
-    )
-    bt.prepare(limit_orders, atr)
+    bt.prepare(limit_orders)
     bt.backtest()
-    pnl = 0
-    unrealized_pnl = 0
-    max_dd = 0
-    commissions = 0
-    wins = 0
-    losses = 0
-    for pos in bt.closed_positions:
-        entry = pos.entry_price
-        exit = pos.exit_price
-        # pnl = (exit - entry) * 1000000
-        pnl += pos.pnl
-        max_dd += pos.max_dd
-        commissions += pos.commission
-        if pos.pnl < 0:
-            losses += 1
-        else:
-            wins += 1
-        # print()
-        # print()
-        # pos.print()
-        # print("Entry: ", pos.entry_price)
-        # print("Size: ", pos.size)
-        # print("Commission: ", 0.02 / 100)
-        # commission = float(pos.entry_price) * float(pos.size) * 0.02 / 100
-        # print(commission)
 
-    for pos in bt.active_positions:
-        unrealized_pnl += pos.pnl
-        max_dd += pos.max_dd
-        commissions += pos.commission
-        # print()
-        # print("WE STILL HAVE ACTIVE POSITIONS")
-        # pos.print()
-    print(
-        f"New backtest: atr_multiplier: {atr_multiplier}, rr: {rr}, tp_distance: {tp_distance}"
+    # df["d"] = pd.to_datetime(df["d"], unit="ms")
+    # df.set_index("d", inplace=True)
+    # print(
+    #     f"New backtest: atr_multiplier: {atr_multiplier}, rr: {rr}, tp_distance: {tp_distance}"
+    # )
+    stats = Stats(bt, df)
+    rprint(stats.stats)
+    # stats.equity["realized_equity"].plot()
+    stats.equity["unrealized_equity"].plot()
+    # trades = stats.closed_positions
+    # print(f"Number of trades: {len(trades)}")
+    # rprint(trades)
+    return stats.stats
+
+    losers = trades[trades["pnl"] < 0]
+    winners = trades[trades["pnl"] > 0]
+    rprint(losers["pnl"].mean())
+    rprint(winners["pnl"].mean())
+    trades.to_csv("trades.csv")
+    return stats.stats
+
+    # rprint(stats.equity)
+    # rprint(stats.equity.dtypes)
+    # plt.show()
+    # # plt.show()
+    trades = stats.closed_positions
+    trades.drop(
+        columns=[
+            "commission",
+            "max_dd",
+            "pnl",
+            "side",
+            "commission_pct",
+            "exit_timestamp",
+        ],
+        inplace=True,
     )
-    print("Total pnl: {}".format(pnl))
-    print("Unrealized pnl: {}".format(unrealized_pnl))
-    print(f"Total closed trades: {len(bt.closed_positions)}")
-    print(f"Still open trades: {len(bt.active_positions)}")
-    print(f"Max DD: {max_dd}")
-    print(f"Commissions: {commissions}")
-    print(f"Wins: {wins} -- Losses: {losses}")
-    print(f"Win rate {np.round(wins / (wins + losses) * 100, 2)}%")
-    print()
+    trades["d"] = trades["entry_price"] / trades["sl"]
+    rprint(trades[["entry_price", "sl", "d"]])
     return pnl
     # print(bt.closed_positions[0].print())
 
 
 def download_data():
-    df = OKXKlines().load_klines("BNB-USDT-SWAP", "1m", days_ago=90)
+    df = OKXKlines().load_klines("LTC-USDT-SWAP", "1m", days_ago=90)
 
 
-def main() -> int:
-    # download_data()
-    # df = pd.read_parquet("./data/kline_BTC-USDT-SWAP_1m.parquet")
-    pnl = 0
-    # for sym in ["DOGE", "BTC", "PEPE", "BNB"]:
-    for sym in ["PEPE"]:
-        df = pd.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
-
-        df.sort_values(by=["date"], ascending=True, inplace=True)
-        # df = df[-5000:]
-        # print(df)
-
-        df = df.resample("1min", on="d").agg(
-            {
-                "open": "first",
-                "high": "max",
-                "low": "min",
-                "close": "last",
-                "volume": "sum",
-            }
-        )
-        # df.set_index("d", inplace=True)
+def read_data(sym, start=0, end=-1, resample_tf="1min"):
+    # df = pd.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
+    # df.sort_values(by=["date"], ascending=True, inplace=True)
+    df = pd.read_parquet(f"./data/binance-{sym}USDT-PERPETUAL-1m.parquet")
+    df.drop(
+        columns=[
+            "taker_buy_volume",
+            "quote_asset_volume",
+            "close_time",
+            "number_of_trades",
+            "taker_buy_quote_asset_volume",
+            "ignore",
+        ],
+        inplace=True,
+    )
+    df["volume"] = df["volume"].astype(float)
+    df["open"] = df["open"].astype(float)
+    df["high"] = df["high"].astype(float)
+    df["low"] = df["low"].astype(float)
+    df["close"] = df["close"].astype(float)
+    df = df[start:end]
+    # df = df[-5000:]
+    # df = df[28000:30000]
+    df.reset_index(inplace=True)
+    if resample_tf != "1min":
+        df = resample(df, tf=resample_tf, on="time")
         df.reset_index(inplace=True)
-        df["d"] = pd.to_datetime(df["d"]).astype(int) / 10**6
-        ohlc = df.to_numpy()
-        COMMISSION = 0.02 / 100
-        COMMISSION = 0
-        bt = Backtest(ohlc, commission=COMMISSION)
-
-        size = 10000 / df["close"][0]
-        print(size)
-        # size = 0.1
-        for i in range(5, 6):
-            print(sym)
-            pnl += run_backtest(
-                df, bt, size=size, atr_multiplier=i, rr=1 / 10, tp_distance=0.618
-            )
-    print(pnl)
+    df["time"] = pd.to_datetime(df["time"]).astype(int) / 10**6
+    return df
 
 
-# main()
+def generate_bt_params():
+    atr_multipler = np.arange(2, 20)
+    rr = [0.3, 0.5, 1, 2]
+    tp_distance = [0.33, 0.618, 0.786, 1, 1.5, 2]
+    use_close = [True, False]
+
+    # atr_multipler = np.arange(2, 3)
+    # rr = [0.3, 0.5]
+    # tp_distance = [0.33, 0.618]
+    return list(itertools.product(atr_multipler, rr, tp_distance, use_close))
+
+
+def _dev():
+    for sym in ["DOGE"]:
+        df = read_data(sym, 0, -1, resample_tf="5min")
+        print(len(df))
+        bt = Backtest(df.to_numpy(), commission_pct=COMMISSION, initial_capital=10000)
+        size = initial_capital / df["close"][0]
+        multi_backtest(df, bt, size, generate_bt_params(), run_backtest)
+
+
+def _dev():
+    # fetch_futures_data(symbol="BNBUSDT", count=365)
+    # download_data()
+    df = pd.read_parquet("./data/simulation_result_20240906_185750.parquet")
+
+    df["pnl"] = df["pnl"] + df["unrealized_pnl"]
+    df.sort_values(by=["pnl"], inplace=True)
+    # df = df["pnl"]
+    rprint(df.tail(10))
+
+    # df = read_data("PEPE")
+    # df["d"] = pd.to_datetime(df["d"], unit="ms")
+    # print(df)
+
+
+COMMISSION = 0
+COMMISSION = 0.02 / 100
+initial_capital = 1000
+
+
+def dev():
+    # fetch_futures_data(symbol="BTCUSDT", count=365)
+    for sym in ["BTC"]:
+        print(f"Running for {sym}")
+        df = read_data(sym, 0, -1, resample_tf="1min")
+        print()
+        bt = Backtest(
+            df.to_numpy(), commission_pct=COMMISSION, initial_capital=initial_capital
+        )
+        # size = initial_capital / df["close"][0]
+        size = 10000
+        size = 0.001
+        size = 0.01
+        params = (2, 0.33, 2, True)
+        params = (15, 1, 1, True)
+        run_backtest(df, bt, size, params)
+
+
+dev()

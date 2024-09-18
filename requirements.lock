@@ -20,26 +20,53 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.4.0
     # via httpx
+    # via jupyter-server
+argon2-cffi==23.1.0
+    # via jupyter-server
+argon2-cffi-bindings==21.2.0
+    # via argon2-cffi
+arrow==1.3.0
+    # via isoduration
+asttokens==2.4.1
+    # via stack-data
+async-lru==2.0.4
+    # via jupyterlab
 async-timeout==4.0.3
     # via aiohttp
 attrs==24.2.0
     # via aiohttp
+    # via jsonschema
+    # via referencing
     # via twisted
 automat==24.8.1
     # via twisted
+babel==2.16.0
+    # via jupyterlab-server
 backports-tarfile==1.2.0
     # via jaraco-context
+beautifulsoup4==4.12.3
+    # via nbconvert
+binance-historical-data==0.1.13
+    # via zenbt
+bleach==6.1.0
+    # via nbconvert
 certifi==2024.8.30
     # via clickhouse-connect
     # via httpcore
     # via httpx
     # via requests
 cffi==1.17.0
+    # via argon2-cffi-bindings
     # via cryptography
+char==0.1.2
+    # via binance-historical-data
 charset-normalizer==3.3.2
     # via requests
 clickhouse-connect==0.7.19
     # via tradingtoolbox
+comm==0.2.2
+    # via ipykernel
+    # via ipywidgets
 constantly==23.10.4
     # via twisted
 contourpy==1.3.0
@@ -51,10 +78,23 @@ cycler==0.12.1
     # via matplotlib
 dateparser==1.2.0
     # via python-binance
+debugpy==1.8.5
+    # via ipykernel
+decorator==5.1.1
+    # via ipython
+defusedxml==0.7.1
+    # via nbconvert
 exceptiongroup==1.2.2
     # via anyio
+    # via ipython
+executing==2.1.0
+    # via stack-data
+fastjsonschema==2.20.0
+    # via nbformat
 fonttools==4.53.1
     # via matplotlib
+fqdn==1.5.1
+    # via jsonschema
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
@@ -67,6 +107,7 @@ hpack==4.0.0
 httpcore==1.0.5
     # via httpx
 httpx==0.27.2
+    # via jupyterlab
     # via python-okx
 hyperframe==6.0.1
     # via h2
@@ -76,6 +117,7 @@ idna==3.8
     # via anyio
     # via httpx
     # via hyperlink
+    # via jsonschema
     # via requests
     # via yarl
 importlib-metadata==8.4.0
@@ -83,15 +125,76 @@ importlib-metadata==8.4.0
     # via python-okx
 incremental==24.7.2
     # via twisted
+ipykernel==6.29.5
+    # via jupyterlab
+ipython==8.27.0
+    # via ipykernel
+    # via ipywidgets
+ipython-genutils==0.2.0
+    # via ipywidgets
+ipywidgets==7.8.4
+    # via binance-historical-data
+isoduration==20.11.0
+    # via jsonschema
 jaraco-classes==3.4.0
     # via keyring
 jaraco-context==6.0.1
     # via keyring
 jaraco-functools==4.0.2
     # via keyring
+jedi==0.19.1
+    # via ipython
 jeepney==0.8.0
     # via keyring
     # via secretstorage
+jinja2==3.1.4
+    # via jupyter-server
+    # via jupyterlab
+    # via jupyterlab-server
+    # via nbconvert
+json5==0.9.25
+    # via jupyterlab-server
+jsonpointer==3.0.0
+    # via jsonschema
+jsonschema==4.23.0
+    # via jupyter-events
+    # via jupyterlab-server
+    # via nbformat
+jsonschema-specifications==2023.12.1
+    # via jsonschema
+jupyter-client==8.6.2
+    # via ipykernel
+    # via jupyter-server
+    # via nbclient
+jupyter-core==5.7.2
+    # via ipykernel
+    # via jupyter-client
+    # via jupyter-server
+    # via jupyterlab
+    # via nbclient
+    # via nbconvert
+    # via nbformat
+jupyter-events==0.10.0
+    # via jupyter-server
+jupyter-lsp==2.2.5
+    # via jupyterlab
+jupyter-server==2.14.2
+    # via jupyter-lsp
+    # via jupyterlab
+    # via jupyterlab-server
+    # via notebook
+    # via notebook-shim
+jupyter-server-terminals==0.5.3
+    # via jupyter-server
+jupyterlab==4.2.5
+    # via notebook
+jupyterlab-pygments==0.3.0
+    # via nbconvert
+jupyterlab-server==2.27.3
+    # via jupyterlab
+    # via notebook
+jupyterlab-widgets==1.1.10
+    # via ipywidgets
 keyring==25.3.0
     # via python-okx
 kiwisolver==1.4.5
@@ -104,18 +207,43 @@ lz4==4.3.3
     # via clickhouse-connect
 markdown-it-py==3.0.0
     # via rich
+markupsafe==2.1.5
+    # via jinja2
+    # via nbconvert
 matplotlib==3.9.2
     # via mplfinance
+matplotlib-inline==0.1.7
+    # via ipykernel
+    # via ipython
 mdurl==0.1.2
     # via markdown-it-py
+mistune==3.0.2
+    # via nbconvert
 more-itertools==10.4.0
     # via jaraco-classes
     # via jaraco-functools
+mpire==2.10.2
+    # via binance-historical-data
 mplfinance==0.12.10b0
     # via zenbt
 multidict==6.0.5
     # via aiohttp
     # via yarl
+nbclient==0.10.0
+    # via nbconvert
+nbconvert==7.16.4
+    # via jupyter-server
+nbformat==5.10.4
+    # via jupyter-server
+    # via nbclient
+    # via nbconvert
+nest-asyncio==1.6.0
+    # via ipykernel
+notebook==7.2.2
+    # via widgetsnbextension
+notebook-shim==0.2.4
+    # via jupyterlab
+    # via notebook
 numba==0.60.0
     # via zenbt
 numpy==1.26.4
@@ -126,14 +254,40 @@ numpy==1.26.4
     # via pyarrow
     # via ta-lib
     # via zenbt
+overrides==7.7.0
+    # via jupyter-server
 packaging==24.1
+    # via ipykernel
+    # via jupyter-server
+    # via jupyterlab
+    # via jupyterlab-server
     # via matplotlib
+    # via nbconvert
 pandas==2.2.2
     # via mplfinance
     # via tradingtoolbox
     # via zenbt
+pandocfilters==1.5.1
+    # via nbconvert
+parso==0.8.4
+    # via jedi
+pexpect==4.9.0
+    # via ipython
 pillow==10.4.0
     # via matplotlib
+platformdirs==4.2.2
+    # via jupyter-core
+prometheus-client==0.20.0
+    # via jupyter-server
+prompt-toolkit==3.0.47
+    # via ipython
+psutil==6.0.0
+    # via ipykernel
+ptyprocess==0.7.0
+    # via pexpect
+    # via terminado
+pure-eval==0.2.3
+    # via stack-data
 pyarrow==17.0.0
     # via zenbt
 pycparser==2.22
@@ -145,6 +299,9 @@ pydantic==2.8.2
 pydantic-core==2.20.1
     # via pydantic
 pygments==2.18.0
+    # via ipython
+    # via mpire
+    # via nbconvert
     # via rich
 pyopenssl==24.2.1
     # via python-okx
@@ -152,45 +309,115 @@ pyparsing==3.1.4
     # via matplotlib
 python-binance==1.0.19
     # via tradingtoolbox
+    # via zenbt
 python-dateutil==2.9.0.post0
+    # via arrow
     # via dateparser
+    # via jupyter-client
     # via matplotlib
     # via pandas
     # via tradingtoolbox
+python-json-logger==2.0.7
+    # via jupyter-events
 python-okx==0.3.2
     # via zenbt
 pytz==2024.1
     # via clickhouse-connect
     # via dateparser
     # via pandas
+pyyaml==6.0.2
+    # via jupyter-events
+pyzmq==26.2.0
+    # via ipykernel
+    # via jupyter-client
+    # via jupyter-server
+referencing==0.35.1
+    # via jsonschema
+    # via jsonschema-specifications
+    # via jupyter-events
 regex==2024.7.24
     # via dateparser
 requests==2.32.3
+    # via jupyterlab-server
     # via python-binance
     # via python-okx
+rfc3339-validator==0.1.4
+    # via jsonschema
+    # via jupyter-events
+rfc3986-validator==0.1.1
+    # via jsonschema
+    # via jupyter-events
 rich==13.8.0
     # via zenbt
+rpds-py==0.20.0
+    # via jsonschema
+    # via referencing
 secretstorage==3.3.3
     # via keyring
+send2trash==1.8.3
+    # via jupyter-server
 setuptools==74.1.0
     # via incremental
+    # via jupyterlab
     # via zope-interface
 six==1.16.0
+    # via asttokens
+    # via bleach
     # via python-binance
     # via python-dateutil
+    # via rfc3339-validator
 sniffio==1.3.1
     # via anyio
     # via httpx
+soupsieve==2.6
+    # via beautifulsoup4
+stack-data==0.6.3
+    # via ipython
 ta-lib==0.4.32
     # via zenbt
+terminado==0.18.1
+    # via jupyter-server
+    # via jupyter-server-terminals
+tinycss2==1.3.0
+    # via nbconvert
 tomli==2.0.1
     # via incremental
-tradingtoolbox==0.14.0
+    # via jupyterlab
+tornado==6.4.1
+    # via ipykernel
+    # via jupyter-client
+    # via jupyter-server
+    # via jupyterlab
+    # via notebook
+    # via terminado
+tqdm==4.66.5
+    # via binance-historical-data
+    # via mpire
     # via zenbt
+tradingtoolbox==0.17.0
+    # via zenbt
+traitlets==5.14.3
+    # via comm
+    # via ipykernel
+    # via ipython
+    # via ipywidgets
+    # via jupyter-client
+    # via jupyter-core
+    # via jupyter-events
+    # via jupyter-server
+    # via jupyterlab
+    # via matplotlib-inline
+    # via nbclient
+    # via nbconvert
+    # via nbformat
 twisted==24.7.0
     # via python-okx
+types-python-dateutil==2.9.0.20240821
+    # via arrow
 typing-extensions==4.12.2
     # via anyio
+    # via async-lru
+    # via ipython
     # via pydantic
     # via pydantic-core
     # via twisted
@@ -200,11 +427,24 @@ tzlocal==5.2
     # via dateparser
 ujson==5.10.0
     # via python-binance
+uri-template==1.3.0
+    # via jsonschema
 urllib3==2.2.2
     # via clickhouse-connect
     # via requests
+wcwidth==0.2.13
+    # via prompt-toolkit
+webcolors==24.8.0
+    # via jsonschema
+webencodings==0.5.1
+    # via bleach
+    # via tinycss2
+websocket-client==1.8.0
+    # via jupyter-server
 websockets==13.0.1
     # via python-binance
+widgetsnbextension==3.6.9
+    # via ipywidgets
 yarl==1.9.11
     # via aiohttp
 zipp==3.20.1

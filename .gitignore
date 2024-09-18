@@ -25,3 +25,5 @@ data/okx_trading_history.csv
 data/okx_trading_history.csv.org
 .idea
 src/zenbt/.jukit
+rs/src/sdk/.jukit
+trades.csv

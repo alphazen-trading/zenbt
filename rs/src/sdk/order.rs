@@ -1,9 +1,10 @@
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
+use serde::Serialize;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Order {
     pub index: Decimal,
     pub price: Decimal,
