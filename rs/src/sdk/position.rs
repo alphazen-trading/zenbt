@@ -11,6 +11,7 @@ use super::enums::{CloseReason, Side};
 #[derive(Debug, Clone)]
 pub struct Position {
     pub index: Decimal,
+    pub exit_index: usize,
     pub entry_timestamp: DateTime<Utc>,
     pub exit_timestamp: Option<DateTime<Utc>>,
     pub entry_price: Decimal,
@@ -31,6 +32,7 @@ impl ToPyObject for Position {
 
         // Convert and insert fields
         dict.set_item("index", self.index).unwrap();
+        dict.set_item("exit index", self.exit_index).unwrap();
         dict.set_item("entry_timestamp", self.entry_timestamp.to_rfc3339())
             .unwrap(); // DateTime<Utc> as string
 
@@ -88,60 +90,58 @@ impl Position {
     }
     pub fn close_position(
         &mut self,
+        i: usize,
         ohlc: &OHLC,
         exit_price: Decimal,
         close_reason: CloseReason,
         pnl: Decimal,
     ) {
         self.exit_timestamp = Some(ohlc.date);
+        self.exit_index = i;
         self.exit_price = Some(exit_price);
         self.close_reason = Some(close_reason);
         self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
         self.pnl = pnl;
     }
 
-    pub fn was_sl_hit(&mut self, ohlc: &OHLC) -> bool {
+    pub fn was_sl_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
         if let Some(sl_price) = self.sl {
             if self.side == Side::Long {
                 if ohlc.low <= sl_price {
                     let pnl = (sl_price - self.entry_price) * self.size - self.commission;
-                    self.close_position(ohlc, sl_price, CloseReason::StopLoss, pnl);
+                    self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
                     return true;
                 }
             } else {
                 if ohlc.low >= sl_price {
                     let pnl = (self.entry_price - sl_price) * self.size - self.commission;
-                    self.close_position(ohlc, sl_price, CloseReason::StopLoss, pnl);
+                    self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
                     return true;
                 }
             }
         }
         false
     }
-    pub fn was_tp_hit(&mut self, ohlc: &OHLC) -> bool {
-        let tp_string = String::from("take_profit");
+    pub fn was_tp_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
         if let Some(tp_price) = self.tp {
-            // For long positions (side == 1.0)
             if self.side == Side::Long {
                 if ohlc.high >= tp_price {
                     let pnl = (tp_price - self.entry_price) * self.size - self.commission;
-                    self.close_position(ohlc, tp_price, CloseReason::TakeProfit, pnl);
+                    self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
                     return true;
                 }
-            }
-            // For short positions (side != 1.0)
-            else {
+            } else {
                 if ohlc.low <= tp_price {
                     let pnl = (self.entry_price - tp_price) * self.size - self.commission;
-                    self.close_position(ohlc, tp_price, CloseReason::TakeProfit, pnl);
+                    self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
                     return true;
                 }
             }
         }
         false
     }
-    pub fn should_close(&mut self, ohlc: &OHLC) -> bool {
-        return self.was_sl_hit(ohlc) || self.was_tp_hit(ohlc);
+    pub fn should_close(&mut self, i: usize, ohlc: &OHLC) -> bool {
+        return self.was_sl_hit(i, ohlc) || self.was_tp_hit(i, ohlc);
     }
 }
 

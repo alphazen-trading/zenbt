@@ -22,12 +22,14 @@ impl ToPyObject for Side {
 pub enum CloseReason {
     TakeProfit,
     StopLoss,
+    Signal,
 }
 impl ToPyObject for CloseReason {
     fn to_object(&self, py: Python) -> PyObject {
         match self {
             CloseReason::TakeProfit => PyString::new(py, "TakeProfit").into_py(py),
             CloseReason::StopLoss => PyString::new(py, "StopLoss").into_py(py),
+            CloseReason::Signal => PyString::new(py, "Signal").into_py(py),
         }
     }
 }

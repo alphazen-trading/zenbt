@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
@@ -47,7 +49,7 @@ pub fn create_stats(backtest: &Backtest) -> Stats {
     let pnl = backtest.equity.last().unwrap() - backtest.params.initial_capital
         + backtest.floating_equity.last().unwrap();
 
-    Stats {
+    let stats = Stats {
         initial_capital: backtest.params.initial_capital,
         pnl,
         pnl_pct: pnl * dec!(100) / backtest.params.initial_capital,
@@ -71,5 +73,7 @@ pub fn create_stats(backtest: &Backtest) -> Stats {
         end_date: backtest.ohlc.last().unwrap().date.to_string(),
         max_drawdown,
         max_drawdown_pct: max_drawdown * dec!(100) / backtest.params.initial_capital,
-    }
+    };
+
+    return stats;
 }

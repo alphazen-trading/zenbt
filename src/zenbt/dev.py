@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 from zenbt.rs import OHLCs
 from rich import print
 import numpy as np
@@ -67,54 +68,75 @@ def run_backtest(df, ohlcs, size, st_params, bt_params):
 
 COMMISSION = 0
 COMMISSION = 0.02 / 100
-initial_capital = 1000
+initial_capital = 10000000000000
 
 bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
 
 
 def dev():
-    df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
+    # df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
 
-    # size = initial_capital / df["close"][0]
-    size = 10000
-    size = 0.001
-    size = 0.01
-    st_params = (2, 0.33, 2, True)
-    # st_params = (15, 1, 5, True)
-    print("Running the backtest")
-    bt = run_backtest(df, ohlcs, size, st_params, bt_params)
+    # # size = initial_capital / df["close"][0]
+    # size = 10000
+    # size = 0.001
+    # size = 0.01
+    # st_params = (2, 0.33, 2, True)
+    # # st_params = (15, 1, 5, True)
+    # print("Running the backtest")
+    # bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-    a = bt.get_state()
-    # print(a["floating_equity"])
-    # print(a["equity"])
+    # a = bt.get_state()
+    # # print(a["floating_equity"])
+    # # print(a["equity"])
+    # # print(a["closed_positions"])
+    # print(a["stats"])
     # print(a["closed_positions"])
-    print(a["stats"])
-    print(a["closed_positions"])
-    return
+    # return
+    # df = pd.read_parquet("./data/btc.parquet")
+    # # df = df[0:150]
+    # ohlcs = OHLCs(df.to_numpy())
+    df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
 
-    print("In ma cross")
-    df = pd.read_parquet("./data/btc_small.parquet")
-    df = df[0:150]
-    ohlcs = OHLCs(df.to_numpy())
     close = df["close"].to_numpy()
-    fast_ma = talib.EMA(close, timeperiod=10)
-    slow_ma = talib.EMA(close, timeperiod=50)
+    start = time.time()
+    fast_ma = talib.SMA(close, timeperiod=10)
+    slow_ma = talib.SMA(close, timeperiod=50)
 
-    entries = cross_above(fast_ma, slow_ma)
-    exits = cross_below(fast_ma, slow_ma)
+    start = time.time()
+    entries = cross_below(slow_ma, fast_ma)
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
+    start = time.time()
+    exits = cross_above(slow_ma, fast_ma)
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
+
+    start = time.time()
     blank = np.full(len(close), False)
-    signals = create_signals(entries, exits, blank, blank)
-    # convert_signals_to_orders(entries, exits, exits, entries)
-    # print(entries)
-    # print(exits)
-    # # print(df)
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
 
+    start = time.time()
+    print("Time to creat the signals")
+    signals = create_signals(entries, exits, blank, blank)
+
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Time To create signals: {elapsed_time_ms:.2f} ms")
+
+    start = time.time()
     bt = Backtest(ohlcs, bt_params, {}, signals)
     bt.backtest()
-    a = bt.get_state()
-    print(a["active_positions"])
-    print(a["closed_positions"])
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Backtest took: {elapsed_time_ms:.2f} ms")
+    # print(a["stats"])
 
-    df["time"] = pd.to_datetime(df["time"], unit="ms")
-    print(df[entries])
-    print(df[exits])
+    start = time.time()
+    # a = bt.get_state()
+    a = bt.get_stats()
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Elapsed time to get stats: {elapsed_time_ms:.2f} ms")
+    print(a["stats"])
+    # print(a["active_positions"])
+    # print(a["closed_positions"])
+    # # print(entries)
+    # print(fast_ma)

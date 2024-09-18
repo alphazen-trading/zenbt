@@ -1,6 +1,6 @@
 use super::backtest::Backtest;
 use super::backtest_params::BacktestParams;
-use super::enums::Side;
+use super::enums::{CloseReason, Side};
 use super::ohlc::OHLC;
 use super::order::Order;
 use super::position::Position;
@@ -34,6 +34,7 @@ pub fn has_account_blown_up(equity: &Vec<Decimal>, floating_equity: &Vec<Decimal
 pub fn create_position(order: &Order, ohlc: &OHLC, params: &BacktestParams) -> Position {
     Position {
         index: order.index,
+        exit_index: 0,
         entry_timestamp: ohlc.date,
         exit_timestamp: None,
         entry_price: order.price,
@@ -72,7 +73,7 @@ pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest) {
     let mut realized_equity = dec!(0);
 
     for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate() {
-        let should = position.should_close(&ohlc);
+        let should = position.should_close(i, &ohlc);
         if should {
             backtest.positions.closed_positions.push(position.clone());
             backtest.commissions += position.commission;
@@ -101,7 +102,7 @@ pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest) {
             match was_hit {
                 true => {
                     let mut new_position = create_position(&order, ohlc, &backtest.params);
-                    if new_position.was_sl_hit(&ohlc) {
+                    if new_position.was_sl_hit(i, &ohlc) {
                         println!("SL HIT in the same candle");
                         backtest.positions.closed_positions.push(new_position);
                     } else {
@@ -129,6 +130,7 @@ pub fn find_signals_to_manage(i: usize, backtest: &mut Backtest) {
             if signal.signal_type == "open" {
                 let new_position = Position {
                     index,
+                    exit_index: 0,
                     entry_timestamp: ohlc.date,
                     exit_timestamp: None,
                     entry_price: ohlc.open,
@@ -148,6 +150,13 @@ pub fn find_signals_to_manage(i: usize, backtest: &mut Backtest) {
                 for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate()
                 {
                     if position.side != signal.side {
+                        position.close_position(
+                            i,
+                            ohlc,
+                            ohlc.close,
+                            CloseReason::Signal,
+                            dec!(0.0),
+                        );
                         position.exit_timestamp = Some(ohlc.date);
                         backtest.positions.closed_positions.push(position.clone());
                         backtest.commissions += position.commission;

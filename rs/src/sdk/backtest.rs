@@ -3,7 +3,7 @@ use super::backtest_methods::{
     has_account_blown_up,
 };
 use super::backtest_params::BacktestParams;
-use super::backtest_state::get_state;
+use super::backtest_state::{get_state, get_stats};
 use super::ohlc::{OHLCs, OHLC};
 use super::order::LimitOrders;
 use super::position::Positions;
@@ -50,6 +50,9 @@ impl Backtest {
         }
     }
 
+    fn get_stats(&self, py: Python) -> PyResult<PyObject> {
+        get_stats(self, py)
+    }
     fn get_state(&self, py: Python) -> PyResult<PyObject> {
         get_state(self, py)
     }
