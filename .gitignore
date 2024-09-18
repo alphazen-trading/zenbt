@@ -27,3 +27,4 @@ data/okx_trading_history.csv.org
 src/zenbt/.jukit
 rs/src/sdk/.jukit
 trades.csv
+src/strategy
