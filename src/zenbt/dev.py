@@ -6,7 +6,7 @@ from binance import Client
 
 from data.binance_klines import fetch_futures_data
 import mplfinance as mpf
-from zenbt.rs import BBO, OHLC, Backtest, Signals
+from zenbt.rs import BBO, OHLC, Backtest, BacktestParams
 import zenbt.rs as rs
 import numpy as np
 import pandas as pd
@@ -48,16 +48,17 @@ def run_backtest(df, bt, size, params):
     limit_orders = st.limit_orders
 
     bt.prepare(limit_orders)
-    # bt.backtest()
+    bt.backtest()
 
     # df["d"] = pd.to_datetime(df["d"], unit="ms")
     # df.set_index("d", inplace=True)
     # print(
     #     f"New backtest: atr_multiplier: {atr_multiplier}, rr: {rr}, tp_distance: {tp_distance}"
     # )
+    print(bt.stats)
+    # stats = Stats(bt, df)
+    # print(stats.stats)
     return
-    stats = Stats(bt, df)
-    print(stats.stats)
     # stats.equity["realized_equity"].plot()
     stats.equity["unrealized_equity"].plot()
     # trades = stats.closed_positions
@@ -174,12 +175,14 @@ def dev():
     # fetch_futures_data(symbol="BTCUSDT", count=365)
     for sym in ["BTC"]:
         print(f"Running for {sym}")
-        df = read_data(sym, 0, -1, resample_tf="1min")
+        df = read_data(sym, 0, 1000, resample_tf="1min")
         print(len(df))
         print("Preparing the backtestg")
-        bt = Backtest(
-            df.to_numpy(), commission_pct=COMMISSION, initial_capital=initial_capital
+
+        params = BacktestParams(
+            commission_pct=COMMISSION, initial_capital=initial_capital
         )
+        bt = Backtest(df.to_numpy(), params)
         # size = initial_capital / df["close"][0]
         size = 10000
         size = 0.001
@@ -188,3 +191,6 @@ def dev():
         params = (15, 1, 1, True)
         print("Running the backtest")
         run_backtest(df, bt, size, params)
+
+        a = bt.get_data_as_dict()
+        print(a["closed_positions"][0])

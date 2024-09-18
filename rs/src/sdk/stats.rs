@@ -80,7 +80,7 @@ impl Default for Stats {
 pub fn create_stats(backtest: &Backtest) -> Stats {
     let mut wins = dec!(0);
     let mut losses = dec!(0);
-    for position in backtest.closed_positions.clone() {
+    for position in backtest.positions.closed_positions.clone() {
         if position.pnl > dec!(0.0) {
             wins += dec!(1);
         } else {
@@ -88,7 +88,7 @@ pub fn create_stats(backtest: &Backtest) -> Stats {
         }
     }
     let mut commissions = backtest.commissions;
-    for position in &backtest.active_positions {
+    for position in &backtest.positions.active_positions {
         commissions += position.commission;
     }
 
@@ -105,9 +105,10 @@ pub fn create_stats(backtest: &Backtest) -> Stats {
         pnl,
         pnl_pct: pnl * dec!(100) / backtest.params.initial_capital,
         unrealized_pnl: *backtest.floating_equity.last().unwrap(),
-        total_positions: backtest.active_positions.len() + backtest.closed_positions.len(),
-        closed_positions: backtest.closed_positions.len(),
-        active_positions: backtest.active_positions.len(),
+        total_positions: backtest.positions.active_positions.len()
+            + backtest.positions.closed_positions.len(),
+        closed_positions: backtest.positions.closed_positions.len(),
+        active_positions: backtest.positions.active_positions.len(),
         commissions,
         wins,
         losses,

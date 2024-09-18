@@ -2,11 +2,11 @@ use super::backtest_methods::{create_position, has_account_blown_up, was_order_h
 use super::backtest_params::BacktestParams;
 use super::ohlc::OHLC;
 use super::order::Order;
-use super::position::Position;
+use super::position::{Position, Positions};
 use super::stats::create_stats;
 use chrono::{DateTime, TimeZone, Utc};
 use pyo3::prelude::*;
-use pyo3::types::IntoPyDict;
+use pyo3::types::{IntoPyDict, PyDict};
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
@@ -23,8 +23,7 @@ pub struct Backtest {
     pub ohlc: Vec<OHLC>,
     pub limit_orders: HashMap<Decimal, Vec<Order>>,
     pub trailing_tp: Vec<Decimal>,
-    pub active_positions: Vec<Position>,
-    pub closed_positions: Vec<Position>,
+    pub positions: Positions,
     pub equity: Vec<Decimal>,
     pub floating_equity: Vec<Decimal>,
     pub commissions: Decimal,
@@ -53,8 +52,7 @@ impl Backtest {
         Backtest {
             ohlc: ohlcs,
             limit_orders: HashMap::new(),
-            active_positions: Vec::new(),
-            closed_positions: Vec::new(),
+            positions: Positions::new(),
             trailing_tp: Vec::new(),
             equity: Vec::new(),
             floating_equity: Vec::new(),
@@ -64,8 +62,7 @@ impl Backtest {
     }
     fn reset(&mut self) {
         self.trailing_tp = Vec::new();
-        self.active_positions = Vec::new();
-        self.closed_positions = Vec::new();
+        self.positions = Positions::new();
         self.commissions = dec![0];
         self.equity = Vec::new();
         self.floating_equity = Vec::new();
@@ -116,10 +113,10 @@ impl Backtest {
             let mut floating_equity = dec!(0);
             let mut realized_equity = dec!(0);
 
-            for (j, position) in &mut self.active_positions.iter_mut().enumerate() {
+            for (j, position) in &mut self.positions.active_positions.iter_mut().enumerate() {
                 let should = position.should_close(&ohlc);
                 if should {
-                    self.closed_positions.push(position.clone());
+                    self.positions.closed_positions.push(position.clone());
                     self.commissions += position.commission;
                     realized_equity += position.pnl;
                     indexes_to_remove.push(j);
@@ -134,7 +131,7 @@ impl Backtest {
                 .push(self.equity.last().unwrap_or(&self.params.initial_capital) + realized_equity);
 
             for &i in indexes_to_remove.iter().rev() {
-                self.active_positions.remove(i);
+                self.positions.active_positions.remove(i);
             }
 
             if has_account_blown_up(&self.equity, &self.floating_equity) {
@@ -153,9 +150,9 @@ impl Backtest {
                             let mut new_position = create_position(&order, ohlc, &self.params);
                             if new_position.was_sl_hit(&ohlc) {
                                 // println!("SL HIT in the same candle");
-                                self.closed_positions.push(new_position);
+                                self.positions.closed_positions.push(new_position);
                             } else {
-                                self.active_positions.push(new_position);
+                                self.positions.active_positions.push(new_position);
                             }
                         }
                         _ => {}
@@ -167,12 +164,12 @@ impl Backtest {
 
     #[getter]
     fn closed_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.closed_positions.clone())
+        Ok(self.positions.closed_positions.clone())
     }
 
     #[getter]
     fn active_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.active_positions.clone())
+        Ok(self.positions.active_positions.clone())
     }
 
     #[getter]
@@ -185,12 +182,17 @@ impl Backtest {
     }
     // Method that returns the data as a Python dictionary
     fn get_data_as_dict(&self, py: Python) -> PyResult<PyObject> {
-        let mut data = HashMap::new();
-        data.insert("key1".to_string(), 10);
-        data.insert("key2".to_string(), 20);
-        data.insert("key3".to_string(), 30);
-        let dict = data.clone().into_py_dict(py);
-        Ok(dict.to_object(py))
+        // Create a new PyDict
+        let dict = PyDict::new_bound(py);
+
+        // Insert the struct's fields into the PyDict
+        dict.set_item("commission_pct", self.params.commission_pct)?;
+        dict.set_item("initial_capital", self.params.initial_capital)?;
+        // dict.set_item("ohlc", self.ohlc.clone())?;
+        dict.set_item("active_positions", self.positions.active_positions.clone())?;
+        dict.set_item("closed_positions", self.positions.closed_positions.clone())?;
+
+        Ok(dict.into())
     }
 
     #[getter]
