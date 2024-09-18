@@ -10,7 +10,7 @@ from zenbt.rs import BBO, OHLC, Backtest, Signals
 import zenbt.rs as rs
 import numpy as np
 import pandas as pd
-from rich import print as rprint
+from rich import print
 from tradingtoolbox.utils import resample
 
 from strategy.atr import ATR_Strategy
@@ -56,7 +56,7 @@ def run_backtest(df, bt, size, params):
     #     f"New backtest: atr_multiplier: {atr_multiplier}, rr: {rr}, tp_distance: {tp_distance}"
     # )
     stats = Stats(bt, df)
-    rprint(stats.stats)
+    print(stats.stats)
     # stats.equity["realized_equity"].plot()
     stats.equity["unrealized_equity"].plot()
     # trades = stats.closed_positions
@@ -174,7 +174,7 @@ def dev():
     for sym in ["BTC"]:
         print(f"Running for {sym}")
         df = read_data(sym, 0, -1, resample_tf="1min")
-        print()
+        print("Preparing the backtestg")
         bt = Backtest(
             df.to_numpy(), commission_pct=COMMISSION, initial_capital=initial_capital
         )
@@ -184,6 +184,7 @@ def dev():
         size = 0.01
         params = (2, 0.33, 2, True)
         params = (15, 1, 1, True)
+        print("Running the backtest")
         run_backtest(df, bt, size, params)
 
 
