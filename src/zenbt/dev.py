@@ -175,7 +175,7 @@ def dev():
     # fetch_futures_data(symbol="BTCUSDT", count=365)
     for sym in ["BTC"]:
         print(f"Running for {sym}")
-        df = read_data(sym, 0, 1000, resample_tf="1min")
+        df = read_data(sym, 0, 20, resample_tf="1min")
         print(len(df))
         print("Preparing the backtestg")
 
@@ -193,4 +193,4 @@ def dev():
         run_backtest(df, bt, size, params)
 
         a = bt.get_data_as_dict()
-        print(a["closed_positions"][0])
+        print(a)

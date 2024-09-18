@@ -102,10 +102,6 @@ impl Backtest {
         self.reset()
     }
 
-    fn print(&self) {
-        println!("{:?}", self.ohlc);
-    }
-
     fn backtest(&mut self) {
         for i in 0..self.ohlc.len() {
             let ohlc = &self.ohlc[i];
@@ -162,24 +158,6 @@ impl Backtest {
         }
     }
 
-    #[getter]
-    fn closed_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.positions.closed_positions.clone())
-    }
-
-    #[getter]
-    fn active_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.positions.active_positions.clone())
-    }
-
-    #[getter]
-    fn equity(&self) -> PyResult<Vec<Decimal>> {
-        Ok(self.equity.clone())
-    }
-    #[getter]
-    fn floating_equity(&self) -> PyResult<Vec<Decimal>> {
-        Ok(self.floating_equity.clone())
-    }
     // Method that returns the data as a Python dictionary
     fn get_data_as_dict(&self, py: Python) -> PyResult<PyObject> {
         // Create a new PyDict
@@ -187,10 +165,13 @@ impl Backtest {
 
         // Insert the struct's fields into the PyDict
         dict.set_item("commission_pct", self.params.commission_pct)?;
+        dict.set_item("commissions", self.commissions)?;
         dict.set_item("initial_capital", self.params.initial_capital)?;
-        // dict.set_item("ohlc", self.ohlc.clone())?;
+        dict.set_item("ohlc", self.ohlc.clone())?;
         dict.set_item("active_positions", self.positions.active_positions.clone())?;
         dict.set_item("closed_positions", self.positions.closed_positions.clone())?;
+        dict.set_item("equity", self.equity.clone())?;
+        dict.set_item("floating_equity", self.floating_equity.clone())?;
 
         Ok(dict.into())
     }

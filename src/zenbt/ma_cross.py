@@ -36,4 +36,4 @@ def ma_cross():
 
     bt = Backtest(df.to_numpy(), params)
     a = bt.get_data_as_dict()
-    rprint(type(a))
+    rprint(a["active_positions"])
