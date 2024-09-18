@@ -1,46 +1,14 @@
-import itertools
-# from sdk.logger import print, logger
-
-from zenbt.multi_backtest import multi_backtest
-from binance import Client
-
-from data.binance_klines import fetch_futures_data
-import mplfinance as mpf
-from zenbt.rs import OHLCs, Backtest, BacktestParams, create_limit_orders
-import zenbt.rs as rs
-import numpy as np
 import pandas as pd
+from zenbt.rs import OHLCs
 from rich import print
-from tradingtoolbox.utils import resample
-
+import numpy as np
 from strategy.atr import ATR_Strategy
-
-from sdk.stats import Stats
-
-from data.okx_klines import OKXKlines
+from zenbt.rs import Backtest, BacktestParams, create_limit_orders
+from data.data import read_data
+from zenbt.rs import cross_above, cross_below, create_signals
+import talib
 
 pd.options.display.float_format = "{:.10f}".format
-
-
-def plot(df):
-    ema_values = talib.EMA(df["close"].to_numpy(), timeperiod=33)
-    ema = mpf.make_addplot(
-        ema_values,
-        panel=0,
-        color="lime",
-        ylabel="ema",
-    )
-
-    subplots = [ema]
-    mpf.plot(
-        df,
-        style="nightclouds",
-        type="candle",
-        volume=False,
-        title="OHLC Chart",
-        addplot=subplots,
-        # alines=dict(alines=[line], colors=[color], linewidths=[2]),
-    )
 
 
 def run_backtest(df, ohlcs, size, st_params, bt_params):
@@ -48,7 +16,7 @@ def run_backtest(df, ohlcs, size, st_params, bt_params):
     limit_orders = st.limit_orders
     limit_orders = create_limit_orders(limit_orders)
 
-    bt = Backtest(ohlcs, bt_params, limit_orders)
+    bt = Backtest(ohlcs, bt_params, limit_orders, {})
     bt.backtest()
     return bt
 
@@ -97,104 +65,56 @@ def run_backtest(df, ohlcs, size, st_params, bt_params):
     # print(bt.closed_positions[0].print())
 
 
-def download_data():
-    df = OKXKlines().load_klines("LTC-USDT-SWAP", "1m", days_ago=90)
-
-
-def read_data(sym, start=0, end=-1, resample_tf="1min"):
-    # df = pd.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
-    # df.sort_values(by=["date"], ascending=True, inplace=True)
-    df = pd.read_parquet(f"./data/binance-{sym}USDT-PERPETUAL-1m.parquet")
-    df.drop(
-        columns=[
-            "taker_buy_volume",
-            "quote_asset_volume",
-            "close_time",
-            "number_of_trades",
-            "taker_buy_quote_asset_volume",
-            "ignore",
-        ],
-        inplace=True,
-    )
-    df["volume"] = df["volume"].astype(float)
-    df["open"] = df["open"].astype(float)
-    df["high"] = df["high"].astype(float)
-    df["low"] = df["low"].astype(float)
-    df["close"] = df["close"].astype(float)
-    df = df[start:end]
-    # df = df[-5000:]
-    # df = df[28000:30000]
-    df.reset_index(inplace=True)
-    if resample_tf != "1min":
-        df = resample(df, tf=resample_tf, on="time")
-        df.reset_index(inplace=True)
-    df["time"] = pd.to_datetime(df["time"]).astype(int) / 10**6
-
-    ohlcs = OHLCs(df.to_numpy())
-    return df, ohlcs
-
-
-def generate_bt_params():
-    atr_multipler = np.arange(2, 20)
-    rr = [0.3, 0.5, 1, 2]
-    tp_distance = [0.33, 0.618, 0.786, 1, 1.5, 2]
-    use_close = [True, False]
-
-    # atr_multipler = np.arange(2, 3)
-    # rr = [0.3, 0.5]
-    # tp_distance = [0.33, 0.618]
-    return list(itertools.product(atr_multipler, rr, tp_distance, use_close))
-
-
-def _dev():
-    for sym in ["DOGE"]:
-        df = read_data(sym, 0, -1, resample_tf="5min")
-        print(len(df))
-        bt = Backtest(df.to_numpy(), commission_pct=COMMISSION, initial_capital=10000)
-        size = initial_capital / df["close"][0]
-        multi_backtest(df, bt, size, generate_bt_params(), run_backtest)
-
-
-def _dev():
-    # fetch_futures_data(symbol="BNBUSDT", count=365)
-    # download_data()
-    df = pd.read_parquet("./data/simulation_result_20240906_185750.parquet")
-
-    df["pnl"] = df["pnl"] + df["unrealized_pnl"]
-    df.sort_values(by=["pnl"], inplace=True)
-    # df = df["pnl"]
-    print(df.tail(10))
-
-    # df = read_data("PEPE")
-    # df["d"] = pd.to_datetime(df["d"], unit="ms")
-    # print(df)
-
-
 COMMISSION = 0
 COMMISSION = 0.02 / 100
 initial_capital = 1000
 
+bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
+
 
 def dev():
-    bt_params = BacktestParams(
-        commission_pct=COMMISSION, initial_capital=initial_capital
-    )
+    df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
 
-    # fetch_futures_data(symbol="BTCUSDT", count=365)
-    for sym in ["BTC"]:
-        df, ohlcs = read_data(sym, 0, 1000, resample_tf="1min")
+    # size = initial_capital / df["close"][0]
+    size = 10000
+    size = 0.001
+    size = 0.01
+    st_params = (2, 0.33, 2, True)
+    # st_params = (15, 1, 5, True)
+    print("Running the backtest")
+    bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-        # size = initial_capital / df["close"][0]
-        size = 10000
-        size = 0.001
-        size = 0.01
-        st_params = (2, 0.33, 2, True)
-        st_params = (15, 1, 5, True)
-        print("Running the backtest")
-        bt = run_backtest(df, ohlcs, size, st_params, bt_params)
+    a = bt.get_state()
+    # print(a["floating_equity"])
+    # print(a["equity"])
+    # print(a["closed_positions"])
+    print(a["stats"])
+    print(a["closed_positions"])
+    return
 
-        a = bt.get_state()
-        # print(a["floating_equity"])
-        # print(a["equity"])
-        # print(a["closed_positions"])
-        print(a["stats"])
+    print("In ma cross")
+    df = pd.read_parquet("./data/btc_small.parquet")
+    df = df[0:150]
+    ohlcs = OHLCs(df.to_numpy())
+    close = df["close"].to_numpy()
+    fast_ma = talib.EMA(close, timeperiod=10)
+    slow_ma = talib.EMA(close, timeperiod=50)
+
+    entries = cross_above(fast_ma, slow_ma)
+    exits = cross_below(fast_ma, slow_ma)
+    blank = np.full(len(close), False)
+    signals = create_signals(entries, exits, blank, blank)
+    # convert_signals_to_orders(entries, exits, exits, entries)
+    # print(entries)
+    # print(exits)
+    # # print(df)
+
+    bt = Backtest(ohlcs, bt_params, {}, signals)
+    bt.backtest()
+    a = bt.get_state()
+    print(a["active_positions"])
+    print(a["closed_positions"])
+
+    df["time"] = pd.to_datetime(df["time"], unit="ms")
+    print(df[entries])
+    print(df[exits])

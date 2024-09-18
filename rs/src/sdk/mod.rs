@@ -9,6 +9,9 @@ pub mod instrument;
 pub mod ohlc;
 pub mod order;
 pub mod position;
+pub mod signal;
 pub mod signals;
 pub mod stats;
 pub mod stats_methods;
+
+pub mod enums;

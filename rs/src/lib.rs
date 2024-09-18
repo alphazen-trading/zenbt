@@ -3,6 +3,7 @@ mod indicators;
 mod sdk;
 
 use crate::helpers::create_limit_orders::create_limit_orders;
+use crate::helpers::create_signals::create_signals;
 use crate::helpers::round_value::round_value;
 use indicators::cross_above::cross_above;
 use indicators::cross_below::cross_below;
@@ -22,6 +23,7 @@ use sdk::signals::Signals;
 fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(round_value, m)?)?;
     m.add_function(wrap_pyfunction!(create_limit_orders, m)?)?;
+    m.add_function(wrap_pyfunction!(create_signals, m)?)?;
 
     m.add_class::<Instrument>()?;
     m.add_class::<Contract>()?;

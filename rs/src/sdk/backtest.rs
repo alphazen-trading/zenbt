@@ -1,11 +1,13 @@
 use super::backtest_methods::{
-    find_active_positions_to_close, find_triggered_pending_orders, has_account_blown_up,
+    find_active_positions_to_close, find_signals_to_manage, find_triggered_pending_orders,
+    has_account_blown_up,
 };
 use super::backtest_params::BacktestParams;
 use super::backtest_state::get_state;
 use super::ohlc::{OHLCs, OHLC};
 use super::order::LimitOrders;
 use super::position::Positions;
+use super::signal::Signals;
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
@@ -16,6 +18,7 @@ use rust_decimal_macros::dec;
 pub struct Backtest {
     pub ohlc: Vec<OHLC>,
     pub limit_orders: LimitOrders,
+    pub signals: Signals,
     pub trailing_tp: Vec<Decimal>,
     pub positions: Positions,
     pub equity: Vec<Decimal>,
@@ -28,11 +31,17 @@ pub struct Backtest {
 #[pymethods]
 impl Backtest {
     #[new]
-    fn new(ohlcs: OHLCs, backtest_params: BacktestParams, limit_orders: LimitOrders) -> Self {
+    fn new(
+        ohlcs: OHLCs,
+        backtest_params: BacktestParams,
+        limit_orders: LimitOrders,
+        signals: Signals,
+    ) -> Self {
         Backtest {
             ohlc: ohlcs.ohlc,
             params: backtest_params,
             limit_orders,
+            signals,
             positions: Positions::new(),
             trailing_tp: Vec::new(),
             equity: Vec::new(),
@@ -59,7 +68,8 @@ impl Backtest {
             }
 
             // All good, we can check which of the pending orders got filled in that bar
-            find_triggered_pending_orders(i, self)
+            find_triggered_pending_orders(i, self);
+            find_signals_to_manage(i, self);
         }
     }
 }

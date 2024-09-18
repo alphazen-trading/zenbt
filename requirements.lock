@@ -394,7 +394,7 @@ tqdm==4.66.5
     # via binance-historical-data
     # via mpire
     # via zenbt
-tradingtoolbox==0.17.0
+tradingtoolbox==0.18.0
     # via zenbt
 traitlets==5.14.3
     # via comm

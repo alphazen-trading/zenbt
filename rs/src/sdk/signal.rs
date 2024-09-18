@@ -7,14 +7,11 @@ use super::enums::Side;
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
-pub struct Order {
+pub struct Signal {
     pub index: Decimal,
-    pub price: Decimal,
-    pub size: Decimal,
-    pub sl: Decimal,
-    pub tp: Decimal,
     pub side: Side,
+    pub signal_type: String,
     pub order_type: String,
 }
 
-pub type LimitOrders = HashMap<Decimal, Vec<Order>>;
+pub type Signals = HashMap<Decimal, Vec<Signal>>;
