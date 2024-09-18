@@ -26,6 +26,7 @@ license = { text = "MIT" }
 
 [project.scripts]
 "dev" = "zenbt:dev"
+# "dev" = "zenbt:ma_cross"
 
 [tool.rye.scripts]
 rye_script = {cmd = 'echo hello world'}

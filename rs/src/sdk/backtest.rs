@@ -1,9 +1,15 @@
+use super::backtest_methods::{
+    create_position, find_active_positions_to_close, find_triggered_pending_orders,
+    has_account_blown_up, was_order_hit,
+};
+use super::backtest_params::BacktestParams;
 use super::ohlc::OHLC;
 use super::order::Order;
-use super::position::Position;
-use super::stats::{calculate_max_drawdown, Stats};
+use super::position::{Position, Positions};
+use super::stats::create_stats;
 use chrono::{DateTime, TimeZone, Utc};
 use pyo3::prelude::*;
+use pyo3::types::{IntoPyDict, PyDict};
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
@@ -20,19 +26,17 @@ pub struct Backtest {
     pub ohlc: Vec<OHLC>,
     pub limit_orders: HashMap<Decimal, Vec<Order>>,
     pub trailing_tp: Vec<Decimal>,
-    pub active_positions: Vec<Position>,
-    pub closed_positions: Vec<Position>,
-    pub commission_pct: Decimal,
-    pub commissions: Decimal,
+    pub positions: Positions,
     pub equity: Vec<Decimal>,
     pub floating_equity: Vec<Decimal>,
-    pub initial_capital: Decimal,
+    pub commissions: Decimal,
+    pub params: BacktestParams,
 }
 #[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl Backtest {
     #[new]
-    fn new(data: Vec<Vec<f64>>, commission_pct: Decimal, initial_capital: Decimal) -> Self {
+    fn new(data: Vec<Vec<f64>>, backtest_params: BacktestParams) -> Self {
         let mut ohlcs = Vec::new();
         let mut _limit_orders: HashMap<Decimal, Vec<Order>> = HashMap::new();
 
@@ -51,15 +55,20 @@ impl Backtest {
         Backtest {
             ohlc: ohlcs,
             limit_orders: HashMap::new(),
-            active_positions: Vec::new(),
-            closed_positions: Vec::new(),
+            positions: Positions::new(),
             trailing_tp: Vec::new(),
-            commission_pct,
-            commissions: dec![0],
             equity: Vec::new(),
             floating_equity: Vec::new(),
-            initial_capital,
+            commissions: dec![0],
+            params: backtest_params,
         }
+    }
+    fn reset(&mut self) {
+        self.trailing_tp = Vec::new();
+        self.positions = Positions::new();
+        self.commissions = dec![0];
+        self.equity = Vec::new();
+        self.floating_equity = Vec::new();
     }
     fn prepare(&mut self, limit_orders: Vec<Vec<f64>>) {
         // let mut _trailing_tp = Vec::new();
@@ -93,180 +102,48 @@ impl Backtest {
         }
         self.limit_orders = _limit_orders;
         // self.trailing_tp = _trailing_tp;
-        self.trailing_tp = Vec::new();
-        self.active_positions = Vec::new();
-        self.closed_positions = Vec::new();
-        self.commissions = dec![0];
-        self.equity = Vec::new();
-        self.floating_equity = Vec::new();
+        self.reset()
     }
 
-    fn print(&self) {
-        println!("{:?}", self.ohlc);
-    }
-
-    fn was_order_hit(&self, ohlc: &OHLC, order: &Order) -> PyResult<bool> {
-        if order.side == dec!(1.0) {
-            // if ohlc.low <= order.price {
-            //     println!("ORDER WAS HIT");
-            //     println!("{:?}", ohlc.low);
-            //     println!("{:?} {:?}", order.price, order.sl);
-            // }
-            return Ok(ohlc.low <= order.price);
-        } else {
-            // if ohlc.high >= order.price {
-            //     if ohlc.high >= order.sl {
-            //         println!("\nORDER WAS HIT BUT Problem with sl");
-            //         println!("{:?}", ohlc);
-            //         println!("{:?}", order);
-            //     }
-            // }
-            return Ok(ohlc.high >= order.price);
-        }
-    }
-    fn has_account_blown_up(&self) -> bool {
-        return self.equity.last().unwrap() + self.floating_equity.last().unwrap() < dec!(0.0);
-    }
     fn backtest(&mut self) {
         for i in 0..self.ohlc.len() {
-            let ohlc = &self.ohlc[i];
-            let mut indexes_to_remove = Vec::new();
-            let mut floating_equity = dec!(0);
-            let mut realized_equity = dec!(0);
+            // We first need to check which positions will get closed
+            find_active_positions_to_close(i, self);
 
-            for (j, position) in &mut self.active_positions.iter_mut().enumerate() {
-                let should = position.should_close(&ohlc);
-                if should {
-                    self.closed_positions.push(position.clone());
-                    self.commissions += position.commission;
-                    realized_equity += position.pnl;
-                    indexes_to_remove.push(j);
-                } else {
-                    // position.tp = self.trailing_tp[i];
-                    position.update_pnl(ohlc.close);
-                    floating_equity += position.pnl;
-                }
-            }
-            self.floating_equity.push(floating_equity);
-            self.equity
-                .push(self.equity.last().unwrap_or(&self.initial_capital) + realized_equity);
-
-            for &i in indexes_to_remove.iter().rev() {
-                self.active_positions.remove(i);
-            }
-
-            if self.has_account_blown_up() {
+            // Now that we closed the positions, we check that indeed the account didn't blow
+            if has_account_blown_up(&self.equity, &self.floating_equity) {
                 println!("Account blew up");
                 self.equity.pop();
                 self.equity.push(dec!(0.0));
                 break;
             }
 
-            let orders = self.limit_orders.get(&Decimal::from(i));
-            if orders.is_some() {
-                for order in orders.unwrap() {
-                    let was_hit = self.was_order_hit(&ohlc, &order);
-                    match was_hit {
-                        Ok(true) => {
-                            let mut new_position = Position {
-                                index: order.index,
-                                entry_timestamp: ohlc.date,
-                                exit_timestamp: None,
-                                entry_price: order.price,
-                                exit_price: None,
-                                size: order.size,
-                                sl: order.sl,
-                                tp: order.tp,
-                                side: order.side,
-                                close_reason: None,
-                                pnl: dec!(0.0),
-                                max_dd: dec!(0.0),
-                                commission: order.price * self.commission_pct * order.size,
-                                commission_pct: self.commission_pct,
-                            };
-                            if new_position.was_sl_hit(&ohlc) {
-                                // println!("SL HIT in the same candle");
-                                self.closed_positions.push(new_position);
-                            } else {
-                                self.active_positions.push(new_position);
-                            }
-                        }
-                        _ => {}
-                    }
-                }
-            }
+            // All good, we can check which of the pending orders got filled in that bar
+            find_triggered_pending_orders(i, self)
         }
     }
 
-    #[getter]
-    fn closed_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.closed_positions.clone())
-    }
+    // Method that returns the data as a Python dictionary
+    fn get_data_as_dict(&self, py: Python) -> PyResult<PyObject> {
+        // Create a new PyDict
+        let dict = PyDict::new_bound(py);
 
-    #[getter]
-    fn active_positions(&self) -> PyResult<Vec<Position>> {
-        Ok(self.active_positions.clone())
-    }
+        // Insert the struct's fields into the PyDict
+        dict.set_item("commission_pct", self.params.commission_pct)?;
+        dict.set_item("commissions", self.commissions)?;
+        dict.set_item("initial_capital", self.params.initial_capital)?;
+        dict.set_item("ohlc", self.ohlc.clone())?;
+        dict.set_item("active_positions", self.positions.active_positions.clone())?;
+        dict.set_item("closed_positions", self.positions.closed_positions.clone())?;
+        dict.set_item("equity", self.equity.clone())?;
+        dict.set_item("floating_equity", self.floating_equity.clone())?;
 
-    #[getter]
-    fn equity(&self) -> PyResult<Vec<Decimal>> {
-        Ok(self.equity.clone())
-    }
-
-    #[getter]
-    fn floating_equity(&self) -> PyResult<Vec<Decimal>> {
-        Ok(self.floating_equity.clone())
+        Ok(dict.into())
     }
 
     #[getter]
     fn stats(&self) -> PyResult<String> {
-        let mut wins = dec!(0);
-        let mut losses = dec!(0);
-        for position in self.closed_positions.clone() {
-            if position.pnl > dec!(0.0) {
-                wins += dec!(1);
-            } else {
-                losses += dec!(1);
-            }
-        }
-        let mut commissions = self.commissions;
-        for position in &self.active_positions {
-            commissions += position.commission;
-        }
-
-        let mut win_rate = dec!(0);
-        if wins + losses > dec!(0) {
-            win_rate = (wins / (wins + losses) * dec!(100.0)).round_dp(2);
-        }
-
-        let max_drawdown = calculate_max_drawdown(&self.equity).unwrap_or(dec!(0.0));
-        let pnl = self.equity.last().unwrap() - self.initial_capital
-            + self.floating_equity.last().unwrap();
-        let stats = Stats {
-            initial_capital: self.initial_capital,
-            pnl,
-            pnl_pct: pnl * dec!(100) / self.initial_capital,
-            unrealized_pnl: *self.floating_equity.last().unwrap(),
-            total_positions: self.active_positions.len() + self.closed_positions.len(),
-            closed_positions: self.closed_positions.len(),
-            active_positions: self.active_positions.len(),
-            commissions,
-            wins,
-            losses,
-            win_rate,
-            trading_days: self
-                .ohlc
-                .last()
-                .unwrap()
-                .date
-                .signed_duration_since(self.ohlc.first().unwrap().date)
-                .num_days(),
-            start_date: self.ohlc.first().unwrap().date.to_string(),
-            end_date: self.ohlc.last().unwrap().date.to_string(),
-            max_drawdown,
-            max_drawdown_pct: max_drawdown * dec!(100) / self.initial_capital,
-        };
-        match serde_json::to_string(&stats) {
+        match serde_json::to_string(&create_stats(&self)) {
             Ok(json_string) => Ok(json_string),
             Err(err) => Err(pyo3::exceptions::PyValueError::new_err(err.to_string())),
         }
