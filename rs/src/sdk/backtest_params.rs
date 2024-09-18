@@ -1,0 +1,22 @@
+use pyo3::prelude::*;
+use rust_decimal::Decimal;
+use serde::Serialize;
+
+#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
+#[pyclass]
+#[derive(Debug, Clone, Serialize)]
+pub struct BacktestParams {
+    pub commission_pct: Decimal,
+    pub initial_capital: Decimal,
+}
+
+#[pymethods]
+impl BacktestParams {
+    #[new]
+    pub fn new(commission_pct: Decimal, initial_capital: Decimal) -> Self {
+        BacktestParams {
+            commission_pct,
+            initial_capital,
+        }
+    }
+}
