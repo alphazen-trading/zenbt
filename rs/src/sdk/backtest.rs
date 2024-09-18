@@ -3,7 +3,7 @@ use super::backtest_methods::{
 };
 use super::backtest_params::BacktestParams;
 use super::ohlc::{OHLCs, OHLC};
-use super::order::{LimitOrders, Order};
+use super::order::LimitOrders;
 use super::position::Positions;
 use super::stats::create_stats;
 use pyo3::prelude::*;
@@ -11,7 +11,6 @@ use pyo3::types::PyDict;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use serde::Serialize;
-use std::collections::HashMap;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
@@ -26,6 +25,7 @@ pub struct Backtest {
     pub commissions: Decimal,
     pub params: BacktestParams,
 }
+
 #[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl Backtest {
