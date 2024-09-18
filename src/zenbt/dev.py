@@ -189,9 +189,12 @@ def dev():
         size = 0.001
         size = 0.01
         st_params = (2, 0.33, 2, True)
-        st_params = (15, 1, 1, True)
+        st_params = (15, 1, 5, True)
         print("Running the backtest")
         bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-        a = bt.get_data_as_dict()
-        print(a["closed_positions"])
+        a = bt.get_state()
+        # print(a["floating_equity"])
+        # print(a["equity"])
+        # print(a["closed_positions"])
+        print(a["stats"])

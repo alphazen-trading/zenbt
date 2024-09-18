@@ -78,7 +78,7 @@ pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest) {
             realized_equity += position.pnl;
             indexes_to_remove.push(j);
         } else {
-            // position.tp = self.trailing_tp[i];
+            // position.tp = backtest.trailing_tp[i];
             position.update_pnl(ohlc.close);
             floating_equity += position.pnl;
         }
@@ -101,7 +101,7 @@ pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest) {
                 true => {
                     let mut new_position = create_position(&order, ohlc, &backtest.params);
                     if new_position.was_sl_hit(&ohlc) {
-                        // println!("SL HIT in the same candle");
+                        println!("SL HIT in the same candle");
                         backtest.positions.closed_positions.push(new_position);
                     } else {
                         backtest.positions.active_positions.push(new_position);
