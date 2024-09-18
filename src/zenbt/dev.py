@@ -3,6 +3,8 @@ from rich import print
 from strategy.atr import ATR_Strategy
 from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from data.data import read_data
+from zenbt.rs import cross_above, cross_below, create_signals
+import talib
 
 pd.options.display.float_format = "{:.10f}".format
 
@@ -69,19 +71,40 @@ bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_ca
 
 
 def dev():
-    df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
+    # df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
 
-    # size = initial_capital / df["close"][0]
-    size = 10000
-    size = 0.001
-    size = 0.01
-    st_params = (2, 0.33, 2, True)
-    st_params = (15, 1, 5, True)
-    print("Running the backtest")
-    bt = run_backtest(df, ohlcs, size, st_params, bt_params)
+    # # size = initial_capital / df["close"][0]
+    # size = 10000
+    # size = 0.001
+    # size = 0.01
+    # st_params = (2, 0.33, 2, True)
+    # st_params = (15, 1, 5, True)
+    # print("Running the backtest")
+    # bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-    a = bt.get_state()
-    # print(a["floating_equity"])
-    # print(a["equity"])
-    # print(a["closed_positions"])
-    print(a["stats"])
+    # a = bt.get_state()
+    # # print(a["floating_equity"])
+    # # print(a["equity"])
+    # # print(a["closed_positions"])
+    # print(a["stats"])
+
+    print("In ma cross")
+    df = pd.read_parquet("./data/btc_small.parquet")
+    df = df[0:88]
+    close = df["close"].to_numpy()
+    fast_ma = talib.EMA(close, timeperiod=10)
+    slow_ma = talib.EMA(close, timeperiod=50)
+
+    entries = cross_above(fast_ma, slow_ma)
+    exits = cross_below(fast_ma, slow_ma)
+    print(entries)
+    create_signals(entries, exits, exits, entries)
+    # convert_signals_to_orders(entries, exits, exits, entries)
+    # # print(entries)
+    # # print(exits)
+    # # print(df)
+    params = BacktestParams(commission_pct=0, initial_capital=100)
+
+    # bt = Backtest(df.to_numpy(), params)
+    # a = bt.get_data_as_dict()
+    # print(a["active_positions"])
