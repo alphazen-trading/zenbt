@@ -1,4 +1,7 @@
-use super::backtest_methods::{create_position, has_account_blown_up, was_order_hit};
+use super::backtest_methods::{
+    create_position, find_active_positions_to_close, find_triggered_pending_orders,
+    has_account_blown_up, was_order_hit,
+};
 use super::backtest_params::BacktestParams;
 use super::ohlc::OHLC;
 use super::order::Order;
@@ -104,32 +107,10 @@ impl Backtest {
 
     fn backtest(&mut self) {
         for i in 0..self.ohlc.len() {
-            let ohlc = &self.ohlc[i];
-            let mut indexes_to_remove = Vec::new();
-            let mut floating_equity = dec!(0);
-            let mut realized_equity = dec!(0);
+            // We first need to check which positions will get closed
+            find_active_positions_to_close(i, self);
 
-            for (j, position) in &mut self.positions.active_positions.iter_mut().enumerate() {
-                let should = position.should_close(&ohlc);
-                if should {
-                    self.positions.closed_positions.push(position.clone());
-                    self.commissions += position.commission;
-                    realized_equity += position.pnl;
-                    indexes_to_remove.push(j);
-                } else {
-                    // position.tp = self.trailing_tp[i];
-                    position.update_pnl(ohlc.close);
-                    floating_equity += position.pnl;
-                }
-            }
-            self.floating_equity.push(floating_equity);
-            self.equity
-                .push(self.equity.last().unwrap_or(&self.params.initial_capital) + realized_equity);
-
-            for &i in indexes_to_remove.iter().rev() {
-                self.positions.active_positions.remove(i);
-            }
-
+            // Now that we closed the positions, we check that indeed the account didn't blow
             if has_account_blown_up(&self.equity, &self.floating_equity) {
                 println!("Account blew up");
                 self.equity.pop();
@@ -137,24 +118,8 @@ impl Backtest {
                 break;
             }
 
-            let orders = self.limit_orders.get(&Decimal::from(i));
-            if orders.is_some() {
-                for order in orders.unwrap() {
-                    let was_hit = was_order_hit(&ohlc, &order);
-                    match was_hit {
-                        true => {
-                            let mut new_position = create_position(&order, ohlc, &self.params);
-                            if new_position.was_sl_hit(&ohlc) {
-                                // println!("SL HIT in the same candle");
-                                self.positions.closed_positions.push(new_position);
-                            } else {
-                                self.positions.active_positions.push(new_position);
-                            }
-                        }
-                        _ => {}
-                    }
-                }
-            }
+            // All good, we can check which of the pending orders got filled in that bar
+            find_triggered_pending_orders(i, self)
         }
     }
 
