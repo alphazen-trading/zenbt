@@ -1,20 +1,8 @@
-import itertools
-# from sdk.logger import print, logger
-
-from zenbt.multi_backtest import multi_backtest
-from binance import Client
-
-from data.binance_klines import fetch_futures_data
-import mplfinance as mpf
-from zenbt.rs import Backtest, BacktestParams, create_limit_orders
-import zenbt.rs as rs
-import numpy as np
 import pandas as pd
 from rich import print
-from tradingtoolbox.utils import resample
-
 from strategy.atr import ATR_Strategy
-from data.okx_klines import OKXKlines
+from zenbt.rs import Backtest, BacktestParams, create_limit_orders
+from data.data import read_data
 
 pd.options.display.float_format = "{:.10f}".format
 
@@ -77,27 +65,23 @@ COMMISSION = 0
 COMMISSION = 0.02 / 100
 initial_capital = 1000
 
+bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
+
 
 def dev():
-    bt_params = BacktestParams(
-        commission_pct=COMMISSION, initial_capital=initial_capital
-    )
+    df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
 
-    # fetch_futures_data(symbol="BTCUSDT", count=365)
-    for sym in ["BTC"]:
-        df, ohlcs = read_data(sym, 0, 1000, resample_tf="1min")
+    # size = initial_capital / df["close"][0]
+    size = 10000
+    size = 0.001
+    size = 0.01
+    st_params = (2, 0.33, 2, True)
+    st_params = (15, 1, 5, True)
+    print("Running the backtest")
+    bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-        # size = initial_capital / df["close"][0]
-        size = 10000
-        size = 0.001
-        size = 0.01
-        st_params = (2, 0.33, 2, True)
-        st_params = (15, 1, 5, True)
-        print("Running the backtest")
-        bt = run_backtest(df, ohlcs, size, st_params, bt_params)
-
-        a = bt.get_state()
-        # print(a["floating_equity"])
-        # print(a["equity"])
-        # print(a["closed_positions"])
-        print(a["stats"])
+    a = bt.get_state()
+    # print(a["floating_equity"])
+    # print(a["equity"])
+    # print(a["closed_positions"])
+    print(a["stats"])
