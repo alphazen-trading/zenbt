@@ -1,30 +1,24 @@
 use super::backtest_methods::{
-    create_position, find_active_positions_to_close, find_triggered_pending_orders,
-    has_account_blown_up, was_order_hit,
+    find_active_positions_to_close, find_triggered_pending_orders, has_account_blown_up,
 };
 use super::backtest_params::BacktestParams;
-use super::ohlc::OHLC;
-use super::order::Order;
-use super::position::{Position, Positions};
+use super::ohlc::{OHLCs, OHLC};
+use super::order::{LimitOrders, Order};
+use super::position::Positions;
 use super::stats::create_stats;
-use chrono::{DateTime, TimeZone, Utc};
 use pyo3::prelude::*;
-use pyo3::types::{IntoPyDict, PyDict};
-use rust_decimal::prelude::FromPrimitive;
-use rust_decimal::prelude::ToPrimitive;
+use pyo3::types::PyDict;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use serde::Serialize;
 use std::collections::HashMap;
-use std::fmt::Display;
-use std::ops::Div;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone, Serialize)]
 pub struct Backtest {
     pub ohlc: Vec<OHLC>,
-    pub limit_orders: HashMap<Decimal, Vec<Order>>,
+    pub limit_orders: LimitOrders,
     pub trailing_tp: Vec<Decimal>,
     pub positions: Positions,
     pub equity: Vec<Decimal>,
@@ -36,73 +30,17 @@ pub struct Backtest {
 #[pymethods]
 impl Backtest {
     #[new]
-    fn new(data: Vec<Vec<f64>>, backtest_params: BacktestParams) -> Self {
-        let mut ohlcs = Vec::new();
-        let mut _limit_orders: HashMap<Decimal, Vec<Order>> = HashMap::new();
-
-        for i in 0..data.len() {
-            let ohlc = OHLC {
-                date: DateTime::from_timestamp(data[i][0].to_i64().unwrap().div(1000), 0)
-                    .expect("Invalid timestamp"),
-                open: Decimal::from_f64(data[i][1]).unwrap(),
-                high: Decimal::from_f64(data[i][2]).unwrap(),
-                low: Decimal::from_f64(data[i][3]).unwrap(),
-                close: Decimal::from_f64(data[i][4]).unwrap(),
-                volume: Decimal::from_f64(data[i][5]).unwrap(),
-            };
-            ohlcs.push(ohlc);
-        }
+    fn new(ohlcs: OHLCs, backtest_params: BacktestParams, limit_orders: LimitOrders) -> Self {
         Backtest {
-            ohlc: ohlcs,
-            limit_orders: HashMap::new(),
+            ohlc: ohlcs.ohlc,
+            params: backtest_params,
+            limit_orders,
             positions: Positions::new(),
             trailing_tp: Vec::new(),
             equity: Vec::new(),
             floating_equity: Vec::new(),
             commissions: dec![0],
-            params: backtest_params,
         }
-    }
-    fn reset(&mut self) {
-        self.trailing_tp = Vec::new();
-        self.positions = Positions::new();
-        self.commissions = dec![0];
-        self.equity = Vec::new();
-        self.floating_equity = Vec::new();
-    }
-    fn prepare(&mut self, limit_orders: Vec<Vec<f64>>) {
-        // let mut _trailing_tp = Vec::new();
-        let mut _limit_orders: HashMap<Decimal, Vec<Order>> = HashMap::new();
-
-        // for i in 0..trailing_tp.len() {
-        //     _trailing_tp.push(Decimal::from_f64(trailing_tp[i]).unwrap_or(dec![0]));
-        // }
-        for i in 0..limit_orders.len() {
-            let index = Decimal::from_f64(limit_orders[i][0]).unwrap();
-            if index != dec![0] {
-                let new_order = Order {
-                    index,
-                    side: Decimal::from_f64(limit_orders[i][1]).unwrap(),
-                    price: Decimal::from_f64(limit_orders[i][2]).unwrap(),
-                    size: Decimal::from_f64(limit_orders[i][3]).unwrap(),
-                    sl: Decimal::from_f64(limit_orders[i][4]).unwrap(),
-                    tp: Decimal::from_f64(limit_orders[i][5]).unwrap(),
-                    order_type: String::from("limit"),
-                };
-
-                match _limit_orders.get_mut(&index) {
-                    Some(vec) => vec.push(new_order),
-                    None => {
-                        let mut new_vec = Vec::new();
-                        new_vec.push(new_order);
-                        _limit_orders.insert(index, new_vec);
-                    }
-                }
-            }
-        }
-        self.limit_orders = _limit_orders;
-        // self.trailing_tp = _trailing_tp;
-        self.reset()
     }
 
     fn backtest(&mut self) {

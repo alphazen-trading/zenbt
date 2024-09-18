@@ -1,6 +1,7 @@
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
 use serde::Serialize;
+use std::collections::HashMap;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
@@ -23,3 +24,5 @@ impl Order {
         println!("{:?}", self);
     }
 }
+
+pub type LimitOrders = HashMap<Decimal, Vec<Order>>;

@@ -6,7 +6,7 @@ from binance import Client
 
 from data.binance_klines import fetch_futures_data
 import mplfinance as mpf
-from zenbt.rs import BBO, OHLC, Backtest, BacktestParams
+from zenbt.rs import OHLCs, Backtest, BacktestParams, create_limit_orders
 import zenbt.rs as rs
 import numpy as np
 import pandas as pd
@@ -43,12 +43,14 @@ def plot(df):
     )
 
 
-def run_backtest(df, bt, size, params):
-    st = ATR_Strategy(df, size, params)
+def run_backtest(df, ohlcs, size, st_params, bt_params):
+    st = ATR_Strategy(df, size, st_params)
     limit_orders = st.limit_orders
+    limit_orders = create_limit_orders(limit_orders)
 
-    bt.prepare(limit_orders)
+    bt = Backtest(ohlcs, bt_params, limit_orders)
     bt.backtest()
+    return bt
 
     # df["d"] = pd.to_datetime(df["d"], unit="ms")
     # df.set_index("d", inplace=True)
@@ -127,7 +129,9 @@ def read_data(sym, start=0, end=-1, resample_tf="1min"):
         df = resample(df, tf=resample_tf, on="time")
         df.reset_index(inplace=True)
     df["time"] = pd.to_datetime(df["time"]).astype(int) / 10**6
-    return df
+
+    ohlcs = OHLCs(df.to_numpy())
+    return df, ohlcs
 
 
 def generate_bt_params():
@@ -159,7 +163,7 @@ def _dev():
     df["pnl"] = df["pnl"] + df["unrealized_pnl"]
     df.sort_values(by=["pnl"], inplace=True)
     # df = df["pnl"]
-    rprint(df.tail(10))
+    print(df.tail(10))
 
     # df = read_data("PEPE")
     # df["d"] = pd.to_datetime(df["d"], unit="ms")
@@ -172,25 +176,22 @@ initial_capital = 1000
 
 
 def dev():
+    bt_params = BacktestParams(
+        commission_pct=COMMISSION, initial_capital=initial_capital
+    )
+
     # fetch_futures_data(symbol="BTCUSDT", count=365)
     for sym in ["BTC"]:
-        print(f"Running for {sym}")
-        df = read_data(sym, 0, 20, resample_tf="1min")
-        print(len(df))
-        print("Preparing the backtestg")
+        df, ohlcs = read_data(sym, 0, 1000, resample_tf="1min")
 
-        params = BacktestParams(
-            commission_pct=COMMISSION, initial_capital=initial_capital
-        )
-        bt = Backtest(df.to_numpy(), params)
         # size = initial_capital / df["close"][0]
         size = 10000
         size = 0.001
         size = 0.01
-        params = (2, 0.33, 2, True)
-        params = (15, 1, 1, True)
+        st_params = (2, 0.33, 2, True)
+        st_params = (15, 1, 1, True)
         print("Running the backtest")
-        run_backtest(df, bt, size, params)
+        bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
         a = bt.get_data_as_dict()
-        print(a)
+        print(a["closed_positions"])
