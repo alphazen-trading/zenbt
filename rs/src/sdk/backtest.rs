@@ -1,3 +1,4 @@
+use super::backtest_methods::{has_account_blown_up, was_order_hit};
 use super::ohlc::OHLC;
 use super::order::Order;
 use super::position::Position;
@@ -105,28 +106,6 @@ impl Backtest {
         println!("{:?}", self.ohlc);
     }
 
-    fn was_order_hit(&self, ohlc: &OHLC, order: &Order) -> PyResult<bool> {
-        if order.side == dec!(1.0) {
-            // if ohlc.low <= order.price {
-            //     println!("ORDER WAS HIT");
-            //     println!("{:?}", ohlc.low);
-            //     println!("{:?} {:?}", order.price, order.sl);
-            // }
-            return Ok(ohlc.low <= order.price);
-        } else {
-            // if ohlc.high >= order.price {
-            //     if ohlc.high >= order.sl {
-            //         println!("\nORDER WAS HIT BUT Problem with sl");
-            //         println!("{:?}", ohlc);
-            //         println!("{:?}", order);
-            //     }
-            // }
-            return Ok(ohlc.high >= order.price);
-        }
-    }
-    fn has_account_blown_up(&self) -> bool {
-        return self.equity.last().unwrap() + self.floating_equity.last().unwrap() < dec!(0.0);
-    }
     fn backtest(&mut self) {
         for i in 0..self.ohlc.len() {
             let ohlc = &self.ohlc[i];
@@ -155,7 +134,7 @@ impl Backtest {
                 self.active_positions.remove(i);
             }
 
-            if self.has_account_blown_up() {
+            if has_account_blown_up(&self.equity, &self.floating_equity) {
                 println!("Account blew up");
                 self.equity.pop();
                 self.equity.push(dec!(0.0));
@@ -165,9 +144,9 @@ impl Backtest {
             let orders = self.limit_orders.get(&Decimal::from(i));
             if orders.is_some() {
                 for order in orders.unwrap() {
-                    let was_hit = self.was_order_hit(&ohlc, &order);
+                    let was_hit = was_order_hit(&ohlc, &order);
                     match was_hit {
-                        Ok(true) => {
+                        true => {
                             let mut new_position = Position {
                                 index: order.index,
                                 entry_timestamp: ohlc.date,
