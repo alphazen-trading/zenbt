@@ -1,28 +1,20 @@
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
-use serde::Serialize;
 use std::collections::HashMap;
+
+use super::enums::Side;
 
 #[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct Order {
     pub index: Decimal,
     pub price: Decimal,
     pub size: Decimal,
     pub sl: Decimal,
     pub tp: Decimal,
-    pub side: Decimal,
+    pub side: Side,
     pub order_type: String,
-}
-
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
-#[pymethods]
-impl Order {
-    #[getter]
-    fn print(&self) {
-        println!("{:?}", self);
-    }
 }
 
 pub type LimitOrders = HashMap<Decimal, Vec<Order>>;

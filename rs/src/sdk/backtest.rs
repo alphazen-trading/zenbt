@@ -1,5 +1,6 @@
 use super::backtest_methods::{
-    find_active_positions_to_close, find_triggered_pending_orders, has_account_blown_up,
+    find_active_positions_to_close, find_signals_to_manage, find_triggered_pending_orders,
+    has_account_blown_up,
 };
 use super::backtest_params::BacktestParams;
 use super::backtest_state::get_state;
@@ -67,7 +68,8 @@ impl Backtest {
             }
 
             // All good, we can check which of the pending orders got filled in that bar
-            find_triggered_pending_orders(i, self)
+            find_triggered_pending_orders(i, self);
+            find_signals_to_manage(i, self);
         }
     }
 }

@@ -1,5 +1,7 @@
 import pandas as pd
+from zenbt.rs import OHLCs
 from rich import print
+import numpy as np
 from strategy.atr import ATR_Strategy
 from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from data.data import read_data
@@ -14,7 +16,7 @@ def run_backtest(df, ohlcs, size, st_params, bt_params):
     limit_orders = st.limit_orders
     limit_orders = create_limit_orders(limit_orders)
 
-    bt = Backtest(ohlcs, bt_params, limit_orders)
+    bt = Backtest(ohlcs, bt_params, limit_orders, {})
     bt.backtest()
     return bt
 
@@ -71,40 +73,48 @@ bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_ca
 
 
 def dev():
-    # df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
+    df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
 
-    # # size = initial_capital / df["close"][0]
-    # size = 10000
-    # size = 0.001
-    # size = 0.01
-    # st_params = (2, 0.33, 2, True)
+    # size = initial_capital / df["close"][0]
+    size = 10000
+    size = 0.001
+    size = 0.01
+    st_params = (2, 0.33, 2, True)
     # st_params = (15, 1, 5, True)
-    # print("Running the backtest")
-    # bt = run_backtest(df, ohlcs, size, st_params, bt_params)
+    print("Running the backtest")
+    bt = run_backtest(df, ohlcs, size, st_params, bt_params)
 
-    # a = bt.get_state()
-    # # print(a["floating_equity"])
-    # # print(a["equity"])
-    # # print(a["closed_positions"])
-    # print(a["stats"])
+    a = bt.get_state()
+    # print(a["floating_equity"])
+    # print(a["equity"])
+    # print(a["closed_positions"])
+    print(a["stats"])
+    print(a["closed_positions"])
+    return
 
     print("In ma cross")
     df = pd.read_parquet("./data/btc_small.parquet")
-    df = df[0:88]
+    df = df[0:150]
+    ohlcs = OHLCs(df.to_numpy())
     close = df["close"].to_numpy()
     fast_ma = talib.EMA(close, timeperiod=10)
     slow_ma = talib.EMA(close, timeperiod=50)
 
     entries = cross_above(fast_ma, slow_ma)
     exits = cross_below(fast_ma, slow_ma)
-    print(entries)
-    create_signals(entries, exits, exits, entries)
+    blank = np.full(len(close), False)
+    signals = create_signals(entries, exits, blank, blank)
     # convert_signals_to_orders(entries, exits, exits, entries)
-    # # print(entries)
-    # # print(exits)
+    # print(entries)
+    # print(exits)
     # # print(df)
-    params = BacktestParams(commission_pct=0, initial_capital=100)
 
-    # bt = Backtest(df.to_numpy(), params)
-    # a = bt.get_data_as_dict()
-    # print(a["active_positions"])
+    bt = Backtest(ohlcs, bt_params, {}, signals)
+    bt.backtest()
+    a = bt.get_state()
+    print(a["active_positions"])
+    print(a["closed_positions"])
+
+    df["time"] = pd.to_datetime(df["time"], unit="ms")
+    print(df[entries])
+    print(df[exits])

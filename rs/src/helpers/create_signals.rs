@@ -1,7 +1,10 @@
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
 
-use crate::sdk::signal::{Signal, Signals};
+use crate::sdk::{
+    enums::Side,
+    signal::{Signal, Signals},
+};
 use rust_decimal::prelude::FromPrimitive;
 use std::collections::HashMap;
 
@@ -12,7 +15,6 @@ pub fn create_signals(
     short_entries: Vec<bool>,
     short_exits: Vec<bool>,
 ) -> Signals {
-    println!("Here it is");
     let mut signals: Signals = HashMap::new();
 
     fn add_signal(signals: &mut Signals, index: Decimal, new_signal: Signal) {
@@ -31,7 +33,7 @@ pub fn create_signals(
         if long_entries[i] {
             let new_signal = Signal {
                 index: Decimal::from_f64(i as f64).unwrap(),
-                side: Decimal::from_f64(1.0).unwrap(),
+                side: Side::Long,
                 signal_type: String::from("open"),
                 order_type: String::from("market"),
             };
@@ -40,7 +42,7 @@ pub fn create_signals(
         if long_exits[i] {
             let new_signal = Signal {
                 index: Decimal::from_f64(i as f64).unwrap(),
-                side: Decimal::from_f64(0.0).unwrap(),
+                side: Side::Short,
                 signal_type: String::from("close"),
                 order_type: String::from("market"),
             };
@@ -49,7 +51,7 @@ pub fn create_signals(
         if short_entries[i] {
             let new_signal = Signal {
                 index: Decimal::from_f64(i as f64).unwrap(),
-                side: Decimal::from_f64(0.0).unwrap(),
+                side: Side::Short,
                 signal_type: String::from("open"),
                 order_type: String::from("market"),
             };
@@ -58,7 +60,7 @@ pub fn create_signals(
         if short_exits[i] {
             let new_signal = Signal {
                 index: Decimal::from_f64(i as f64).unwrap(),
-                side: Decimal::from_f64(1.0).unwrap(),
+                side: Side::Long,
                 signal_type: String::from("close"),
                 order_type: String::from("market"),
             };
