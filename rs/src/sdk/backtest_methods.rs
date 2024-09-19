@@ -100,14 +100,12 @@ pub fn find_signals_to_close(i: usize, backtest: &mut Backtest, long_exit: bool,
 
     for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate() {
         if long_exit && position.side == Side::Long {
-            println!("{} Need to close long position", i);
             backtest.positions.closed_positions.push(position.clone());
             backtest.commissions += position.commission;
             realized_equity += position.pnl;
             indexes_to_remove.push(j);
         }
         if short_exit && position.side == Side::Short {
-            println!("{} Need to close short position", i);
             backtest.positions.closed_positions.push(position.clone());
             backtest.commissions += position.commission;
             realized_equity += position.pnl;
@@ -134,13 +132,11 @@ pub fn find_signals_to_enter(
     let ohlc = backtest.ohlc[i];
     let size = dec!(1.0);
     if long_entry {
-        println!("{} Going long", i);
         let new_position =
             create_position_from_signal(i, &ohlc, &backtest.params, size, Side::Long);
         backtest.positions.active_positions.push(new_position);
     }
     if short_entry {
-        println!("{} Going short", i);
         let new_position =
             create_position_from_signal(i, &ohlc, &backtest.params, size, Side::Short);
         backtest.positions.active_positions.push(new_position);

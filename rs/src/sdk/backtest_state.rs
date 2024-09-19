@@ -13,7 +13,6 @@ pub fn get_state(backtest: &Backtest, py: Python) -> PyResult<PyObject> {
     dict.set_item("commission_pct", backtest.params.commission_pct)?;
     dict.set_item("commissions", backtest.commissions)?;
     dict.set_item("initial_capital", backtest.params.initial_capital)?;
-    dict.set_item("ohlc", backtest.ohlc.clone())?;
     dict.set_item(
         "active_positions",
         backtest.positions.active_positions.clone(),
@@ -29,27 +28,6 @@ pub fn get_state(backtest: &Backtest, py: Python) -> PyResult<PyObject> {
     let duration = start.elapsed();
 
     println!("RS Time elapsed: {:?}", duration);
-
-    Ok(dict.into())
-}
-
-pub fn get_stats(backtest: &Backtest, py: Python) -> PyResult<PyObject> {
-    let dict = PyDict::new_bound(py);
-
-    dict.set_item("commission_pct", backtest.params.commission_pct)?;
-    dict.set_item("commissions", backtest.commissions)?;
-    dict.set_item("initial_capital", backtest.params.initial_capital)?;
-    dict.set_item(
-        "active_positions",
-        backtest.positions.active_positions.clone(),
-    )?;
-    dict.set_item(
-        "closed_positions",
-        backtest.positions.closed_positions.clone(),
-    )?;
-    // dict.set_item("equity", backtest.equity.clone())?;
-    // dict.set_item("floating_equity", backtest.floating_equity.clone())?;
-    dict.set_item("stats", create_stats(&backtest))?;
 
     Ok(dict.into())
 }

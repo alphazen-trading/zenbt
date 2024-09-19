@@ -2,10 +2,9 @@ use super::backtest_methods::{
     find_active_positions_to_close, find_signals_to_close, find_signals_to_enter,
     find_triggered_pending_orders, has_account_blown_up,
 };
-use super::enums::{CloseReason, Side};
 
 use super::backtest_params::BacktestParams;
-use super::backtest_state::{get_state, get_stats};
+use super::backtest_state::get_state;
 use super::ohlc::{OHLCs, OHLC};
 use super::order::LimitOrders;
 use super::position::Positions;
@@ -52,9 +51,6 @@ impl Backtest {
             floating_equity: Vec::new(),
             commissions: dec![0],
         }
-    }
-    fn get_stats(&self, py: Python) -> PyResult<PyObject> {
-        get_stats(self, py)
     }
     fn get_state(&self, py: Python) -> PyResult<PyObject> {
         get_state(self, py)

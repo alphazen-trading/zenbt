@@ -98,7 +98,7 @@ def dev():
     # x = np.array([1.0, 2.0, 3.0])
     # mult(3.0, x)
 
-    df, ohlcs = read_data("BTC", 0, 150, resample_tf="1min")
+    df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
     close = df["close"].to_numpy()
     fast_ma = talib.SMA(close, timeperiod=10)
     slow_ma = talib.SMA(close, timeperiod=50)
@@ -119,8 +119,11 @@ def dev():
 
     elapsed_time_ms = (time.time() - start) * 1000
     print(f"Backtest took: {elapsed_time_ms:.2f} ms")
-    a = bt.get_stats()
+    start = time.time()
+    a = bt.get_state()
     print(a["stats"])
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"State took: {elapsed_time_ms:.2f} ms")
     return
 
     start = time.time()
