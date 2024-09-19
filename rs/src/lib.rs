@@ -18,7 +18,6 @@ use sdk::order::Order;
 use sdk::position::Position;
 use sdk::signals::Signals;
 
-/// A Python module implemented in Rust.
 #[pymodule]
 fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(round_value, m)?)?;
