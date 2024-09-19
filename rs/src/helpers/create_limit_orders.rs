@@ -17,6 +17,7 @@ pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
         let index = Decimal::from_f64(limit_orders[i][0]).unwrap();
         if index != dec![0] {
             let side_decimal = Decimal::from_f64(limit_orders[i][1]).unwrap();
+
             let side = match side_decimal {
                 d if d == dec!(1.0) => Side::Long,
                 d if d == dec!(0.0) => Side::Short,
@@ -25,8 +26,9 @@ pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
                     continue;
                 }
             };
+
             let new_order = Order {
-                index,
+                index: limit_orders[i][0] as usize,
                 side,
                 price: Decimal::from_f64(limit_orders[i][2]).unwrap(),
                 size: Decimal::from_f64(limit_orders[i][3]).unwrap(),

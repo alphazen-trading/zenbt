@@ -4,8 +4,8 @@ from zenbt.rs import OHLCs
 from rich import print
 import numpy as np
 from strategy.atr import ATR_Strategy
-from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from data.data import read_data
+from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from zenbt.rs import cross_above, cross_below, create_signals
 import talib
 
@@ -95,40 +95,36 @@ def dev():
     # df = pd.read_parquet("./data/btc.parquet")
     # # df = df[0:150]
     # ohlcs = OHLCs(df.to_numpy())
-    df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
+    # x = np.array([1.0, 2.0, 3.0])
+    # mult(3.0, x)
 
+    df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
     close = df["close"].to_numpy()
-    start = time.time()
     fast_ma = talib.SMA(close, timeperiod=10)
     slow_ma = talib.SMA(close, timeperiod=50)
 
-    start = time.time()
-    entries = cross_below(slow_ma, fast_ma)
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
-    start = time.time()
-    exits = cross_above(slow_ma, fast_ma)
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
+    entries = np.full(len(close), False)
+    cross_below(fast_ma, slow_ma, entries)
 
-    start = time.time()
+    exits = np.full(len(close), False)
+    cross_above(fast_ma, slow_ma, exits)
+
     blank = np.full(len(close), False)
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Take to indicators: {elapsed_time_ms:.2f} ms")
 
+    # signals = create_signals(entries, exits, blank, blank)
+    # signals = create_signals(entries)
     start = time.time()
-    print("Time to creat the signals")
-    signals = create_signals(entries, exits, blank, blank)
+    bt = Backtest(ohlcs, bt_params, {})
+    bt.backtest_signals(entries, exits, exits, entries)
 
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Time To create signals: {elapsed_time_ms:.2f} ms")
-
-    start = time.time()
-    bt = Backtest(ohlcs, bt_params, {}, signals)
-    bt.backtest()
     elapsed_time_ms = (time.time() - start) * 1000
     print(f"Backtest took: {elapsed_time_ms:.2f} ms")
-    # print(a["stats"])
+    start = time.time()
+    a = bt.get_state()
+    print(a["stats"])
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"State took: {elapsed_time_ms:.2f} ms")
+    return
 
     start = time.time()
     # a = bt.get_state()
