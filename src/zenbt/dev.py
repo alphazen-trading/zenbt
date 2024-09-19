@@ -107,7 +107,7 @@ def dev():
     cross_below(fast_ma, slow_ma, entries)
 
     exits = np.full(len(close), False)
-    cross_above(slow_ma, fast_ma, exits)
+    cross_above(fast_ma, slow_ma, exits)
 
     blank = np.full(len(close), False)
 
@@ -115,11 +115,12 @@ def dev():
     # signals = create_signals(entries)
     start = time.time()
     bt = Backtest(ohlcs, bt_params, {})
-    bt.backtest_signals(entries, exits, blank, blank)
+    bt.backtest_signals(entries, exits, exits, entries)
 
     elapsed_time_ms = (time.time() - start) * 1000
     print(f"Backtest took: {elapsed_time_ms:.2f} ms")
-    # print(a["stats"])
+    a = bt.get_stats()
+    print(a["stats"])
     return
 
     start = time.time()

@@ -17,6 +17,5 @@ pub fn cross_below<'py>(
             mask[i] = true;
         }
     }
-
     mask;
 }

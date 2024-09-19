@@ -8,7 +8,7 @@ use super::enums::Side;
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Order {
-    pub index: Decimal,
+    pub index: usize,
     pub price: Decimal,
     pub size: Decimal,
     pub sl: Decimal,
