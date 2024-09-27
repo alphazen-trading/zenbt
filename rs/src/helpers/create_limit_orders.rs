@@ -2,12 +2,14 @@ use pyo3::prelude::*;
 use rust_decimal::Decimal;
 
 use crate::sdk::{
-    enums::Side,
-    order::{LimitOrders, Order},
+    enums::{OrderType, Side},
+    order::Order,
 };
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal_macros::dec;
 use std::collections::HashMap;
+
+pub type LimitOrders = HashMap<Decimal, Vec<Order>>;
 
 #[pyfunction]
 pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
@@ -34,7 +36,7 @@ pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
                 size: Decimal::from_f64(limit_orders[i][3]).unwrap(),
                 sl: Decimal::from_f64(limit_orders[i][4]).unwrap(),
                 tp: Decimal::from_f64(limit_orders[i][5]).unwrap(),
-                order_type: String::from("limit"),
+                order_type: OrderType::Limit,
             };
 
             match _limit_orders.get_mut(&index) {

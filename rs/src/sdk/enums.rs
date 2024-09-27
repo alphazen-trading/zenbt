@@ -8,11 +8,18 @@ pub enum Side {
     Short,
 }
 
+#[derive(Copy, Debug, Clone, PartialEq)]
+#[pyclass]
+pub enum OrderType {
+    Market,
+    Limit,
+}
+
 impl ToPyObject for Side {
     fn to_object(&self, py: Python) -> PyObject {
         match self {
-            Side::Long => PyString::new(py, "Long").into_py(py),
-            Side::Short => PyString::new(py, "Short").into_py(py),
+            Side::Long => PyString::new_bound(py, "Long").into_py(py),
+            Side::Short => PyString::new_bound(py, "Short").into_py(py),
         }
     }
 }
@@ -27,9 +34,9 @@ pub enum CloseReason {
 impl ToPyObject for CloseReason {
     fn to_object(&self, py: Python) -> PyObject {
         match self {
-            CloseReason::TakeProfit => PyString::new(py, "TakeProfit").into_py(py),
-            CloseReason::StopLoss => PyString::new(py, "StopLoss").into_py(py),
-            CloseReason::Signal => PyString::new(py, "Signal").into_py(py),
+            CloseReason::TakeProfit => PyString::new_bound(py, "TakeProfit").into_py(py),
+            CloseReason::StopLoss => PyString::new_bound(py, "StopLoss").into_py(py),
+            CloseReason::Signal => PyString::new_bound(py, "Signal").into_py(py),
         }
     }
 }

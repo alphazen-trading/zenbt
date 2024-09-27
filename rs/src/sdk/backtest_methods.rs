@@ -172,21 +172,22 @@ pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest) {
 
 pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest) {
     let ohlc = &backtest.ohlc[i];
-    let orders = backtest.limit_orders.get(&Decimal::from(i));
+    let orders = backtest.limit_orders.get(i);
     if orders.is_some() {
-        for order in orders.unwrap() {
-            let was_hit = was_order_hit(&ohlc, &order);
-            match was_hit {
-                true => {
-                    let mut new_position = create_position(&order, ohlc, &backtest.params);
-                    if new_position.was_sl_hit(i, &ohlc) {
-                        println!("SL HIT in the same candle");
-                        backtest.positions.closed_positions.push(new_position);
-                    } else {
-                        backtest.positions.active_positions.push(new_position);
+        for order in orders {
+            if was_order_hit(&ohlc, &order) {
+                let mut new_position = create_position(&order, ohlc, &backtest.params);
+
+                if new_position.was_sl_hit(i, &ohlc) {
+                    // If SL was hit in the same candle, update equity and move to closed positions
+                    if let Some(last_equity) = backtest.equity.last_mut() {
+                        *last_equity += new_position.pnl;
                     }
+                    backtest.positions.closed_positions.push(new_position);
+                } else {
+                    // If SL wasn't hit, move the position to active positions
+                    backtest.positions.active_positions.push(new_position);
                 }
-                _ => {}
             }
         }
     }

@@ -2,6 +2,8 @@ use super::backtest_methods::{
     find_active_positions_to_close, find_signals_to_close, find_signals_to_enter,
     find_triggered_pending_orders, has_account_blown_up,
 };
+use super::stats_methods::create_stats;
+use pyo3::types::PyDict;
 
 use super::backtest_params::BacktestParams;
 use super::backtest_state::get_state;
@@ -52,6 +54,13 @@ impl Backtest {
             commissions: dec![0],
         }
     }
+    fn get_stats(&self, py: Python) -> PyResult<PyObject> {
+        let dict = PyDict::new_bound(py);
+        dict.set_item("stats", create_stats(&self))?;
+
+        Ok(dict.into())
+    }
+
     fn get_state(&self, py: Python) -> PyResult<PyObject> {
         get_state(self, py)
     }

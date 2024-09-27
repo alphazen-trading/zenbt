@@ -113,7 +113,7 @@ impl Position {
                     return true;
                 }
             } else {
-                if ohlc.low >= sl_price {
+                if ohlc.high >= sl_price {
                     let pnl = (self.entry_price - sl_price) * self.size - self.commission;
                     self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
                     return true;

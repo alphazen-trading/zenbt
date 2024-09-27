@@ -12,9 +12,10 @@ use sdk::backtest::Backtest;
 use sdk::backtest_params::BacktestParams;
 use sdk::bbo::BBO;
 use sdk::contract::Contract;
+use sdk::enums::{OrderType, Side};
 use sdk::instrument::Instrument;
 use sdk::ohlc::OHLCs;
-use sdk::order::Order;
+use sdk::order::LimitOrders;
 use sdk::position::Position;
 use sdk::signals::Signals;
 
@@ -32,7 +33,9 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<BacktestParams>()?;
     m.add_class::<Signals>()?;
     m.add_class::<Position>()?;
-    m.add_class::<Order>()?;
+    m.add_class::<LimitOrders>()?;
+    m.add_class::<Side>()?;
+    m.add_class::<OrderType>()?;
 
     m.add_function(wrap_pyfunction!(cross_above, m)?)?;
     m.add_function(wrap_pyfunction!(cross_below, m)?)?;
