@@ -1,6 +1,4 @@
-# type: ignore
 # from sdk.logger import print, logger
-
 import mplfinance as mpf
 import talib
 from zenbt.rs import BBO, OHLC, Backtest, Signals
@@ -9,8 +7,7 @@ import numpy as np
 import pandas as pd
 from rich import print as rprint
 from numba import njit
-
-from data.okx_klines import OKXKlines
+from tradingtoolbox.exchanges.okx import OKXKlines
 
 pd.options.display.float_format = "{:.10f}".format
 
