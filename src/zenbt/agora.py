@@ -1,3 +1,4 @@
+# type: ignore
 # from sdk.logger import print, logger
 
 import mplfinance as mpf

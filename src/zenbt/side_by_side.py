@@ -1,3 +1,4 @@
+# type: ignore
 import pandas as pd
 from rich import print
 

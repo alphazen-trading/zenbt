@@ -6,7 +6,6 @@ import concurrent.futures
 import multiprocessing
 import itertools
 import math
-from tqdm import tqdm
 
 NUMBER_OF_CPU = math.floor(multiprocessing.cpu_count() - 3)
 # NUMBER_OF_CPU = 3

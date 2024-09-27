@@ -11,8 +11,6 @@ from data.data import read_data, download_okx_data
 from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from zenbt.rs import cross_above, cross_below, create_signals
 import talib
-import time
-import numpy as np
 
 pd.options.display.float_format = "{:.10f}".format
 
