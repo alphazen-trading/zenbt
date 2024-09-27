@@ -157,10 +157,13 @@ class ATR_Strategy:
 
     @staticmethod
     def generate_bt_params(simple=False):
-        atr_multipler = np.arange(2, 20)
-        rr = [0.3, 0.5, 1, 2]
-        tp_distance = [0.33, 0.618, 0.786, 1, 1.5, 2]
-        use_close = [True, False]
+        atr_multipler = np.arange(2, 6)
+        rr = np.arange(1, 10)
+        # tp_distance = [0.33, 0.618, 0.786, 1, 1.5, 2]
+        # tp_distance = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        tp_distance = np.arange(1, 15)
+        # use_close = [True, False]
+        use_close = [True]
 
         if simple:
             atr_multipler = np.arange(2, 4)

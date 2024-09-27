@@ -1,102 +1,136 @@
 import pandas as pd
 import time
+from sdk.plotter import plot_equity
+from sdk.trade_record import get_trades_df
+from zenbt.multi_backtest import multi_backtest
 from zenbt.rs import OHLCs
 from rich import print
 import numpy as np
 from strategy.atr import ATR_Strategy
-from data.data import read_data
+from data.data import read_data, download_okx_data
 from zenbt.rs import Backtest, BacktestParams, create_limit_orders
 from zenbt.rs import cross_above, cross_below, create_signals
 import talib
+import time
+import numpy as np
 
 pd.options.display.float_format = "{:.10f}".format
 
 
 def run_backtest(df, ohlcs, size, st_params, bt_params):
     st = ATR_Strategy(df, size, st_params)
-    limit_orders = st.limit_orders
-    limit_orders = create_limit_orders(limit_orders)
 
-    bt = Backtest(ohlcs, bt_params, limit_orders, {})
+    bt = Backtest(ohlcs, bt_params, st.limit_orders, {})
     bt.backtest()
     return bt
-
-    # df["d"] = pd.to_datetime(df["d"], unit="ms")
-    # df.set_index("d", inplace=True)
-    # print(
-    #     f"New backtest: atr_multiplier: {atr_multiplier}, rr: {rr}, tp_distance: {tp_distance}"
-    # )
-    print(bt.stats)
-    # stats = Stats(bt, df)
-    # print(stats.stats)
-    return
-    # stats.equity["realized_equity"].plot()
-    stats.equity["unrealized_equity"].plot()
-    # trades = stats.closed_positions
-    # print(f"Number of trades: {len(trades)}")
-    # rprint(trades)
-    return stats.stats
-
-    losers = trades[trades["pnl"] < 0]
-    winners = trades[trades["pnl"] > 0]
-    rprint(losers["pnl"].mean())
-    rprint(winners["pnl"].mean())
-    trades.to_csv("trades.csv")
-    return stats.stats
-
-    # rprint(stats.equity)
-    # rprint(stats.equity.dtypes)
-    # plt.show()
-    # # plt.show()
-    trades = stats.closed_positions
-    trades.drop(
-        columns=[
-            "commission",
-            "max_dd",
-            "pnl",
-            "side",
-            "commission_pct",
-            "exit_timestamp",
-        ],
-        inplace=True,
-    )
-    trades["d"] = trades["entry_price"] / trades["sl"]
-    rprint(trades[["entry_price", "sl", "d"]])
-    return pnl
-    # print(bt.closed_positions[0].print())
 
 
 COMMISSION = 0
 COMMISSION = 0.02 / 100
-initial_capital = 10000000000000
+initial_capital = 2000
 
 bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
 
 
+# size = initial_capital / df["close"][0]
+size = {
+    "PEPE": 200,
+    "1000PEPE": 200,
+    "BTC": 0.01,
+}
+
+
+def analyze_simulations():
+    df = pd.read_parquet("./data/latest_simulation.parquet")
+    print(df.columns)
+    df.sort_values(by=["pnl"], ascending=False, inplace=True)
+    df.drop(
+        columns=[
+            "initial_capital",
+            "active_positions",
+            "closed_positions",
+            "max_drawdown_pct",
+        ],
+        inplace=True,
+    )
+    print(df.head(30))
+    print(df)
+
+
+# Function to calculate the average time over 1000 iterations
+def time_execution(fn, *args, iterations=1000):
+    times = []
+    for _ in range(iterations):
+        # print(f"Running {fn.__name__}...")
+        start = time.time()
+        fn(*args)
+        end = time.time()
+        times.append(end - start)
+    return np.mean(times), np.std(times)  # Return mean and standard deviation
+
+
+def bt_perf(param, df, ohlcvs):
+    st = ATR_Strategy(df, 1000, param)
+
+    # Measure time for ATR_Strategy
+    avg_time, std_dev = time_execution(ATR_Strategy, df, 10, param)
+    print(f"ATR_Strategy: Mean time = {avg_time:.4f} seconds, Std dev = {std_dev:.4f}")
+
+    # Measure time for Backtest creation
+    avg_time, std_dev = time_execution(Backtest, ohlcvs, bt_params, st.limit_orders)
+    print(
+        f"Backtest creation: Mean time = {avg_time:.4f} seconds, Std dev = {std_dev:.4f}"
+    )
+
+    # Measure time for Backtest execution
+    bt = Backtest(
+        ohlcvs, bt_params, st.limit_orders
+    )  # Create the backtest outside the loop
+    avg_time, std_dev = time_execution(bt.backtest)
+    print(
+        f"Backtest execution: Mean time = {avg_time:.4f} seconds, Std dev = {std_dev:.4f}"
+    )
+
+    # Measure time for stats generation
+    avg_time, std_dev = time_execution(bt.get_stats)
+    print(
+        f"Stats generation: Mean time = {avg_time:.4f} seconds, Std dev = {std_dev:.4f}"
+    )
+
+
+def bt_method(param, df, ohlcvs):
+    st = ATR_Strategy(df, 0.1, param)
+    bt = Backtest(ohlcvs, bt_params, st.limit_orders)
+    bt.backtest()
+    return bt
+
+
 def dev():
-    # df, ohlcs = read_data("BTC", 0, 1000, resample_tf="1min")
+    # download_okx_data(days_ago=2)
+    sym = "1000PEPE"
+    df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="binance")
+    # df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="okx")
+    # bt = bt_method((1, 2, 10, 1), df, ohlcs)
+    # plot_equity(df, bt)
 
-    # # size = initial_capital / df["close"][0]
-    # size = 10000
-    # size = 0.001
-    # size = 0.01
-    # st_params = (2, 0.33, 2, True)
-    # # st_params = (15, 1, 5, True)
-    # print("Running the backtest")
-    # bt = run_backtest(df, ohlcs, size, st_params, bt_params)
+    # res = multi_backtest(
+    #     df, ohlcs, ATR_Strategy.generate_bt_params(simple=False), bt_method
+    # )
 
-    # a = bt.get_state()
-    # # print(a["floating_equity"])
-    # # print(a["equity"])
-    # # print(a["closed_positions"])
-    # print(a["stats"])
-    # print(a["closed_positions"])
-    # return
-    # df = pd.read_parquet("./data/btc.parquet")
-    # # df = df[0:150]
-    # ohlcs = OHLCs(df.to_numpy())
-    # x = np.array([1.0, 2.0, 3.0])
-    # mult(3.0, x)
+    analyze_simulations()
+
+    # bt = bt_perf((15, 2, 2, 1), df, ohlcs)
+    # bt = bt_method((11, 2, 0.786, 1), df, ohlcs)
+    # print(bt.get_stats()["stats"])
+    return
+
+    state = bt.get_state()
+
+    plot_equity(df, bt)
+
+    multi_backtest(df, bt, size, st.generate_bt_params(), run_backtest)
+
+    return
 
     df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
     close = df["close"].to_numpy()
@@ -136,3 +170,6 @@ def dev():
     # print(a["closed_positions"])
     # # print(entries)
     # print(fast_ma)
+
+
+dev()

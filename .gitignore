@@ -28,3 +28,5 @@ src/zenbt/.jukit
 rs/src/sdk/.jukit
 trades.csv
 src/strategy
+.jukit
+src/zenbt/.ipynb_checkpoints
