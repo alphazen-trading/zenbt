@@ -8,8 +8,7 @@ from rich import print
 import numpy as np
 from strategy.atr import ATR_Strategy
 from data.data import read_data, download_okx_data
-from zenbt.rs import Backtest, BacktestParams, create_limit_orders
-from zenbt.rs import cross_above, cross_below, create_signals
+from zenbt.rs import Backtest, BacktestParams
 import talib
 
 pd.options.display.float_format = "{:.10f}".format
@@ -122,52 +121,52 @@ def dev():
     # print(bt.get_stats()["stats"])
     return
 
-    state = bt.get_state()
+    # state = bt.get_state()
 
-    plot_equity(df, bt)
+    # plot_equity(df, bt)
 
-    multi_backtest(df, bt, size, st.generate_bt_params(), run_backtest)
+    # multi_backtest(df, bt, size, st.generate_bt_params(), run_backtest)
 
-    return
+    # return
 
-    df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
-    close = df["close"].to_numpy()
-    fast_ma = talib.SMA(close, timeperiod=10)
-    slow_ma = talib.SMA(close, timeperiod=50)
+    # df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
+    # close = df["close"].to_numpy()
+    # fast_ma = talib.SMA(close, timeperiod=10)
+    # slow_ma = talib.SMA(close, timeperiod=50)
 
-    entries = np.full(len(close), False)
-    cross_below(fast_ma, slow_ma, entries)
+    # entries = np.full(len(close), False)
+    # cross_below(fast_ma, slow_ma, entries)
 
-    exits = np.full(len(close), False)
-    cross_above(fast_ma, slow_ma, exits)
+    # exits = np.full(len(close), False)
+    # cross_above(fast_ma, slow_ma, exits)
 
-    blank = np.full(len(close), False)
+    # blank = np.full(len(close), False)
 
-    # signals = create_signals(entries, exits, blank, blank)
-    # signals = create_signals(entries)
-    start = time.time()
-    bt = Backtest(ohlcs, bt_params, {})
-    bt.backtest_signals(entries, exits, exits, entries)
+    # # signals = create_signals(entries, exits, blank, blank)
+    # # signals = create_signals(entries)
+    # start = time.time()
+    # bt = Backtest(ohlcs, bt_params, {})
+    # bt.backtest_signals(entries, exits, exits, entries)
 
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Backtest took: {elapsed_time_ms:.2f} ms")
-    start = time.time()
-    a = bt.get_state()
-    print(a["stats"])
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"State took: {elapsed_time_ms:.2f} ms")
-    return
-
-    start = time.time()
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"Backtest took: {elapsed_time_ms:.2f} ms")
+    # start = time.time()
     # a = bt.get_state()
-    a = bt.get_stats()
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"Elapsed time to get stats: {elapsed_time_ms:.2f} ms")
-    print(a["stats"])
-    # print(a["active_positions"])
-    # print(a["closed_positions"])
-    # # print(entries)
-    # print(fast_ma)
+    # print(a["stats"])
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"State took: {elapsed_time_ms:.2f} ms")
+    # return
+
+    # start = time.time()
+    # # a = bt.get_state()
+    # a = bt.get_stats()
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"Elapsed time to get stats: {elapsed_time_ms:.2f} ms")
+    # print(a["stats"])
+    # # print(a["active_positions"])
+    # # print(a["closed_positions"])
+    # # # print(entries)
+    # # print(fast_ma)
 
 
-dev()
+# dev()

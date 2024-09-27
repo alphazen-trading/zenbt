@@ -1,6 +1,6 @@
-from datetime import datetime as DateTime
-from typing import *
-from decimal import *
+from datetime import datetime
+from typing import Any
+from decimal import Decimal
 from enum import Enum
 
 class BBO:
@@ -45,4 +45,3 @@ class Instrument:
     def on_new_bbo(self, bbo: BBO) -> None: ...
     def round_amount(self, value: Decimal) -> Decimal: ...
     def round_price(self, value: Decimal) -> Decimal: ...
-    def underlyings_codes(self) -> Vec: ...
