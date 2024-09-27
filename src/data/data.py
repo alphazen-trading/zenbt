@@ -5,7 +5,7 @@ from tradingtoolbox.exchanges.okx import OKXKlines
 
 
 def download_okx_data(symbol="PEPE-USDT-SWAP", interval="1m", days_ago=90):
-    df = OKXKlines().load_klines(symbol, interval, days_ago=days_ago)
+    OKXKlines().load_klines(symbol, interval, days_ago=days_ago)
 
 
 def read_data(
@@ -36,7 +36,6 @@ def read_data(
             df = resample(df, tf=resample_tf, on="time")
             df.reset_index(inplace=True)
         df["time"] = pd.to_datetime(df["time"]).astype(int) / 10**6
-        print(df)
         df = df[start:end]
     else:
         df = pd.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
@@ -46,8 +45,7 @@ def read_data(
             df = resample(df, tf=resample_tf, on="time")
             df.reset_index(inplace=True)
         df = df[start:end]
-        print(df)
-        df.drop(columns=["d"], inplace=True)
+        df.drop(columns=["d"], inplace=True)  # type: ignore
 
         df["volume"] = df["volume"].astype(float)
         df["open"] = df["open"].astype(float)
@@ -55,5 +53,5 @@ def read_data(
         df["low"] = df["low"].astype(float)
         df["close"] = df["close"].astype(float)
 
-    ohlcs = OHLCs(df.to_numpy())
-    return df, ohlcs
+    ohlcs = OHLCs(df.to_numpy())  # type: ignore
+    return df, ohlcs  # type: ignore

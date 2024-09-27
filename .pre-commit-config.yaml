@@ -36,17 +36,17 @@ repos:
       - id: ruff-format
   - repo: local
     hooks:
-    # - id: rye-pyright
-    #   name: pyright
-    #   description: "Run pyright"
-    #   entry: rye run pyright
-    #   language: system
-    #   types_or: [python, pyi]
-    #   args: []
-    #   pass_filenames: false
-    #   require_serial: true
-    #   additional_dependencies: []
-    #   minimum_pre_commit_version: "2.9.2"
+    - id: rye-pyright
+      name: pyright
+      description: "Run pyright"
+      entry: rye run pyright
+      language: system
+      types_or: [python, pyi]
+      args: []
+      pass_filenames: false
+      require_serial: true
+      additional_dependencies: []
+      minimum_pre_commit_version: "2.9.2"
     - id: rye-test
       name: rye-test
       description: "Test Python via 'rye test'"

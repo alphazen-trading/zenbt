@@ -37,8 +37,7 @@ def create_buckets(items):
 
 
 def bt_wrapper(bt_method, st_params, iteration, df, ohlcvs, *args):
-    if iteration == 0:
-        pbar = tqdm(total=len(st_params), ncols=40)
+    pbar = tqdm(total=len(st_params), ncols=40)
 
     stats = []
     for param in st_params:

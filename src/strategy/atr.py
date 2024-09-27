@@ -4,8 +4,12 @@ from numba import njit
 import numpy as np
 import time
 
+from talib import ATR
+
 from zenbt.rs import create_limit_orders
 from zenbt.rs import LimitOrders, OrderType, Side
+
+dir(talib)
 
 
 @njit(cache=True)
