@@ -7,13 +7,14 @@ from rich import print as rprint
 import talib
 
 
-bbw = mpf.make_addplot(
-    c["bbw"].rolling(window=4).mean(),
-    panel=3,
-    color="orange",
-    ylabel="BBW",
-)
-subplots = [bbw]
+# bbw = mpf.make_addplot(
+#     c["bbw"].rolling(window=4).mean(),
+#     panel=3,
+#     color="orange",
+#     ylabel="BBW",
+# )
+# subplots = [bbw]
+subplots = []
 
 
 class PlotPricesAtTrade:
@@ -31,7 +32,7 @@ class PlotPricesAtTrade:
             volume=False,
             title="OHLC Chart",
             addplot=subplots,
-            alines=dict(alines=[line], colors=[line__color], linewidths=[2]),
+            alines=dict(alines=[line], colors=[line_color], linewidths=[2]),
         )
 
     def prepare(self, ohlc, trade, funding, left_delta, right_delta):

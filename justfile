@@ -36,6 +36,7 @@ local_docker:
 # Code Section
 # ============================================= #
 pre-commit-test:
+  ruff check --fix
   rye run pre-commit run
 
 alias dev := py_dev

@@ -73,6 +73,6 @@ norecursedirs = ["docker"]
 # Enable Pyflakes and pycodestyle rules.
 select = ["E", "F"]
 # Never enforce `E501` (line length violations).
-ignore = ["E501"]
+ignore = ["E501", "F401", "F841"]
 # Never try to fix `F401` (unused imports).
 unfixable = ["F401", "F841"]
