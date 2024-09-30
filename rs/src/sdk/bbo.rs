@@ -4,7 +4,6 @@ use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct BBO {
@@ -16,7 +15,6 @@ pub struct BBO {
     pub ask_size: Decimal,
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl BBO {
     #[new]

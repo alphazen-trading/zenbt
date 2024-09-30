@@ -13,5 +13,6 @@ pub mod signal;
 pub mod signals;
 pub mod stats;
 pub mod stats_methods;
+pub mod strategy;
 
 pub mod enums;

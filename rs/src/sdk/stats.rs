@@ -4,7 +4,6 @@ use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use serde::{Deserialize, Serialize};
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stats {

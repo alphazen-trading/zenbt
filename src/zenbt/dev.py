@@ -98,14 +98,49 @@ def bt_perf(param, df, ohlcvs):
 def bt_method(param, df, ohlcvs):
     st = ATR_Strategy(df, 0.1, param)
     bt = Backtest(ohlcvs, bt_params, st.limit_orders)
-    bt.backtest()
+    bt.backtest_with_cb()
     return bt
 
 
+from zenbt.rs import LimitOrders, OrderType, Side
+from zenbt.rs import Strategy, BT, Bar, Foo
+
+
+class ST(Strategy):
+    def major(self):
+        print("IN major")
+        print(self.inner.open)
+        return 4
+
+
 def dev():
+    bar = Bar()
+    print(bar.test())
+    print(bar.foo.inner)
+    bar.foo.inner = 50
+    print(bar.foo.inner)
+    return
+    st = ST()
+    print(st.inner.open)
+    # print(dir(st.inner))
+    # st.test()
+    st.major()
+    bt = BT(strategy=st)
+    bt.test()
+    return
+    import inspect
+
+    # Get the path of the module
+    module_path = inspect.getfile(ATR_Strategy)
+    print(module_path)
     # download_okx_data(days_ago=2)
-    sym = "1000PEPE"
-    df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="binance")
+    sym = "PEPE"
+    df, ohlcs = read_data(sym, 0, 100, resample_tf="1min", exchange="okx")
+    bt = Backtest(ohlcs, bt_params, LimitOrders(10))
+    print(bt.external)
+    print(bt.ohlc)
+    print(bt.external.curr)
+    # bt.backtest_with_cb()
     # df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="okx")
     # bt = bt_method((1, 2, 10, 1), df, ohlcs)
     # plot_equity(df, bt)
@@ -114,7 +149,7 @@ def dev():
     #     df, ohlcs, ATR_Strategy.generate_bt_params(simple=False), bt_method
     # )
 
-    analyze_simulations()
+    # analyze_simulations()
 
     # bt = bt_perf((15, 2, 2, 1), df, ohlcs)
     # bt = bt_method((11, 2, 0.786, 1), df, ohlcs)

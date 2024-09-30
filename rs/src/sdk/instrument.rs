@@ -6,7 +6,6 @@ use pyo3::prelude::*;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Instrument {
@@ -21,7 +20,6 @@ pub struct Instrument {
     pub id: u64,
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl Instrument {
     #[new]

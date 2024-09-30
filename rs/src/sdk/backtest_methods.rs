@@ -193,65 +193,65 @@ pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest) {
     }
 }
 
-pub fn find_signals_to_manage(i: usize, backtest: &mut Backtest) {
-    // let ohlc = &backtest.ohlc[i];
-    // let index = Decimal::from(i);
-    // let signals = backtest.signals.get(&index);
+// pub fn find_signals_to_manage(i: usize, backtest: &mut Backtest) {
+// let ohlc = &backtest.ohlc[i];
+// let index = Decimal::from(i);
+// let signals = backtest.signals.get(&index);
 
-    // let mut indexes_to_remove = Vec::new();
-    // let mut floating_equity = dec!(0);
-    // let mut realized_equity = dec!(0);
+// let mut indexes_to_remove = Vec::new();
+// let mut floating_equity = dec!(0);
+// let mut realized_equity = dec!(0);
 
-    // if signals.is_some() {
-    //     for signal in signals.unwrap() {
-    //         let size = dec!(1);
-    //         if signal.signal_type == "open" {
-    //             let new_position = Position {
-    //                 index,
-    //                 exit_index: 0,
-    //                 entry_timestamp: ohlc.date,
-    //                 exit_timestamp: None,
-    //                 entry_price: ohlc.open,
-    //                 exit_price: None,
-    //                 size,
-    //                 sl: None,
-    //                 tp: None,
-    //                 side: signal.side,
-    //                 close_reason: None,
-    //                 pnl: dec!(0.0),
-    //                 max_dd: dec!(0.0),
-    //                 commission: ohlc.open * backtest.params.commission_pct * size,
-    //                 commission_pct: backtest.params.commission_pct,
-    //             };
-    //             backtest.positions.active_positions.push(new_position);
-    //         } else {
-    //             for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate()
-    //             {
-    //                 if position.side != signal.side {
-    //                     position.close_position(
-    //                         i,
-    //                         ohlc,
-    //                         ohlc.close,
-    //                         CloseReason::Signal,
-    //                         dec!(0.0),
-    //                     );
-    //                     position.exit_timestamp = Some(ohlc.date);
-    //                     backtest.positions.closed_positions.push(position.clone());
-    //                     backtest.commissions += position.commission;
-    //                     realized_equity += position.pnl;
-    //                     indexes_to_remove.push(j);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    // for &i in indexes_to_remove.iter().rev() {
-    //     backtest.positions.active_positions.remove(i);
-    // }
-    // for position in &mut backtest.positions.active_positions.iter_mut() {
-    //     position.update_pnl(ohlc.close);
-    //     floating_equity += position.pnl;
-    // }
+// if signals.is_some() {
+//     for signal in signals.unwrap() {
+//         let size = dec!(1);
+//         if signal.signal_type == "open" {
+//             let new_position = Position {
+//                 index,
+//                 exit_index: 0,
+//                 entry_timestamp: ohlc.date,
+//                 exit_timestamp: None,
+//                 entry_price: ohlc.open,
+//                 exit_price: None,
+//                 size,
+//                 sl: None,
+//                 tp: None,
+//                 side: signal.side,
+//                 close_reason: None,
+//                 pnl: dec!(0.0),
+//                 max_dd: dec!(0.0),
+//                 commission: ohlc.open * backtest.params.commission_pct * size,
+//                 commission_pct: backtest.params.commission_pct,
+//             };
+//             backtest.positions.active_positions.push(new_position);
+//         } else {
+//             for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate()
+//             {
+//                 if position.side != signal.side {
+//                     position.close_position(
+//                         i,
+//                         ohlc,
+//                         ohlc.close,
+//                         CloseReason::Signal,
+//                         dec!(0.0),
+//                     );
+//                     position.exit_timestamp = Some(ohlc.date);
+//                     backtest.positions.closed_positions.push(position.clone());
+//                     backtest.commissions += position.commission;
+//                     realized_equity += position.pnl;
+//                     indexes_to_remove.push(j);
+//                 }
+//             }
+//         }
+//     }
+// }
+// for &i in indexes_to_remove.iter().rev() {
+//     backtest.positions.active_positions.remove(i);
+// }
+// for position in &mut backtest.positions.active_positions.iter_mut() {
+//     position.update_pnl(ohlc.close);
+//     floating_equity += position.pnl;
+// }
 
-    // update_backtest_equity(backtest, floating_equity, realized_equity);
-}
+// update_backtest_equity(backtest, floating_equity, realized_equity);
+// }

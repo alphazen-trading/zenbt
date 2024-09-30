@@ -1,15 +1,15 @@
 use pyo3::prelude::*;
 use pyo3::types::PyString;
 
+#[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq)]
-#[pyclass]
 pub enum Side {
     Long,
     Short,
 }
 
+#[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq)]
-#[pyclass]
 pub enum OrderType {
     Market,
     Limit,
@@ -24,8 +24,8 @@ impl ToPyObject for Side {
     }
 }
 
+#[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq)]
-#[pyclass]
 pub enum CloseReason {
     TakeProfit,
     StopLoss,

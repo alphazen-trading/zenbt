@@ -8,7 +8,6 @@ use std::ops::Div;
 
 use serde::Serialize;
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone, Serialize, Copy)]
 pub struct OHLC {
@@ -33,7 +32,6 @@ impl ToPyObject for OHLC {
     }
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl OHLC {
     #[new]
@@ -60,14 +58,12 @@ impl OHLC {
 
 // Where we create the Actual OHLCs
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone, Serialize)]
 pub struct OHLCs {
     pub ohlc: Vec<OHLC>,
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl OHLCs {
     #[new]

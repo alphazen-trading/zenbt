@@ -5,7 +5,6 @@ use std::collections::HashMap;
 
 use super::enums::{OrderType, Side};
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Order {
@@ -18,14 +17,12 @@ pub struct Order {
     pub tp: Decimal,
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct LimitOrders {
     pub limit_orders: HashMap<usize, Vec<Order>>,
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl LimitOrders {
     #[new]

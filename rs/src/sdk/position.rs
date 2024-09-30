@@ -6,7 +6,6 @@ use rust_decimal::Decimal;
 
 use super::enums::{CloseReason, Side};
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi)]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct Position {
@@ -75,7 +74,6 @@ impl ToPyObject for Position {
     }
 }
 
-#[cfg_attr(feature = "pyi", pyi_macros::pyi_impl)]
 #[pymethods]
 impl Position {
     pub fn update_pnl(&mut self, close: Decimal) {
@@ -145,6 +143,7 @@ impl Position {
     }
 }
 
+#[pyclass()]
 #[derive(Debug, Clone)]
 pub struct Positions {
     pub active_positions: Vec<Position>,
