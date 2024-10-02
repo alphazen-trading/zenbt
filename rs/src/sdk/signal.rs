@@ -1,10 +1,11 @@
 use pyo3::prelude::*;
+use pyo3::types::{PyDict, PyTuple};
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 
 use super::enums::Side;
 
-#[pyclass]
+#[pyclass(get_all, set_all)]
 #[derive(Debug, Clone)]
 pub struct Signal {
     pub index: Decimal,

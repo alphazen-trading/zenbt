@@ -47,6 +47,7 @@ dev-dependencies = [
     "pyright>=1.1.382.post1",
     "ipython<=8.0.0",
     "matplotlib>=3.9.2",
+    "ruff>=0.6.8",
 ]
 
 [tool.hatch.metadata]

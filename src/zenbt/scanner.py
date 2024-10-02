@@ -1,6 +1,7 @@
 from types import ModuleType
 import inspect
 import os
+import sys
 
 
 class Scanner:
@@ -98,7 +99,7 @@ class Scanner:
             path = f"{pyi_root}/{path}.pyi"
             os.makedirs(os.path.dirname(f"{pyi_root}"), exist_ok=True)
             with open(path, "w") as file:
-                file.write(f"from typing import Final\n\n")
+                file.write("from typing import Final\n\n")
                 for (
                     class_obj,
                     class_constants,
@@ -119,7 +120,7 @@ class Scanner:
                         )
 
                     for attr in class_attributes:
-                        doc = inspect.getdoc(method[1])
+                        doc = inspect.getdoc(attr[1])
                         if doc:
                             file.write(f'    """\n')
                             file.write(doc)
@@ -159,4 +160,45 @@ class Scanner:
                     file.write("\n")
 
 
-Scanner()
+# import zenbt.rs
+
+# scanner = Scanner()
+# scanner.scan_module("", sys.modules["zenbt.rs"])
+# scanner.write_pyis("./")
+
+import argparse
+import importlib
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Scan a module and generate .pyi files"
+    )
+    parser.add_argument(
+        "module", help="The name of the module to scan (e.g., zenbt.rs)"
+    )
+    parser.add_argument("module_dir", help="The directory where the module is located")
+    args = parser.parse_args()
+
+    # Add module_dir to sys.path
+    sys.path.append(args.module_dir)
+
+    # Dynamically import the module
+    try:
+        module = importlib.import_module(args.module)
+    except ModuleNotFoundError:
+        print(f"Module {args.module} not found in {args.module_dir}")
+        return
+
+    # Instantiate the scanner and scan the module
+    scanner = Scanner()
+    scanner.scan_module("", module)
+
+    # Write the .pyi file in the same directory as the module
+    module_file = module.__file__
+    module_dir = os.path.dirname(module_file)
+    scanner.write_pyis(module_dir)
+
+
+if __name__ == "__main__":
+    main()

@@ -33,8 +33,6 @@ asttokens==2.4.1
     # via stack-data
 async-lru==2.0.4
     # via jupyterlab
-async-timeout==4.0.3
-    # via aiohttp
 attrs==24.2.0
     # via aiohttp
     # via jsonschema
@@ -46,8 +44,6 @@ babel==2.16.0
     # via jupyterlab-server
 backcall==0.2.0
     # via ipython
-backports-tarfile==1.2.0
-    # via jaraco-context
 beautifulsoup4==4.12.3
     # via nbconvert
 binance-historical-data==0.1.13
@@ -102,9 +98,6 @@ defusedxml==0.7.1
     # via nbconvert
 distlib==0.3.8
     # via virtualenv
-exceptiongroup==1.2.2
-    # via anyio
-    # via pytest
 executing==2.1.0
     # via stack-data
 fastjsonschema==2.20.0
@@ -144,7 +137,6 @@ idna==3.8
     # via yarl
 importlib-metadata==7.2.1
     # via commitizen
-    # via keyring
     # via python-okx
 incremental==24.7.2
     # via twisted
@@ -404,6 +396,7 @@ rich==13.8.0
 rpds-py==0.20.0
     # via jsonschema
     # via referencing
+ruff==0.6.8
 secretstorage==3.3.3
     # via keyring
 send2trash==1.8.3
@@ -435,11 +428,6 @@ terminado==0.18.1
     # via jupyter-server-terminals
 tinycss2==1.3.0
     # via nbconvert
-tomli==2.0.1
-    # via black
-    # via incremental
-    # via jupyterlab
-    # via pytest
 tomlkit==0.13.0
     # via commitizen
 tornado==6.4.1
@@ -474,9 +462,6 @@ twisted==24.7.0
 types-python-dateutil==2.9.0.20240821
     # via arrow
 typing-extensions==4.12.2
-    # via anyio
-    # via async-lru
-    # via black
     # via pydantic
     # via pydantic-core
     # via pyright

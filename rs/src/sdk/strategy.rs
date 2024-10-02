@@ -5,11 +5,17 @@ use chrono::{DateTime, Utc};
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
-#[pyclass(get_all)]
+#[pyclass(get_all, set_all)]
+#[derive(Debug)]
+pub struct Test {
+    pub mine: Decimal,
+}
+
+#[pyclass(get_all, frozen)]
 #[derive(Debug)]
 pub struct Foo {
-    #[pyo3(set)]
     pub inner: Decimal,
+    pub test: Py<Test>,
 }
 
 #[pyclass(get_all, subclass)]
@@ -27,6 +33,12 @@ impl Bar {
                 py,
                 Foo {
                     inner: Decimal::from_f64(24.1).unwrap(),
+                    test: Py::new(
+                        py,
+                        Test {
+                            mine: Decimal::from_f64(24.1).unwrap(),
+                        },
+                    )?,
                 },
             )?;
             Ok(Bar { foo })
@@ -34,10 +46,12 @@ impl Bar {
     }
 
     fn test(&self) {
-        Python::with_gil(|py| {
-            let val = self.foo.borrow(py);
-            println!("Za val is this {:?}", val);
-        });
+        let val = self.foo.get().inner;
+        println!("Za val is this {:?}", val);
+        // Python::with_gil(|py| {
+        //     let val = self.foo.borrow(py);
+        //     println!("Za val is this {:?}", val);
+        // });
     }
 }
 
