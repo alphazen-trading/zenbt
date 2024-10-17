@@ -1,4 +1,4 @@
-use super::backtest::Backtest;
+use super::backtest::Backtest_old;
 use super::backtest_params::BacktestParams;
 use super::enums::{CloseReason, Side};
 use super::ohlc::OHLC;
@@ -78,7 +78,7 @@ pub fn create_position_from_signal(
 }
 
 pub fn update_backtest_equity(
-    backtest: &mut Backtest,
+    backtest: &mut Backtest_old,
     floating_equity: Decimal,
     realized_equity: Decimal,
 ) {
@@ -92,7 +92,12 @@ pub fn update_backtest_equity(
     );
 }
 
-pub fn find_signals_to_close(i: usize, backtest: &mut Backtest, long_exit: bool, short_exit: bool) {
+pub fn find_signals_to_close(
+    i: usize,
+    backtest: &mut Backtest_old,
+    long_exit: bool,
+    short_exit: bool,
+) {
     let ohlc = backtest.ohlc[i];
     let mut indexes_to_remove = Vec::new();
     let mut floating_equity = dec!(0);
@@ -125,7 +130,7 @@ pub fn find_signals_to_close(i: usize, backtest: &mut Backtest, long_exit: bool,
 
 pub fn find_signals_to_enter(
     i: usize,
-    backtest: &mut Backtest,
+    backtest: &mut Backtest_old,
     long_entry: bool,
     short_entry: bool,
 ) {
@@ -143,7 +148,7 @@ pub fn find_signals_to_enter(
     }
 }
 
-pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest) {
+pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest_old) {
     let ohlc = &backtest.ohlc[i];
     let mut indexes_to_remove = Vec::new();
     let mut floating_equity = dec!(0);
@@ -170,7 +175,7 @@ pub fn find_active_positions_to_close(i: usize, backtest: &mut Backtest) {
     update_backtest_equity(backtest, floating_equity, realized_equity);
 }
 
-pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest) {
+pub fn find_triggered_pending_orders(i: usize, backtest: &mut Backtest_old) {
     let ohlc = &backtest.ohlc[i];
     let orders = backtest.limit_orders.get(i);
     if orders.is_some() {

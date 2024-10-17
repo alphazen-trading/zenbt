@@ -1,4 +1,5 @@
 # from zenbt.rs import Signal, Foo, Bar
+import numpy as np
 
 # sig = Signal()
 # sig.method
@@ -25,8 +26,10 @@
 # from rich import print
 # import numpy as np
 # from strategy.atr import ATR_Strategy
-from data.data import read_data, download_okx_data
-# from zenbt.rs import Backtest, BacktestParams
+from data.data import read_data, read_data_pl, download_okx_data
+import polars
+import time
+from zenbt.rs import BacktestParams, OHLCs
 # import talib
 
 # pd.options.display.float_format = "{:.10f}".format
@@ -40,11 +43,11 @@ from data.data import read_data, download_okx_data
 #     return bt
 
 
-# COMMISSION = 0
-# COMMISSION = 0.02 / 100
-# initial_capital = 2000
+COMMISSION = 0
+COMMISSION = 0.02 / 100
+initial_capital = 2000
 
-# bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
+bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
 
 
 # # size = initial_capital / df["close"][0]
@@ -120,8 +123,18 @@ from data.data import read_data, download_okx_data
 #     return bt
 
 
-# from zenbt.rs import LimitOrders, OrderType, Side
+from zenbt.rs import LimitOrders, OrderType, Side
+
 # from zenbt.rs import Strategy, BT, Bar, Foo, BBO, Signal
+from zenbt.rs import (
+    Strategy,
+    Backtest,
+    Backtest_old,
+    Decision,
+    cross_above,
+    cross_below,
+    Result,
+)
 
 # sg = Signal()
 
@@ -129,86 +142,168 @@ from data.data import read_data, download_okx_data
 # # bbo.code
 # # print(BB)
 
+import talib
+import polars as pl
 
-# class ST(Strategy):
-#     def major(self):
-#         print("IN major")
-#         print(self.inner.open)
-#         return 4
+from numba import njit
+
+
+class ST(Strategy):
+    def on_candle_col(self, index, has_position, **kwargs):
+        row = self.df[index]
+        return Decision.Nothing
+
+    def on_candle(self, index, **kwargs):
+        time = self.data["time"][index]
+        open = self.data["open"][index]
+        close = self.data["close"][index]
+        cross_above = self.data["cross_above"][index]
+        cross_below = self.data["cross_below"][index]
+        if len(self.equity) > 0:
+            equity = self.equity[-1]
+            print(cross_above)
+        res = Result(2)
+        return res
+
+        # return Decision.Nothing
 
 
 def dev():
     #     # download_okx_data(days_ago=2)
-    sym = "PEPE"
-    df, ohlcs = read_data(sym, 0, 100, resample_tf="1min", exchange="okx")
+    sym = "1000PEPE"
+    start = time.time()
+    # df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="binance")
+    # print(df)
+    # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    # df, ohlcs = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    df = read_data_pl(sym, 0, 1000, resample_tf="1min", exchange="binance")
+    # transposed_df = df.transpose(include_header=False)
 
+    # start = time.time()
+    # for i in range(len(df)):
+    #     if df["close"][i] > df["close"][i - 1]:
+    #         a = True
+    #     elif df["close"][i] < df["close"][i - 1]:
+    #         a = False
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"Backtest took: {elapsed_time_ms:.2f} ms")
 
-#     bt = Backtest(ohlcs, bt_params, LimitOrders(10))
-#     print(bt.external)
-#     print(bt.ohlc)
-#     print(bt.external.curr)
-#     # bt.backtest_with_cb()
-#     # df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="okx")
-#     # bt = bt_method((1, 2, 10, 1), df, ohlcs)
-#     # plot_equity(df, bt)
+    fast_ma = talib.SMA(df["close"], timeperiod=10)
+    slow_ma = talib.SMA(df["close"], timeperiod=50)
+    atr = talib.ATR(df["high"], df["low"], df["close"], timeperiod=14)
+    df = df.with_columns(
+        # pl.Series("atr", atr),
+        # pl.Series("fast_ma", fast_ma),
+        # pl.Series("slow_ma", slow_ma),
+        pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
+        pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
+    )
 
-#     # res = multi_backtest(
-#     #     df, ohlcs, ATR_Strategy.generate_bt_params(simple=False), bt_method
-#     # )
+    st = ST(df, bt_params)
+    bt = Backtest(df, bt_params, st)
+    start = time.time()
+    bt.backtest_with_row()
+    # st.backtest()
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Backtest with rows: {elapsed_time_ms:.2f} ms")
+    return
 
-#     # analyze_simulations()
+    # st = ST(transposed_df, bt_params)
+    # # # print(dir(st))
+    # # st.test_df(df)
+    # # st.major()
+    # bt = Backtest(transposed_df, bt_params, st)
+    # start = time.time()
+    # bt.backtest()
+    # # st.backtest()
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"Backtest with cols took: {elapsed_time_ms:.2f} ms")
 
-#     # bt = bt_perf((15, 2, 2, 1), df, ohlcs)
-#     # bt = bt_method((11, 2, 0.786, 1), df, ohlcs)
-#     # print(bt.get_stats()["stats"])
-#     return
+    # bt = Backtest(ohlcs, bt_params, LimitOrders(10))
 
-#     # state = bt.get_state()
+    #     print(bt.external)
+    #     print(bt.ohlc)
+    #     print(bt.external.curr)
+    #     # bt.backtest_with_cb()
+    #     # df, ohlcs = read_data(sym, 0, -1, resample_tf="1min", exchange="okx")
+    #     # bt = bt_method((1, 2, 10, 1), df, ohlcs)
+    #     # plot_equity(df, bt)
 
-#     # plot_equity(df, bt)
+    #     # res = multi_backtest(
+    #     #     df, ohlcs, ATR_Strategy.generate_bt_params(simple=False), bt_method
+    #     # )
 
-#     # multi_backtest(df, bt, size, st.generate_bt_params(), run_backtest)
+    #     # analyze_simulations()
 
-#     # return
+    #     # bt = bt_perf((15, 2, 2, 1), df, ohlcs)
+    #     # bt = bt_method((11, 2, 0.786, 1), df, ohlcs)
+    #     # print(bt.get_stats()["stats"])
+    #     return
 
-#     # df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
-#     # close = df["close"].to_numpy()
-#     # fast_ma = talib.SMA(close, timeperiod=10)
-#     # slow_ma = talib.SMA(close, timeperiod=50)
+    #     # state = bt.get_state()
 
-#     # entries = np.full(len(close), False)
-#     # cross_below(fast_ma, slow_ma, entries)
+    #     # plot_equity(df, bt)
 
-#     # exits = np.full(len(close), False)
-#     # cross_above(fast_ma, slow_ma, exits)
+    #     # multi_backtest(df, bt, size, st.generate_bt_params(), run_backtest)
 
-#     # blank = np.full(len(close), False)
+    #     # return
 
-#     # # signals = create_signals(entries, exits, blank, blank)
-#     # # signals = create_signals(entries)
-#     # start = time.time()
-#     # bt = Backtest(ohlcs, bt_params, {})
-#     # bt.backtest_signals(entries, exits, exits, entries)
+    # df, ohlcs = read_data("BTC", 0, -1, resample_tf="1min")
+    # close = df["close"].to_numpy()
+    # fast_ma = talib.SMA(close, timeperiod=10)
+    # slow_ma = talib.SMA(close, timeperiod=50)
 
-#     # elapsed_time_ms = (time.time() - start) * 1000
-#     # print(f"Backtest took: {elapsed_time_ms:.2f} ms")
-#     # start = time.time()
-#     # a = bt.get_state()
-#     # print(a["stats"])
-#     # elapsed_time_ms = (time.time() - start) * 1000
-#     # print(f"State took: {elapsed_time_ms:.2f} ms")
-#     # return
+    # # entries = np.full(len(close), False)
+    # # cross_below(fast_ma, slow_ma, entries)
+    # entries = cross_below(fast_ma, slow_ma)
 
-#     # start = time.time()
-#     # # a = bt.get_state()
-#     # a = bt.get_stats()
-#     # elapsed_time_ms = (time.time() - start) * 1000
-#     # print(f"Elapsed time to get stats: {elapsed_time_ms:.2f} ms")
-#     # print(a["stats"])
-#     # # print(a["active_positions"])
-#     # # print(a["closed_positions"])
-#     # # # print(entries)
-#     # # print(fast_ma)
+    # # exits = np.full(len(close), False)
+    # # cross_above(fast_ma, slow_ma, exits)
+    # exits = cross_above(fast_ma, slow_ma)
+    df, ohlcs = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    fast_ma = talib.SMA(df["close"], timeperiod=10)
+    slow_ma = talib.SMA(df["close"], timeperiod=50)
+    atr = talib.ATR(df["high"], df["low"], df["close"], timeperiod=14)
+    df = df.with_columns(
+        # pl.Series("atr", atr),
+        # pl.Series("fast_ma", fast_ma),
+        # pl.Series("slow_ma", slow_ma),
+        pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
+        pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
+    )
+    close = df["close"].to_numpy()
+    exits = df["cross_above"].to_numpy()
+    entries = df["cross_above"].to_numpy()
+
+    blank = np.full(len(close), False)
+
+    # signals = create_signals(entries, exits, blank, blank)
+    # signals = create_signals(entries)
+
+    ohlcs = OHLCs(df.to_numpy())
+    bt = Backtest_old(ohlcs, bt_params, LimitOrders(10))
+    start = time.time()
+    bt.backtest_signals(entries, exits, exits, entries)
+
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"RS Backtest took: {elapsed_time_ms:.2f} ms")
+    start = time.time()
+    # a = bt.get_state()
+    # # print(a["stats"])
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"State took: {elapsed_time_ms:.2f} ms")
+    return
+
+    start = time.time()
+    # a = bt.get_state()
+    a = bt.get_stats()
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"Elapsed time to get stats: {elapsed_time_ms:.2f} ms")
+    print(a["stats"])
+    # print(a["active_positions"])
+    # print(a["closed_positions"])
+    # # print(entries)
+    # print(fast_ma)
 
 
 # # dev()

@@ -2,6 +2,7 @@ from zenbt.rs import OHLCs
 import pandas as pd
 from tradingtoolbox.utils import resample
 from tradingtoolbox.exchanges.okx import OKXKlines
+import polars as pl
 
 
 def download_okx_data(symbol="PEPE-USDT-SWAP", interval="1m", days_ago=90):
@@ -53,5 +54,75 @@ def read_data(
         df["low"] = df["low"].astype(float)
         df["close"] = df["close"].astype(float)
 
-    ohlcs = OHLCs(df.to_numpy())  # type: ignore
-    return df, ohlcs  # type: ignore
+    # ohlcs = OHLCs(df.to_numpy())  # type: ignore
+    # return df, ohlcs  # type: ignore
+    return df
+
+
+def read_data_pl(
+    sym,
+    start=0,
+    end=-1,
+    resample_tf="1min",
+    exchange="binance",
+    # ) -> pl.DataFrame:
+) -> tuple[pd.DataFrame, OHLCs]:
+    # Read the appropriate Parquet file
+    if exchange == "binance":
+        df = pl.read_parquet(f"./data/binance-{sym}USDT-PERPETUAL-1m.parquet")
+
+        # Drop unnecessary columns
+        df = df.drop([
+            "taker_buy_volume",
+            "quote_asset_volume",
+            "close_time",
+            "number_of_trades",
+            "taker_buy_quote_asset_volume",
+            "ignore",
+        ])
+
+        # Cast columns to Float64
+        df = df.with_columns([
+            pl.col("volume").cast(pl.Float64),
+            pl.col("open").cast(pl.Float64),
+            pl.col("high").cast(pl.Float64),
+            pl.col("low").cast(pl.Float64),
+            pl.col("close").cast(pl.Float64),
+        ])
+
+        # Resampling if needed
+        if resample_tf != "1min":
+            df = resample(df, tf=resample_tf, on="time")
+
+        # Convert timestamp and slice
+        df = df.with_columns(pl.col("time").cast(pl.Datetime).cast(pl.Int64) // 10**6)
+        df = df.slice(start, end - start if end != -1 else None)
+
+    else:
+        df = pl.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
+        print(df)
+
+        # Convert date column to datetime
+        df = df.with_columns(pl.col("date").cast(pl.Datetime("ms")))
+
+        # Resampling if needed
+        if resample_tf != "1min":
+            df = resample(df, tf=resample_tf, on="date")
+
+        # Slice the DataFrame and drop the date column
+        df = df.slice(start, end - start if end != -1 else None)
+        df = df.drop(["date"])
+
+        # Cast columns to Float64
+        df = df.with_columns([
+            pl.col("volume").cast(pl.Float64),
+            pl.col("open").cast(pl.Float64),
+            pl.col("high").cast(pl.Float64),
+            pl.col("low").cast(pl.Float64),
+            pl.col("close").cast(pl.Float64),
+        ])
+
+    # Convert DataFrame to numpy array for OHLCs compatibility, if needed
+    # ohlcs = OHLCs(df.to_numpy())
+    # return df, ohlcs
+    return df
