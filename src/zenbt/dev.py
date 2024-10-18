@@ -148,20 +148,29 @@ import polars as pl
 from numba import njit
 
 
-class ST(Strategy):
+class BaseStrategy(Strategy):
     def on_candle_col(self, index, has_position, **kwargs):
         row = self.df[index]
         return Decision.Nothing
 
+    def update_equity(self, equity, order):
+        # print(order)
+        self.equity.append(equity)
+        # print(self.equity[-1])
+        # self.equity.put(equity)
+
+
+class ST(BaseStrategy):
     def on_candle(self, index, **kwargs):
         time = self.data["time"][index]
         open = self.data["open"][index]
         close = self.data["close"][index]
         cross_above = self.data["cross_above"][index]
         cross_below = self.data["cross_below"][index]
-        if len(self.equity) > 0:
-            equity = self.equity[-1]
-            print(cross_above)
+        equity = self.equity[-1]
+        # if len(self.equity) > 0:
+        #     equity = self.equity[-1]
+        # print(cross_above)
         res = Result(2)
         return res
 
@@ -206,7 +215,6 @@ def dev():
     # st.backtest()
     elapsed_time_ms = (time.time() - start) * 1000
     print(f"Backtest with rows: {elapsed_time_ms:.2f} ms")
-    return
 
     # st = ST(transposed_df, bt_params)
     # # # print(dir(st))
@@ -260,7 +268,7 @@ def dev():
     # # exits = np.full(len(close), False)
     # # cross_above(fast_ma, slow_ma, exits)
     # exits = cross_above(fast_ma, slow_ma)
-    df, ohlcs = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)
     atr = talib.ATR(df["high"], df["low"], df["close"], timeperiod=14)
