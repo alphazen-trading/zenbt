@@ -4,7 +4,7 @@ from rich import print
 from zenbt.rs import (
     BacktestParams,
     OHLCs,
-    Backtest_old,
+    BacktestOld,
     LimitOrders,
     cross_above,
     cross_below,
@@ -45,7 +45,7 @@ class ZBT:
 
         self.blank = np.full(len(df["close"]), False)
 
-        self.bt = Backtest_old(ohlcs, bt_params, LimitOrders(10))
+        self.bt = BacktestOld(ohlcs, bt_params, LimitOrders(10))
 
     def backtest(self):
         self.bt.backtest_signals(self.entries, self.exits, self.blank, self.blank)

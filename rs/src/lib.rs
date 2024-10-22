@@ -1,27 +1,34 @@
+mod backtest;
 mod helpers;
 mod indicators;
 mod sdk;
+mod strategy;
 
+use pyo3::prelude::*;
 // use crate::helpers::create_limit_orders::create_limit_orders;
 // use crate::helpers::create_signals::create_signals;
 // use crate::helpers::round_value::round_value;
 // use ndarray::Ix1;
+use backtest::backtest::Backtest;
+use backtest::backtest_params::BacktestParams;
+use backtest::shared_state::SharedState;
+
+use strategy::actions::Action;
+use strategy::strategy::Strategy;
+
 use indicators::cross_above::cross_above;
 use indicators::cross_below::cross_below;
-use pyo3::prelude::*;
-use sdk::backtest::Backtest_old;
-use sdk::backtest_params::BacktestParams;
+use sdk::backtest::BacktestOld;
 use sdk::bbo::BBO;
 use sdk::contract::Contract;
 use sdk::enums::{Decision, OrderType, Side};
-use sdk::instrument::Instrument;
+// use sdk::instrument::Instrument;
 use sdk::ohlc::OHLCs;
 use sdk::order::LimitOrders;
 use sdk::position::Position;
 use sdk::signal::Signal;
 use sdk::signals::Signals;
 // use sdk::strategy::{Bar, Foo, Strategy, BT};
-use sdk::strategy::{Backtest, Result, Strategy};
 
 #[pymodule]
 fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -32,8 +39,11 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     // m.add_class::<Instrument>()?;
     m.add_class::<Strategy>()?;
+    m.add_class::<Action>()?;
+
     m.add_class::<Backtest>()?;
-    m.add_class::<Backtest_old>()?;
+    m.add_class::<SharedState>()?;
+    m.add_class::<BacktestOld>()?;
     // m.add_class::<BT>()?;
     // m.add_class::<Bar>()?;
     // m.add_class::<Foo>()?;
@@ -42,7 +52,6 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<BBO>()?;
     m.add_class::<OHLCs>()?;
     m.add_class::<Backtest>()?;
-    m.add_class::<Result>()?;
     m.add_class::<BacktestParams>()?;
     m.add_class::<Decision>()?;
     m.add_class::<Signals>()?;

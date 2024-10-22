@@ -65,8 +65,8 @@ def read_data_pl(
     end=-1,
     resample_tf="1min",
     exchange="binance",
-    # ) -> pl.DataFrame:
-) -> tuple[pd.DataFrame, OHLCs]:
+) -> pl.DataFrame:
+    # ) -> tuple[pd.DataFrame, OHLCs]:
     # Read the appropriate Parquet file
     if exchange == "binance":
         df = pl.read_parquet(f"./data/binance-{sym}USDT-PERPETUAL-1m.parquet")
@@ -100,10 +100,10 @@ def read_data_pl(
 
     else:
         df = pl.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
-        print(df)
-
-        # Convert date column to datetime
-        df = df.with_columns(pl.col("date").cast(pl.Datetime("ms")))
+        df.drop_in_place("__index_level_0__")
+        # df.drop_in_place("date")
+        df.drop_in_place("d")
+        df = df.rename({"date": "time"})
 
         # Resampling if needed
         if resample_tf != "1min":
@@ -111,7 +111,7 @@ def read_data_pl(
 
         # Slice the DataFrame and drop the date column
         df = df.slice(start, end - start if end != -1 else None)
-        df = df.drop(["date"])
+        # df = df.drop(["date"])
 
         # Cast columns to Float64
         df = df.with_columns([

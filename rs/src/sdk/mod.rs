@@ -1,6 +1,5 @@
 pub mod backtest;
 pub mod backtest_methods;
-pub mod backtest_params;
 pub mod backtest_state;
 
 pub mod bbo;
@@ -13,6 +12,5 @@ pub mod signal;
 pub mod signals;
 pub mod stats;
 pub mod stats_methods;
-pub mod strategy;
 
 pub mod enums;
