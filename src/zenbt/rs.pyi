@@ -2,8 +2,8 @@ from typing import Final
 
 class Signal:
     """
-This is a signal that does xyz
-Params are
+    This is a signal that does xyz
+    Params are
     """
     def my_method(self, e, f): ...
     """
@@ -19,4 +19,3 @@ MEthod that does this. storm is here
     def __init__(self, *args, **kwargs): ...
     def __hash__(self): ...
     def __eq__(self, value): ...
-

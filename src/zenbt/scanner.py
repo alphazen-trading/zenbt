@@ -122,10 +122,10 @@ class Scanner:
                     for attr in class_attributes:
                         doc = inspect.getdoc(attr[1])
                         if doc:
-                            file.write(f'    """\n')
+                            file.write('    """\n')
                             file.write(doc)
-                            file.write(f'    """\n')
-                        file.write(f"    @property\n")
+                            file.write('    """\n')
+                        file.write("    @property\n")
                         file.write(f"    def {attr[0]}(self): ...\n")
 
                     # always put new first if present
@@ -146,16 +146,16 @@ class Scanner:
                             if not method[0].startswith("__"):
                                 doc = inspect.getdoc(method[1])
                                 if doc:
-                                    file.write(f'    """\n')
+                                    file.write('    """\n')
                                     file.write(doc)
                                     file.write("\n")
-                                    file.write(f'    """\n')
+                                    file.write('    """\n')
                             file.write(
                                 f"    def {method[0]}({', '.join([str(p) for p in sig.parameters.values()])})"
                             )
                             if method[0] == "__new__":
                                 file.write(f" -> {class_obj.__name__}")
-                            file.write(f": ...\n")
+                            file.write(": ...\n")
 
                     file.write("\n")
 
@@ -196,7 +196,7 @@ def main():
 
     # Write the .pyi file in the same directory as the module
     module_file = module.__file__
-    module_dir = os.path.dirname(module_file)
+    module_dir = os.path.dirname(module_file)  # type: ignore
     scanner.write_pyis(module_dir)
 
 

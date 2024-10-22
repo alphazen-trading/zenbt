@@ -185,7 +185,7 @@ class Scanner:
                             if not method[0].startswith("__"):
                                 doc = inspect.getdoc(method[1])
                                 if doc:
-                                    file.write('    """\n')
+                                    file.write('    """\n')  # type: ignore
                                     file.write(doc)
                                     file.write("\n")
                                     file.write('    """\n')
