@@ -76,23 +76,27 @@ def read_data_pl(
         df = pl.read_parquet(f"./data/binance-{sym}USDT-PERPETUAL-1m.parquet")
 
         # Drop unnecessary columns
-        df = df.drop([
-            "taker_buy_volume",
-            "quote_asset_volume",
-            "close_time",
-            "number_of_trades",
-            "taker_buy_quote_asset_volume",
-            "ignore",
-        ])
+        df = df.drop(
+            [
+                "taker_buy_volume",
+                "quote_asset_volume",
+                "close_time",
+                "number_of_trades",
+                "taker_buy_quote_asset_volume",
+                "ignore",
+            ]
+        )
 
         # Cast columns to Float64
-        df = df.with_columns([
-            pl.col("volume").cast(pl.Float64),
-            pl.col("open").cast(pl.Float64),
-            pl.col("high").cast(pl.Float64),
-            pl.col("low").cast(pl.Float64),
-            pl.col("close").cast(pl.Float64),
-        ])
+        df = df.with_columns(
+            [
+                pl.col("volume").cast(pl.Float64),
+                pl.col("open").cast(pl.Float64),
+                pl.col("high").cast(pl.Float64),
+                pl.col("low").cast(pl.Float64),
+                pl.col("close").cast(pl.Float64),
+            ]
+        )
 
         # Resampling if needed
         if resample_tf != "1min":
@@ -118,13 +122,15 @@ def read_data_pl(
         # df = df.drop(["date"])
 
         # Cast columns to Float64
-        df = df.with_columns([
-            pl.col("volume").cast(pl.Float64),
-            pl.col("open").cast(pl.Float64),
-            pl.col("high").cast(pl.Float64),
-            pl.col("low").cast(pl.Float64),
-            pl.col("close").cast(pl.Float64),
-        ])
+        df = df.with_columns(
+            [
+                pl.col("volume").cast(pl.Float64),
+                pl.col("open").cast(pl.Float64),
+                pl.col("high").cast(pl.Float64),
+                pl.col("low").cast(pl.Float64),
+                pl.col("close").cast(pl.Float64),
+            ]
+        )
 
     # Convert DataFrame to numpy array for OHLCs compatibility, if needed
     # ohlcs = OHLCs(df.to_numpy())
