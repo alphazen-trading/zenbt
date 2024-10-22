@@ -70,8 +70,8 @@ features = ["pyo3/extension-module"]
 venvPath = "."
 venv = ".venv"
 reportAttributeAccessIssue = false
-include = ["./**/*.py"]
-exclude = ["./**/*.pyi"]
+include = ["./src/*.py"]
+exclude = ["./src/*.pyi"]
 
 [tool.pytest.ini_options]
 norecursedirs = ["docker"]
