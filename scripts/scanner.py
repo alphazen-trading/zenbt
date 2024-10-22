@@ -2,6 +2,7 @@ from types import ModuleType
 import inspect
 import os
 import sys
+from rich import print
 import argparse
 import importlib
 
@@ -74,8 +75,11 @@ class Scanner:
             class_methods = []
             class_constants = []
             class_attributes = []
+            # if element_name == "Order":
+            #     print(class_members_all)
+
             for m in class_members:
-                print(m)
+                # print(m)
                 if callable(m[1]):
                     class_methods.append(m)
                 elif inspect.isdatadescriptor(m[1]):
@@ -111,9 +115,12 @@ class Scanner:
                     class_methods,
                 ) in classes:
                     print(class_obj.__name__)
-                    print(class_methods)
-                    print(class_obj.__new__.__text_signature__)
-                    print("-----------------------")
+                    # if class_obj.__name__ == "Order":
+                    #     print(class_obj.__name__)
+                    #     print(class_methods)
+                    #     print(class_attributes)
+                    #     print(class_obj.__new__.__text_signature__)
+                    #     print("-----------------------")
                     # init_method = getattr(class_obj, "__new__", None)
                     # try:
                     #     # init_signature = inspect.text(init_method)
@@ -164,11 +171,11 @@ class Scanner:
                         if callable(method[1]):
                             try:
                                 sig = inspect.signature(method[1])
-                                if method[0] == "__new__":
-                                    print(sig)
+                                # if method[0] == "__new__":
+                                #     print(sig)
 
-                                if sig.return_annotation is not inspect._empty:
-                                    print(f"RETURN  = {sig.return_annotation}")
+                                # if sig.return_annotation is not inspect._empty:
+                                #     print(f"RETURN  = {sig.return_annotation}")
                                 if "self" not in sig.parameters:
                                     file.write("    @staticmethod\n")
 
@@ -205,7 +212,6 @@ def main():
 
     # Add module_dir to sys.path
     sys.path.append(args.module_dir)
-    print(args)
 
     # Dynamically import the module
     try:

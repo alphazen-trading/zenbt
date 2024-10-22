@@ -1,55 +1,55 @@
 use super::backtest::BacktestOld;
 use super::enums::Side;
 use super::ohlc::OHLC;
-use super::order::Order;
+// use super::order::Order;
 use super::position::Position;
 use crate::backtest::backtest_params::BacktestParams;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-pub fn was_order_hit(ohlc: &OHLC, order: &Order) -> bool {
-    if order.side == Side::Long {
-        // if ohlc.low <= order.price {
-        //     println!("ORDER WAS HIT");
-        //     println!("{:?}", ohlc.low);
-        //     println!("{:?} {:?}", order.price, order.sl);
-        // }
-        return ohlc.low <= order.price;
-    } else {
-        // if ohlc.high >= order.price {
-        //     if ohlc.high >= order.sl {
-        //         println!("\nORDER WAS HIT BUT Problem with sl");
-        //         println!("{:?}", ohlc);
-        //         println!("{:?}", order);
-        //     }
-        // }
-        return ohlc.high >= order.price;
-    }
-}
+// pub fn was_order_hit(ohlc: &OHLC, order: &Order) -> bool {
+//     // if order.side == Side::Long {
+//     //     // if ohlc.low <= order.price {
+//     //     //     println!("ORDER WAS HIT");
+//     //     //     println!("{:?}", ohlc.low);
+//     //     //     println!("{:?} {:?}", order.price, order.sl);
+//     //     // }
+//     //     return ohlc.low <= order.price;
+//     // } else {
+//     //     // if ohlc.high >= order.price {
+//     //     //     if ohlc.high >= order.sl {
+//     //     //         println!("\nORDER WAS HIT BUT Problem with sl");
+//     //     //         println!("{:?}", ohlc);
+//     //     //         println!("{:?}", order);
+//     //     //     }
+//     //     // }
+//     //     return ohlc.high >= order.price;
+//     // }
+// }
 
 pub fn has_account_blown_up(equity: &Vec<Decimal>, floating_equity: &Vec<Decimal>) -> bool {
     return equity.last().unwrap() + floating_equity.last().unwrap() < dec!(0.0);
 }
 
-pub fn create_position(order: &Order, ohlc: &OHLC, params: &BacktestParams) -> Position {
-    Position {
-        index: order.index,
-        exit_index: 0,
-        entry_timestamp: ohlc.date,
-        exit_timestamp: None,
-        entry_price: order.price,
-        exit_price: None,
-        size: order.size,
-        sl: Some(order.sl),
-        tp: Some(order.tp),
-        side: order.side,
-        close_reason: None,
-        pnl: dec!(0.0),
-        max_dd: dec!(0.0),
-        commission: order.price * params.commission_pct * order.size,
-        commission_pct: params.commission_pct,
-    }
-}
+// pub fn create_position(order: &Order, ohlc: &OHLC, params: &BacktestParams) -> Position {
+// Position {
+//     index: order.index,
+//     exit_index: 0,
+//     entry_timestamp: ohlc.date,
+//     exit_timestamp: None,
+//     entry_price: Some(order.price),
+//     exit_price: None,
+//     size: order.size,
+//     sl: Some(order.sl),
+//     tp: Some(order.tp),
+//     side: order.side,
+//     close_reason: None,
+//     pnl: dec!(0.0),
+//     max_dd: dec!(0.0),
+//     commission: order.price * params.commission_pct * order.size,
+//     commission_pct: params.commission_pct,
+// }
+// }
 
 pub fn create_position_from_signal(
     index: usize,
@@ -175,27 +175,28 @@ pub fn find_active_positions_to_close(i: usize, backtest: &mut BacktestOld) {
     update_backtest_equity(backtest, floating_equity, realized_equity);
 }
 
+#[allow(unused_variables)]
 pub fn find_triggered_pending_orders(i: usize, backtest: &mut BacktestOld) {
-    let ohlc = &backtest.ohlc[i];
-    let orders = backtest.limit_orders.get(i);
-    if orders.is_some() {
-        for order in orders {
-            if was_order_hit(&ohlc, &order) {
-                let mut new_position = create_position(&order, ohlc, &backtest.params);
+    // let ohlc = &backtest.ohlc[i];
+    // let orders = backtest.limit_orders.get(i);
+    // if orders.is_some() {
+    //     for order in orders {
+    //         if was_order_hit(&ohlc, &order) {
+    //             let mut new_position = create_position(&order, ohlc, &backtest.params);
 
-                if new_position.was_sl_hit(i, &ohlc) {
-                    // If SL was hit in the same candle, update equity and move to closed positions
-                    if let Some(last_equity) = backtest.equity.last_mut() {
-                        *last_equity += new_position.pnl;
-                    }
-                    backtest.positions.closed_positions.push(new_position);
-                } else {
-                    // If SL wasn't hit, move the position to active positions
-                    backtest.positions.active_positions.push(new_position);
-                }
-            }
-        }
-    }
+    //             if new_position.was_sl_hit(i, &ohlc) {
+    //                 // If SL was hit in the same candle, update equity and move to closed positions
+    //                 if let Some(last_equity) = backtest.equity.last_mut() {
+    //                     *last_equity += new_position.pnl;
+    //                 }
+    //                 backtest.positions.closed_positions.push(new_position);
+    //             } else {
+    //                 // If SL wasn't hit, move the position to active positions
+    //                 backtest.positions.active_positions.push(new_position);
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 // pub fn find_signals_to_manage(i: usize, backtest: &mut Backtest) {

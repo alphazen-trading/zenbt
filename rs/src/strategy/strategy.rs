@@ -71,7 +71,14 @@ impl Strategy {
     }
 
     #[classmethod]
+    #[allow(unused_variables)]
     pub fn on_candle(cls: &Bound<'_, PyType>) -> PyResult<i32> {
+        Ok(10)
+    }
+
+    #[classmethod]
+    #[allow(unused_variables)]
+    pub fn _on_candle(cls: &Bound<'_, PyType>) -> PyResult<i32> {
         Ok(10)
     }
 }

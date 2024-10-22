@@ -28,7 +28,7 @@ polars-lazy = { version = "0.43.0", default-features = false }
 [dependencies.pyo3]
 version = "0.22.5"
 # "abi3-py38" tells pyo3 (and maturin) to build using the stable ABI with minimum Python version 3.8
-features = ["rust_decimal", "abi3", "abi3-py311", "extension-module", "macros", "auto-initialize"]
+features = ["rust_decimal", "abi3", "abi3-py311", "extension-module", "macros", "auto-initialize", "serde", "chrono"]
 
 # [features]
 # pyi = ["pyi_macros"]

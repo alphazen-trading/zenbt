@@ -1,11 +1,7 @@
+use crate::sdk::{enums::Side, order::Order};
 use pyo3::prelude::*;
-use rust_decimal::Decimal;
-
-use crate::sdk::{
-    enums::{OrderType, Side},
-    order::Order,
-};
 use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use std::collections::HashMap;
 
@@ -20,6 +16,7 @@ pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
         if index != dec![0] {
             let side_decimal = Decimal::from_f64(limit_orders[i][1]).unwrap();
 
+            #[allow(unused_variables)]
             let side = match side_decimal {
                 d if d == dec!(1.0) => Side::Long,
                 d if d == dec!(0.0) => Side::Short,
@@ -29,24 +26,24 @@ pub fn create_limit_orders(limit_orders: Vec<Vec<f64>>) -> LimitOrders {
                 }
             };
 
-            let new_order = Order {
-                index: limit_orders[i][0] as usize,
-                side,
-                price: Decimal::from_f64(limit_orders[i][2]).unwrap(),
-                size: Decimal::from_f64(limit_orders[i][3]).unwrap(),
-                sl: Decimal::from_f64(limit_orders[i][4]).unwrap(),
-                tp: Decimal::from_f64(limit_orders[i][5]).unwrap(),
-                order_type: OrderType::Limit,
-            };
+            // let new_order = Order {
+            //     index: limit_orders[i][0] as usize,
+            //     order_type: OrderType::Limit,
+            //     side,
+            //     size: Decimal::from_f64(limit_orders[i][3]).unwrap(),
+            //     price: Decimal::from_f64(limit_orders[i][2]).unwrap(),
+            //     sl: Decimal::from_f64(limit_orders[i][4]).unwrap(),
+            //     tp: Decimal::from_f64(limit_orders[i][5]).unwrap(),
+            // };
 
-            match _limit_orders.get_mut(&index) {
-                Some(vec) => vec.push(new_order),
-                None => {
-                    let mut new_vec = Vec::new();
-                    new_vec.push(new_order);
-                    _limit_orders.insert(index, new_vec);
-                }
-            }
+            // match _limit_orders.get_mut(&index) {
+            //     Some(vec) => vec.push(new_order),
+            //     None => {
+            //         let mut new_vec = Vec::new();
+            //         new_vec.push(new_order);
+            //         _limit_orders.insert(index, new_vec);
+            //     }
+            // }
         }
     }
     _limit_orders

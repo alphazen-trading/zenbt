@@ -1,8 +1,9 @@
 use pyo3::prelude::*;
 use pyo3::types::PyString;
+use serde::Serialize;
 
 #[pyclass(eq, eq_int)]
-#[derive(Copy, Debug, Clone, PartialEq)]
+#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 pub enum Decision {
     Long,
     Short,
@@ -10,14 +11,14 @@ pub enum Decision {
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(Copy, Debug, Clone, PartialEq)]
+#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 pub enum Side {
     Long,
     Short,
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(Copy, Debug, Clone, PartialEq)]
+#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 pub enum OrderType {
     Market,
     Limit,
@@ -33,7 +34,7 @@ impl ToPyObject for Side {
 }
 
 #[pyclass(eq, eq_int)]
-#[derive(Copy, Debug, Clone, PartialEq)]
+#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 pub enum CloseReason {
     TakeProfit,
     StopLoss,

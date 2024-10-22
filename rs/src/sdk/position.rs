@@ -3,11 +3,12 @@ use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rust_decimal::Decimal;
+use serde::Serialize;
 
 use super::enums::{CloseReason, Side};
 
-#[pyclass]
-#[derive(Debug, Clone)]
+#[pyclass()]
+#[derive(Debug, Clone, Serialize)]
 pub struct Position {
     pub index: usize,
     pub exit_index: usize,
@@ -18,6 +19,7 @@ pub struct Position {
     pub size: Decimal,
     pub sl: Option<Decimal>,
     pub tp: Option<Decimal>,
+    #[pyo3(get)]
     pub side: Side,
     pub pnl: Decimal,
     pub max_dd: Decimal,
@@ -25,6 +27,7 @@ pub struct Position {
     pub commission: Decimal,
     pub commission_pct: Decimal,
 }
+
 impl ToPyObject for Position {
     fn to_object(&self, py: Python) -> PyObject {
         let dict = PyDict::new_bound(py);
@@ -141,6 +144,14 @@ impl Position {
     pub fn should_close(&mut self, i: usize, ohlc: &OHLC) -> bool {
         return self.was_sl_hit(i, ohlc) || self.was_tp_hit(i, ohlc);
     }
+
+    // fn __repr__(&self) -> String {
+    //     // Serialize the struct to a JSON string using serde_json
+    //     match serde_json::to_string(self) {
+    //         Ok(json_string) => json_string,
+    //         Err(_) => "Failed to serialize Order struct".to_string(),
+    //     }
+    // }
 }
 
 #[pyclass()]

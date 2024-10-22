@@ -1,20 +1,52 @@
 use pyo3::prelude::*;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
+use serde::Serialize;
 use std::collections::HashMap;
 
 use super::enums::{OrderType, Side};
 
-#[pyclass]
-#[derive(Debug, Clone)]
+#[pyclass(get_all)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Order {
     pub index: usize,
     pub order_type: OrderType,
     pub side: Side,
-    pub price: Decimal,
     pub size: Decimal,
-    pub sl: Decimal,
-    pub tp: Decimal,
+    pub price: Option<Decimal>, // Optional price
+    pub sl: Option<Decimal>,    // Optional stop-loss
+    pub tp: Option<Decimal>,    // Optional take-profit
+}
+
+#[pymethods]
+impl Order {
+    #[new]
+    fn new(
+        index: usize,
+        order_type: OrderType,
+        side: Side,
+        size: Decimal,
+        price: Option<Decimal>, // Optional price
+        sl: Option<Decimal>,    // Optional stop-loss
+        tp: Option<Decimal>,    // Optional take-profit
+    ) -> PyResult<Order> {
+        Ok(Order {
+            index,
+            order_type,
+            side,
+            size,
+            price,
+            sl, // Keep sl as Option<Decimal>
+            tp, // Keep tp as Option<Decimal>
+        })
+    }
+    fn __repr__(&self) -> String {
+        // Serialize the struct to a JSON string using serde_json
+        match serde_json::to_string(self) {
+            Ok(json_string) => json_string,
+            Err(_) => "Failed to serialize Order struct".to_string(),
+        }
+    }
 }
 
 #[pyclass]
@@ -40,19 +72,19 @@ impl LimitOrders {
         index: usize,
         order_type: OrderType,
         side: Side,
-        price: f64,
-        size: f64,
-        sl: f64,
-        tp: f64,
+        price: Decimal,
+        size: Decimal,
+        sl: Decimal,
+        tp: Decimal,
     ) {
         let order = Order {
             index,
             order_type,
             side,
-            price: Decimal::from_f64(price).unwrap(),
-            size: Decimal::from_f64(size).unwrap(),
-            sl: Decimal::from_f64(sl).unwrap(),
-            tp: Decimal::from_f64(tp).unwrap(),
+            size,
+            price: Some(price),
+            sl: Some(sl),
+            tp: Some(tp),
         };
         let vec = self
             .limit_orders
