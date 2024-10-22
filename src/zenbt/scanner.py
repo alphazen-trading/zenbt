@@ -2,6 +2,8 @@ from types import ModuleType
 import inspect
 import os
 import sys
+import argparse
+import importlib
 
 
 class Scanner:
@@ -165,9 +167,6 @@ class Scanner:
 # scanner = Scanner()
 # scanner.scan_module("", sys.modules["zenbt.rs"])
 # scanner.write_pyis("./")
-
-import argparse
-import importlib
 
 
 def main():
