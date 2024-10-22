@@ -1,12 +1,12 @@
 use std::time::Instant;
 
-use super::backtest::Backtest;
+use super::backtest::BacktestOld;
 use super::stats_methods::create_stats;
 use pyo3::prelude::*;
 
 use pyo3::types::PyDict;
 
-pub fn get_state(backtest: &Backtest, py: Python) -> PyResult<PyObject> {
+pub fn get_state(backtest: &BacktestOld, py: Python) -> PyResult<PyObject> {
     let start = Instant::now();
     let dict = PyDict::new_bound(py);
 

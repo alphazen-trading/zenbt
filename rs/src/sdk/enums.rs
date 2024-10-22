@@ -3,6 +3,14 @@ use pyo3::types::PyString;
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq)]
+pub enum Decision {
+    Long,
+    Short,
+    Nothing,
+}
+
+#[pyclass(eq, eq_int)]
+#[derive(Copy, Debug, Clone, PartialEq)]
 pub enum Side {
     Long,
     Short,

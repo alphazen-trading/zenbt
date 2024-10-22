@@ -1,9 +1,9 @@
-use std::time::Instant;
+// use std::time::Instant;
 
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-use super::{backtest::Backtest, stats::Stats};
+use super::{backtest::BacktestOld, stats::Stats};
 
 pub fn calculate_max_drawdown(values: &[Decimal]) -> Option<Decimal> {
     if values.is_empty() {
@@ -25,7 +25,7 @@ pub fn calculate_max_drawdown(values: &[Decimal]) -> Option<Decimal> {
     Some(max_drawdown)
 }
 
-pub fn create_stats(backtest: &Backtest) -> Stats {
+pub fn create_stats(backtest: &BacktestOld) -> Stats {
     let mut wins = dec!(0);
     let mut losses = dec!(0);
     for position in backtest.positions.closed_positions.clone() {

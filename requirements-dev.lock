@@ -46,12 +46,15 @@ backcall==0.2.0
     # via ipython
 beautifulsoup4==4.12.3
     # via nbconvert
+    # via yfinance
 binance-historical-data==0.1.13
     # via zenbt
 black==24.8.0
     # via ipython
 bleach==6.1.0
     # via nbconvert
+bt==1.1.0
+    # via zenbt
 certifi==2024.8.30
     # via clickhouse-connect
     # via httpcore
@@ -88,26 +91,34 @@ cycler==0.12.1
     # via matplotlib
 dateparser==1.2.0
     # via python-binance
+    # via vectorbt
 debugpy==1.8.5
     # via ipykernel
 decli==0.6.2
     # via commitizen
 decorator==5.1.1
+    # via ffn
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
+dill==0.3.9
+    # via vectorbt
 distlib==0.3.8
     # via virtualenv
 executing==2.1.0
     # via stack-data
 fastjsonschema==2.20.0
     # via nbformat
+ffn==1.1.0
+    # via bt
 filelock==3.15.4
     # via virtualenv
 fonttools==4.53.1
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
+frozendict==2.4.6
+    # via yfinance
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
@@ -117,6 +128,8 @@ h2==4.1.0
     # via httpx
 hpack==4.0.0
     # via h2
+html5lib==1.1
+    # via yfinance
 httpcore==1.0.5
     # via httpx
 httpx==0.27.2
@@ -135,6 +148,8 @@ idna==3.8
     # via jsonschema
     # via requests
     # via yarl
+imageio==2.36.0
+    # via vectorbt
 importlib-metadata==7.2.1
     # via commitizen
     # via python-okx
@@ -151,6 +166,7 @@ ipython-genutils==0.2.0
     # via ipywidgets
 ipywidgets==7.8.4
     # via binance-historical-data
+    # via vectorbt
 isoduration==20.11.0
     # via jsonschema
 jaraco-classes==3.4.0
@@ -170,6 +186,8 @@ jinja2==3.1.4
     # via jupyterlab
     # via jupyterlab-server
     # via nbconvert
+joblib==1.4.2
+    # via scikit-learn
 json5==0.9.25
     # via jupyterlab-server
 jsonpointer==3.0.0
@@ -221,6 +239,8 @@ llvmlite==0.43.0
     # via numba
 loguru==0.7.2
     # via python-okx
+lxml==5.3.0
+    # via yfinance
 lz4==4.3.3
     # via clickhouse-connect
 markdown-it-py==3.0.0
@@ -229,7 +249,9 @@ markupsafe==2.1.5
     # via jinja2
     # via nbconvert
 matplotlib==3.9.2
+    # via ffn
     # via mplfinance
+    # via vectorbt
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
@@ -247,8 +269,11 @@ mplfinance==0.12.10b0
 multidict==6.0.5
     # via aiohttp
     # via yarl
+multitasking==0.0.11
+    # via yfinance
 mypy-extensions==1.0.0
     # via black
+    # via vectorbt
 nbclient==0.10.0
     # via nbconvert
 nbconvert==7.16.4
@@ -268,14 +293,21 @@ notebook-shim==0.2.4
     # via jupyterlab
     # via notebook
 numba==0.60.0
+    # via vectorbt
     # via zenbt
 numpy==1.26.4
     # via contourpy
+    # via ffn
+    # via imageio
     # via matplotlib
     # via numba
     # via pandas
     # via pyarrow
+    # via scikit-learn
+    # via scipy
     # via ta-lib
+    # via vectorbt
+    # via yfinance
     # via zenbt
 orjson==3.10.6
 overrides==7.7.0
@@ -289,10 +321,14 @@ packaging==24.1
     # via jupyterlab-server
     # via matplotlib
     # via nbconvert
+    # via plotly
     # via pytest
 pandas==2.2.2
+    # via ffn
     # via mplfinance
     # via tradingtoolbox
+    # via vectorbt
+    # via yfinance
     # via zenbt
 pandocfilters==1.5.1
     # via nbconvert
@@ -300,19 +336,27 @@ parso==0.8.4
     # via jedi
 pathspec==0.12.1
     # via black
+peewee==3.17.7
+    # via yfinance
 pexpect==4.9.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
 pillow==10.4.0
+    # via imageio
     # via matplotlib
 pip==24.2
 platformdirs==4.2.2
     # via black
     # via jupyter-core
     # via virtualenv
+    # via yfinance
+plotly==5.24.1
+    # via vectorbt
 pluggy==1.5.0
     # via pytest
+polars==1.9.0
+    # via zenbt
 pre-commit==3.7.1
 prometheus-client==0.20.0
     # via jupyter-server
@@ -345,6 +389,8 @@ pyopenssl==24.2.1
     # via python-okx
 pyparsing==3.1.4
     # via matplotlib
+pyprind==2.11.3
+    # via bt
 pyright==1.1.382.post1
 pytest==8.3.3
 python-binance==1.0.19
@@ -365,6 +411,8 @@ pytz==2024.1
     # via clickhouse-connect
     # via dateparser
     # via pandas
+    # via vectorbt
+    # via yfinance
 pyyaml==6.0.1
     # via commitizen
     # via jupyter-events
@@ -385,18 +433,29 @@ requests==2.32.3
     # via jupyterlab-server
     # via python-binance
     # via python-okx
+    # via vectorbt
+    # via yfinance
 rfc3339-validator==0.1.4
     # via jsonschema
     # via jupyter-events
 rfc3986-validator==0.1.1
     # via jsonschema
     # via jupyter-events
-rich==13.8.0
+rich==13.9.2
     # via zenbt
 rpds-py==0.20.0
     # via jsonschema
     # via referencing
 ruff==0.6.8
+schedule==1.2.2
+    # via vectorbt
+scikit-learn==1.5.2
+    # via ffn
+    # via vectorbt
+scipy==1.14.1
+    # via ffn
+    # via scikit-learn
+    # via vectorbt
 secretstorage==3.3.3
     # via keyring
 send2trash==1.8.3
@@ -409,6 +468,7 @@ setuptools==74.1.0
 six==1.16.0
     # via asttokens
     # via bleach
+    # via html5lib
     # via python-binance
     # via python-dateutil
     # via rfc3339-validator
@@ -421,11 +481,17 @@ stack-data==0.6.3
     # via ipython
 ta-lib==0.4.32
     # via zenbt
+tabulate==0.9.0
+    # via ffn
+tenacity==9.0.0
+    # via plotly
 termcolor==2.4.0
     # via commitizen
 terminado==0.18.1
     # via jupyter-server
     # via jupyter-server-terminals
+threadpoolctl==3.5.0
+    # via scikit-learn
 tinycss2==1.3.0
     # via nbconvert
 tomlkit==0.13.0
@@ -439,7 +505,9 @@ tornado==6.4.1
     # via terminado
 tqdm==4.66.5
     # via binance-historical-data
+    # via bt
     # via mpire
+    # via vectorbt
     # via zenbt
 tradingtoolbox==0.18.0
     # via zenbt
@@ -477,6 +545,8 @@ uri-template==1.3.0
 urllib3==2.2.2
     # via clickhouse-connect
     # via requests
+vectorbt==0.26.2
+    # via zenbt
 virtualenv==20.26.3
     # via pre-commit
 wcwidth==0.2.13
@@ -485,6 +555,7 @@ webcolors==24.8.0
     # via jsonschema
 webencodings==0.5.1
     # via bleach
+    # via html5lib
     # via tinycss2
 websocket-client==1.8.0
     # via jupyter-server
@@ -494,6 +565,8 @@ widgetsnbextension==3.6.9
     # via ipywidgets
 yarl==1.9.11
     # via aiohttp
+yfinance==0.2.44
+    # via ffn
 zipp==3.19.2
     # via importlib-metadata
 zope-interface==7.0.3

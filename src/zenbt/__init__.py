@@ -1,9 +1,15 @@
+# from benchmarks import bench
+# from bench import bench
+
+
 def dev():
-    # from .side_by_side import sbs
     from .dev import dev
+    # from .side_by_side import sbs
+    # bench()
 
     # sbs()
     dev()
+    # bench()
 
 
 def ma_cross():
