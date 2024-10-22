@@ -8,7 +8,7 @@ from rich import print
 
 class TradeRecord(BaseModel):
     index: int
-    exit_index: int = Field(alias="exit index")
+    exit_index: int = Field(alias="exit index")  # type: ignore
     entry_timestamp: datetime
     exit_timestamp: datetime
     entry_price: Decimal

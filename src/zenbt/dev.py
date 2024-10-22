@@ -1,4 +1,3 @@
-import numpy as np
 from data.data import read_data, read_data_pl, download_okx_data
 import time
 import talib
@@ -8,10 +7,7 @@ from zenbt.rs import (
     BacktestParams,
     SharedState,
     Backtest,
-    BacktestOld,
     Decision,
-    cross_above,
-    cross_below,
     Action,
 )
 
@@ -24,7 +20,7 @@ bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_ca
 
 
 class ST(Strategy):
-    def on_candle(self, index, state: SharedState, **kwargs):
+    def on_candle(self, index, state: SharedState, **kwargs):  # type: ignore
         time = self.data["time"][index]
         open = self.data["open"][index]
         close = self.data["close"][index]

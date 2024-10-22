@@ -15,7 +15,7 @@ import bt as _bt
 
 def fetch_data(reload=False):
     if reload:
-        data = _bt.get("spy", start="2001-01-01")
+        data = _bt.get("spy", start="2001-01-01")  # type: ignore
         data.to_csv("./data/sample_data.csv")
     else:
         data = pd.read_csv("./data/sample_data.csv")

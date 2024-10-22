@@ -1,4 +1,3 @@
-from zenbt.rs import OHLCs
 import pandas as pd
 from tradingtoolbox.utils import resample
 from tradingtoolbox.exchanges.okx import OKXKlines
@@ -10,8 +9,13 @@ def download_okx_data(symbol="PEPE-USDT-SWAP", interval="1m", days_ago=90):
 
 
 def read_data(
-    sym, start=0, end=-1, resample_tf="1min", exchange="binance"
-) -> tuple[pd.DataFrame, OHLCs]:
+    sym,
+    start=0,
+    end=-1,
+    resample_tf="1min",
+    exchange="binance",
+    # ) -> tuple[pd.DataFrame, OHLCs]:
+) -> pd.DataFrame:
     # df = pd.read_parquet(f"./data/kline_{sym}-USDT-SWAP_1m.parquet")
     # df.sort_values(by=["date"], ascending=True, inplace=True)
     if exchange == "binance":
@@ -56,7 +60,7 @@ def read_data(
 
     # ohlcs = OHLCs(df.to_numpy())  # type: ignore
     # return df, ohlcs  # type: ignore
-    return df
+    return df  # type: ignore
 
 
 def read_data_pl(
