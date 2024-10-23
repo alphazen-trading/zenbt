@@ -36,6 +36,7 @@ local_docker:
 # Code Section
 # ============================================= #
 pre-commit-test:
+  ruff format
   ruff check --fix
   rye run pyright
   rye run pre-commit run
