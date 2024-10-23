@@ -54,8 +54,6 @@ impl Backtest {
                         equity: PyList::new_bound(py, Vec::<f64>::new()).into(),
                         active_positions: PyDict::new_bound(py).into(),
                         closed_positions: PyDict::new_bound(py).into(),
-                        _active_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
-                        _closed_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
                     },
                 )?,
             })
@@ -96,7 +94,7 @@ impl Backtest {
                 result.extract::<Action>(py).unwrap()
             });
 
-            // let active_positions: Vec<Position> =
+            // let active_positions: PyDict =
             //     Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
 
             // println!("The new position: {:?}", active_positions);
@@ -126,7 +124,6 @@ impl Backtest {
                     // println!("Za val is this {} {:?}", i, df["open"].get(i + 1));
 
                     let new_position = create_position(&order, date, &self.backtest_params);
-
                     Python::with_gil(|py| {
                         self._set_state_dict_item(
                             "active_positions",
