@@ -4,6 +4,7 @@ use super::ohlc::OHLC;
 // use super::order::Order;
 use super::position::Position;
 use crate::backtest::backtest_params::BacktestParams;
+use rand::Rng;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
@@ -59,6 +60,7 @@ pub fn create_position_from_signal(
     side: Side,
 ) -> Position {
     Position {
+        id: rand::thread_rng().gen_range(0..101).to_string(),
         index,
         exit_index: 0,
         entry_timestamp: ohlc.date,

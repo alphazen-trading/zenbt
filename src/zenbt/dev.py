@@ -31,6 +31,7 @@ class BaseStrategy(Strategy):
 
     def create_market_order(
         self,
+        clientOrderId: str,
         side: Side,
         size: float,
         sl: Optional[float] = None,
@@ -38,6 +39,7 @@ class BaseStrategy(Strategy):
     ) -> Order:
         return Order(
             index=self.index,
+            clientOrderId=clientOrderId,
             order_type=OrderType.Market,
             side=side,
             size=size,
@@ -46,7 +48,7 @@ class BaseStrategy(Strategy):
             tp=tp,
         )
 
-    def _on_candle(self, index, state: SharedState, **kwargs) -> Action:
+    def _on_candle(self, index, state: SharedState) -> Action:  # type: ignore
         self.index = index
         self.state = state
         self.time = self.data["time"][index]
@@ -67,7 +69,6 @@ class BaseStrategy(Strategy):
     def active_short_positions(self) -> list[Position]:
         positions = []
         for pos in self.state.active_positions:
-            print(type(pos.side))
             if pos.side == Side.Short:
                 positions.append(pos)
         return positions
@@ -80,7 +81,7 @@ DefaultAction = Action(desired_orders=[], desired_positions=[])
 
 
 class ST(BaseStrategy):
-    def on_candle(self) -> Action:
+    def on_candle(self) -> Action:  # type: ignore
         index = self.index
         fast_ma = self.data["fast_ma"]
         slow_ma = self.data["slow_ma"]
@@ -90,18 +91,23 @@ class ST(BaseStrategy):
         if self.has_position():
             # long_positions = self.active_long_positions()
             # print(long_positions)
-            short_positions = self.active_short_positions()
-            print(short_positions)
+            # short_positions = self.active_short_positions()
+            print(self.state.active_positions)
+            # print(short_positions)
             return DefaultAction
 
         # Check for bullish cross over
         if fast_ma[index - 1] < slow_ma[index - 1] and fast_ma[index] >= slow_ma[index]:
-            desired_orders.append(self.create_market_order(side=Side.Long, size=1))
+            desired_orders.append(
+                self.create_market_order(clientOrderId="Long", side=Side.Long, size=1)
+            )
             desired_positions = self.active_long_positions()
 
         # Check for bearish crossover
         if fast_ma[index - 1] > slow_ma[index - 1] and fast_ma[index] <= slow_ma[index]:
-            desired_orders.append(self.create_market_order(side=Side.Short, size=1))
+            desired_orders.append(
+                self.create_market_order(clientOrderId="Short", side=Side.Short, size=1)
+            )
             desired_positions = self.active_long_positions()
 
         return Action(
@@ -112,9 +118,9 @@ class ST(BaseStrategy):
 def dev():
     # download_okx_data(days_ago=2)
     # sym = "1000PEPE"
-    # df = read_data_pl(sym, 0, 1000, resample_tf="1min", exchange="binance")
+    # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     sym = "BTC"
-    df = read_data_pl(sym, 0, 1000, resample_tf="1min", exchange="okx")
+    df = read_data_pl(sym, 0, 100, resample_tf="1min", exchange="okx")
 
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)

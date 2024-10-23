@@ -3,19 +3,24 @@ use super::backtest_params::BacktestParams;
 use super::shared_state::SharedState;
 use crate::sdk::enums::OrderType;
 use crate::sdk::position::Position;
-use crate::sdk::position::Positions;
 use crate::strategy::actions::Action;
 use crate::strategy::strategy::Strategy;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
+use std::any::type_name;
+use std::any::Any;
+use std::borrow::Borrow;
 
-// use super::ohlc::OHLC;
 use pyo3_polars::PyDataFrame;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 use std::borrow::BorrowMut;
+
+fn print_type_of<T>(_: &T) {
+    println!("Type: {}", type_name::<T>());
+}
 
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
@@ -47,8 +52,10 @@ impl Backtest {
                     py,
                     SharedState {
                         equity: PyList::new_bound(py, Vec::<f64>::new()).into(),
-                        active_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
-                        closed_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
+                        active_positions: PyDict::new_bound(py).into(),
+                        closed_positions: PyDict::new_bound(py).into(),
+                        _active_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
+                        _closed_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
                     },
                 )?,
             })
@@ -61,6 +68,15 @@ impl Backtest {
             list.borrow_mut()
                 .call_method_bound(py, "append", (value,), None)
                 .unwrap();
+        });
+    }
+
+    fn _set_state_dict_item(&self, dict_name: &str, key: String, value: PyObject) {
+        Python::with_gil(|py| {
+            let binding = self.state.getattr(py, dict_name).unwrap();
+            let mut _binding = binding.bind(py);
+            let dict = _binding.borrow_mut();
+            dict.set_item(key, value).unwrap();
         });
     }
 
@@ -80,9 +96,10 @@ impl Backtest {
                 result.extract::<Action>(py).unwrap()
             });
 
-            let active_positions: Vec<Position> =
-                Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
+            // let active_positions: Vec<Position> =
+            //     Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
 
+            // println!("The new position: {:?}", active_positions);
             for mut order in action.desired_orders {
                 if order.order_type == OrderType::Market {
                     let price: f64 = df["open"].get(i + 1).unwrap().try_extract::<f64>().unwrap();
@@ -109,16 +126,27 @@ impl Backtest {
                     // println!("Za val is this {} {:?}", i, df["open"].get(i + 1));
 
                     let new_position = create_position(&order, date, &self.backtest_params);
+
                     Python::with_gil(|py| {
-                        self._append_to_list("active_positions", new_position.into_py(py));
+                        self._set_state_dict_item(
+                            "active_positions",
+                            new_position.id.clone(),
+                            new_position.into_py(py),
+                        );
                     })
+
+                    // self._append_to_dict("active_positions", new_position);
+
+                    // Python::with_gil(|py| {
+                    //     self._append_to_list("active_positions", new_position.into_py(py));
+                    // })
                 }
                 // println!("{:?}", order);
             }
 
-            for position in active_positions {
-                println!("The active position: {:?}", position);
-            }
+            // for position in active_positions {
+            //     // println!("The active position: {:?}", position);
+            // }
         }
     }
 }

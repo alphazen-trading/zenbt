@@ -10,6 +10,7 @@ use super::enums::{CloseReason, Side};
 #[pyclass()]
 #[derive(Debug, Clone, Serialize)]
 pub struct Position {
+    pub id: String,
     pub index: usize,
     pub exit_index: usize,
     pub entry_timestamp: DateTime<Utc>,
