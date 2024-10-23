@@ -391,7 +391,8 @@ pyparsing==3.1.4
     # via matplotlib
 pyprind==2.11.3
     # via bt
-pyright==1.1.385
+pyright==1.1.386
+    # via zenbt
 pytest==8.3.3
 python-binance==1.0.19
     # via tradingtoolbox
