@@ -92,8 +92,8 @@ class ST(BaseStrategy):
             # long_positions = self.active_long_positions()
             # print(long_positions)
             # short_positions = self.active_short_positions()
-            for pos in self.state.active_positions.values():
-                print(pos)
+            # for pos in self.state.active_positions.values():
+            #     print(pos)
             # print(short_positions)
             return DefaultAction
 

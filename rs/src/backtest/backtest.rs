@@ -12,6 +12,7 @@ use pyo3::types::{PyDict, PyList};
 use std::any::type_name;
 use std::any::Any;
 use std::borrow::Borrow;
+use std::collections::HashMap;
 
 use pyo3_polars::PyDataFrame;
 use rust_decimal::prelude::FromPrimitive;
@@ -83,23 +84,28 @@ impl Backtest {
         for i in 0..df.height() {
             // self._append_to_list("equity", 1);
             let mut action = Python::with_gil(|py| {
-                let state = self.state.borrow(py);
                 let result: Py<Action> = self
                     .strategy
-                    // .call_method_bound(py, "on_candle", (i, self.has_position), Some(&kwargs_dict))
-                    .call_method_bound(py, intern!(py, "_on_candle"), (i, state), None)
+                    .call_method_bound(
+                        py,
+                        intern!(py, "_on_candle"),
+                        (i, self.state.borrow(py)),
+                        None,
+                    )
                     .unwrap()
                     .extract(py)
                     .unwrap();
                 result.extract::<Action>(py).unwrap()
             });
 
+            let active_positions: HashMap<String, Position> =
+                Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
             // let active_positions: PyDict = Python::with_gil(|py| {
             //     let pos = self.state.borrow(py).active_positions.bind(py).borrow();
             //     pos.as_ptr()
             // });
 
-            // println!("The new position: {:?}", active_positions);
+            // println!("Active Positions: {:?}", active_positions);
             for order in action.desired_orders.values_mut() {
                 if order.order_type == OrderType::Market {
                     let price: f64 = df["open"].get(i + 1).unwrap().try_extract::<f64>().unwrap();
