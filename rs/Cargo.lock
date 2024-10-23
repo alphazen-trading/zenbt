@@ -1341,6 +1341,7 @@ dependencies = [
  "polars-plan",
  "pyo3",
  "pyo3-polars",
+ "rand",
  "rust_decimal",
  "rust_decimal_macros",
  "serde",

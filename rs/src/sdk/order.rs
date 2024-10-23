@@ -10,6 +10,7 @@ use super::enums::{OrderType, Side};
 #[derive(Debug, Clone, Serialize)]
 pub struct Order {
     pub index: usize,
+    pub clientOrderId: String,
     pub order_type: OrderType,
     pub side: Side,
     pub size: Decimal,
@@ -23,6 +24,7 @@ impl Order {
     #[new]
     fn new(
         index: usize,
+        clientOrderId: String,
         order_type: OrderType,
         side: Side,
         size: Decimal,
@@ -32,6 +34,7 @@ impl Order {
     ) -> PyResult<Order> {
         Ok(Order {
             index,
+            clientOrderId,
             order_type,
             side,
             size,
@@ -79,6 +82,7 @@ impl LimitOrders {
     ) {
         let order = Order {
             index,
+            clientOrderId: "".to_string(),
             order_type,
             side,
             size,

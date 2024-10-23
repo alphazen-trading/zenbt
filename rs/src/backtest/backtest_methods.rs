@@ -5,11 +5,14 @@ use crate::backtest::backtest_params::BacktestParams;
 use crate::sdk::order::Order;
 use crate::sdk::position::Position;
 use chrono::{DateTime, Utc};
+use rand::Rng; // Import the Rng trait
 use rust_decimal_macros::dec;
 
 pub fn create_position(order: &Order, date: DateTime<Utc>, params: &BacktestParams) -> Position {
     let entry_price = order.price.expect("Order price is None!");
+
     Position {
+        id: rand::thread_rng().gen_range(0..101).to_string(),
         index: order.index,
         exit_index: 0,
         entry_timestamp: date,

@@ -3,19 +3,25 @@ use super::backtest_params::BacktestParams;
 use super::shared_state::SharedState;
 use crate::sdk::enums::OrderType;
 use crate::sdk::position::Position;
-use crate::sdk::position::Positions;
 use crate::strategy::actions::Action;
 use crate::strategy::strategy::Strategy;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
+use std::any::type_name;
+use std::any::Any;
+use std::borrow::Borrow;
+use std::collections::HashMap;
 
-// use super::ohlc::OHLC;
 use pyo3_polars::PyDataFrame;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 use std::borrow::BorrowMut;
+
+fn print_type_of<T>(_: &T) {
+    println!("Type: {}", type_name::<T>());
+}
 
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
@@ -47,8 +53,8 @@ impl Backtest {
                     py,
                     SharedState {
                         equity: PyList::new_bound(py, Vec::<f64>::new()).into(),
-                        active_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
-                        closed_positions: PyList::new_bound(py, Vec::<Position>::new()).into(),
+                        active_positions: PyDict::new_bound(py).into(),
+                        closed_positions: PyDict::new_bound(py).into(),
                     },
                 )?,
             })
@@ -64,26 +70,43 @@ impl Backtest {
         });
     }
 
+    fn _set_state_dict_item(&self, dict_name: &str, key: String, value: PyObject) {
+        Python::with_gil(|py| {
+            let binding = self.state.getattr(py, dict_name).unwrap();
+            let mut _binding = binding.bind(py);
+            let dict = _binding.borrow_mut();
+            dict.set_item(key, value).unwrap();
+        });
+    }
+
     fn backtest(&self) {
         let df = self.df.0.clone();
         for i in 0..df.height() {
             // self._append_to_list("equity", 1);
-            let action = Python::with_gil(|py| {
-                let state = self.state.borrow(py);
+            let mut action = Python::with_gil(|py| {
                 let result: Py<Action> = self
                     .strategy
-                    // .call_method_bound(py, "on_candle", (i, self.has_position), Some(&kwargs_dict))
-                    .call_method_bound(py, intern!(py, "_on_candle"), (i, state), None)
+                    .call_method_bound(
+                        py,
+                        intern!(py, "_on_candle"),
+                        (i, self.state.borrow(py)),
+                        None,
+                    )
                     .unwrap()
                     .extract(py)
                     .unwrap();
                 result.extract::<Action>(py).unwrap()
             });
 
-            let active_positions: Vec<Position> =
+            let active_positions: HashMap<String, Position> =
                 Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
+            // let active_positions: PyDict = Python::with_gil(|py| {
+            //     let pos = self.state.borrow(py).active_positions.bind(py).borrow();
+            //     pos.as_ptr()
+            // });
 
-            for mut order in action.desired_orders {
+            // println!("Active Positions: {:?}", active_positions);
+            for order in action.desired_orders.values_mut() {
                 if order.order_type == OrderType::Market {
                     let price: f64 = df["open"].get(i + 1).unwrap().try_extract::<f64>().unwrap();
 
@@ -110,15 +133,24 @@ impl Backtest {
 
                     let new_position = create_position(&order, date, &self.backtest_params);
                     Python::with_gil(|py| {
-                        self._append_to_list("active_positions", new_position.into_py(py));
+                        self._set_state_dict_item(
+                            "active_positions",
+                            new_position.id.clone(),
+                            new_position.into_py(py),
+                        );
                     })
+
+                    // self._append_to_dict("active_positions", new_position);
+
+                    // Python::with_gil(|py| {
+                    //     self._append_to_list("active_positions", new_position.into_py(py));
+                    // })
                 }
-                // println!("{:?}", order);
             }
 
-            for position in active_positions {
-                println!("The active position: {:?}", position);
-            }
+            // for position in active_positions {
+            //     // println!("The active position: {:?}", position);
+            // }
         }
     }
 }

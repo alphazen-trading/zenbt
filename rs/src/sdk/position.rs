@@ -10,6 +10,7 @@ use super::enums::{CloseReason, Side};
 #[pyclass()]
 #[derive(Debug, Clone, Serialize)]
 pub struct Position {
+    pub id: String,
     pub index: usize,
     pub exit_index: usize,
     pub entry_timestamp: DateTime<Utc>,
@@ -145,13 +146,13 @@ impl Position {
         return self.was_sl_hit(i, ohlc) || self.was_tp_hit(i, ohlc);
     }
 
-    // fn __repr__(&self) -> String {
-    //     // Serialize the struct to a JSON string using serde_json
-    //     match serde_json::to_string(self) {
-    //         Ok(json_string) => json_string,
-    //         Err(_) => "Failed to serialize Order struct".to_string(),
-    //     }
-    // }
+    fn __repr__(&self) -> String {
+        // Serialize the struct to a JSON string using serde_json
+        match serde_json::to_string(self) {
+            Ok(json_string) => json_string,
+            Err(_) => "Failed to serialize Order struct".to_string(),
+        }
+    }
 }
 
 #[pyclass()]
