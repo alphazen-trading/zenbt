@@ -11,7 +11,6 @@ from zenbt.rs import (
     BacktestParams,
     SharedState,
     Backtest,
-    Decision,
     Action,
     Order,
     Position,

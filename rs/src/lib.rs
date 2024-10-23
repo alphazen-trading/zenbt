@@ -21,7 +21,7 @@ use indicators::cross_below::cross_below;
 use sdk::backtest::BacktestOld;
 use sdk::bbo::BBO;
 use sdk::contract::Contract;
-use sdk::enums::{Decision, OrderType, Side};
+use sdk::enums::{OrderType, Side};
 // use sdk::instrument::Instrument;
 use sdk::ohlc::OHLCs;
 use sdk::order::{LimitOrders, Order};
@@ -53,7 +53,6 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<OHLCs>()?;
     m.add_class::<Backtest>()?;
     m.add_class::<BacktestParams>()?;
-    m.add_class::<Decision>()?;
     m.add_class::<Signals>()?;
     m.add_class::<Signal>()?;
     m.add_class::<Position>()?;

@@ -4,14 +4,6 @@ use serde::Serialize;
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
-pub enum Decision {
-    Long,
-    Short,
-    Nothing,
-}
-
-#[pyclass(eq, eq_int)]
-#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 pub enum Side {
     Long,
     Short,
