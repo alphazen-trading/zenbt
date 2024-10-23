@@ -82,7 +82,7 @@ impl Backtest {
         let df = self.df.0.clone();
         for i in 0..df.height() {
             // self._append_to_list("equity", 1);
-            let action = Python::with_gil(|py| {
+            let mut action = Python::with_gil(|py| {
                 let state = self.state.borrow(py);
                 let result: Py<Action> = self
                     .strategy
@@ -94,11 +94,13 @@ impl Backtest {
                 result.extract::<Action>(py).unwrap()
             });
 
-            // let active_positions: PyDict =
-            //     Python::with_gil(|py| self.state.borrow(py).active_positions.extract(py).unwrap());
+            // let active_positions: PyDict = Python::with_gil(|py| {
+            //     let pos = self.state.borrow(py).active_positions.bind(py).borrow();
+            //     pos.as_ptr()
+            // });
 
             // println!("The new position: {:?}", active_positions);
-            for mut order in action.desired_orders {
+            for order in action.desired_orders.values_mut() {
                 if order.order_type == OrderType::Market {
                     let price: f64 = df["open"].get(i + 1).unwrap().try_extract::<f64>().unwrap();
 
@@ -138,7 +140,6 @@ impl Backtest {
                     //     self._append_to_list("active_positions", new_position.into_py(py));
                     // })
                 }
-                // println!("{:?}", order);
             }
 
             // for position in active_positions {

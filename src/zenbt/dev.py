@@ -77,7 +77,7 @@ class BaseStrategy(Strategy):
         return len(self.state.active_positions) > 0
 
 
-DefaultAction = Action(desired_orders=[], desired_positions=[])
+DefaultAction = Action(desired_positions=[], desired_orders={})
 
 
 class ST(BaseStrategy):
@@ -85,33 +85,36 @@ class ST(BaseStrategy):
         index = self.index
         fast_ma = self.data["fast_ma"]
         slow_ma = self.data["slow_ma"]
-        desired_orders = []
+        desired_orders = {}
         desired_positions = []
 
         if self.has_position():
             # long_positions = self.active_long_positions()
             # print(long_positions)
             # short_positions = self.active_short_positions()
-            print(self.state.active_positions)
+            for pos in self.state.active_positions.values():
+                print(pos)
             # print(short_positions)
             return DefaultAction
 
         # Check for bullish cross over
         if fast_ma[index - 1] < slow_ma[index - 1] and fast_ma[index] >= slow_ma[index]:
-            desired_orders.append(
-                self.create_market_order(clientOrderId="Long", side=Side.Long, size=1)
+            order = self.create_market_order(
+                clientOrderId="Long", side=Side.Long, size=1
             )
-            desired_positions = self.active_long_positions()
+            desired_orders[order.clientOrderId] = order
+            desired_positions = []
 
         # Check for bearish crossover
         if fast_ma[index - 1] > slow_ma[index - 1] and fast_ma[index] <= slow_ma[index]:
-            desired_orders.append(
-                self.create_market_order(clientOrderId="Short", side=Side.Short, size=1)
+            order = self.create_market_order(
+                clientOrderId="Short", side=Side.Short, size=1
             )
-            desired_positions = self.active_long_positions()
+            desired_orders[order.clientOrderId] = order
+            desired_positions = []
 
         return Action(
-            desired_orders=desired_orders, desired_positions=desired_positions
+            desired_positions=desired_positions, desired_orders=desired_orders
         )
 
 
