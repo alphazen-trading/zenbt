@@ -1,11 +1,14 @@
+use super::enums::{CloseReason, Side};
 use super::ohlc::OHLC;
+use crate::backtest::backtest_params::BacktestParams;
+use crate::sdk::order::Order;
 use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
+use rand::Rng; // Import the Rng trait
 use rust_decimal::Decimal;
+use rust_decimal_macros::dec;
 use serde::Serialize;
-
-use super::enums::{CloseReason, Side};
 
 #[pyclass()]
 #[derive(Debug, Clone, Serialize)]
@@ -93,58 +96,58 @@ impl Position {
     pub fn close_position(
         &mut self,
         i: usize,
-        ohlc: &OHLC,
+        date: DateTime<Utc>,
         exit_price: Decimal,
         close_reason: CloseReason,
-        pnl: Decimal,
+        // pnl: Decimal,
     ) {
-        self.exit_timestamp = Some(ohlc.date);
+        self.exit_timestamp = Some(date);
         self.exit_index = i;
         self.exit_price = Some(exit_price);
         self.close_reason = Some(close_reason);
         self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
-        self.pnl = pnl;
+        self.update_pnl(exit_price);
     }
 
-    pub fn was_sl_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
-        if let Some(sl_price) = self.sl {
-            if self.side == Side::Long {
-                if ohlc.low <= sl_price {
-                    let pnl = (sl_price - self.entry_price) * self.size - self.commission;
-                    self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
-                    return true;
-                }
-            } else {
-                if ohlc.high >= sl_price {
-                    let pnl = (self.entry_price - sl_price) * self.size - self.commission;
-                    self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    pub fn was_tp_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
-        if let Some(tp_price) = self.tp {
-            if self.side == Side::Long {
-                if ohlc.high >= tp_price {
-                    let pnl = (tp_price - self.entry_price) * self.size - self.commission;
-                    self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
-                    return true;
-                }
-            } else {
-                if ohlc.low <= tp_price {
-                    let pnl = (self.entry_price - tp_price) * self.size - self.commission;
-                    self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    pub fn should_close(&mut self, i: usize, ohlc: &OHLC) -> bool {
-        return self.was_sl_hit(i, ohlc) || self.was_tp_hit(i, ohlc);
-    }
+    // pub fn was_sl_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
+    //     if let Some(sl_price) = self.sl {
+    //         if self.side == Side::Long {
+    //             if ohlc.low <= sl_price {
+    //                 let pnl = (sl_price - self.entry_price) * self.size - self.commission;
+    //                 self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
+    //                 return true;
+    //             }
+    //         } else {
+    //             if ohlc.high >= sl_price {
+    //                 let pnl = (self.entry_price - sl_price) * self.size - self.commission;
+    //                 self.close_position(i, ohlc, sl_price, CloseReason::StopLoss, pnl);
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     false
+    // }
+    // pub fn was_tp_hit(&mut self, i: usize, ohlc: &OHLC) -> bool {
+    //     if let Some(tp_price) = self.tp {
+    //         if self.side == Side::Long {
+    //             if ohlc.high >= tp_price {
+    //                 let pnl = (tp_price - self.entry_price) * self.size - self.commission;
+    //                 self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
+    //                 return true;
+    //             }
+    //         } else {
+    //             if ohlc.low <= tp_price {
+    //                 let pnl = (self.entry_price - tp_price) * self.size - self.commission;
+    //                 self.close_position(i, ohlc, tp_price, CloseReason::TakeProfit, pnl);
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     false
+    // }
+    // pub fn should_close(&mut self, i: usize, ohlc: &OHLC) -> bool {
+    //     return self.was_sl_hit(i, ohlc) || self.was_tp_hit(i, ohlc);
+    // }
 
     fn __repr__(&self) -> String {
         // Serialize the struct to a JSON string using serde_json
@@ -152,6 +155,29 @@ impl Position {
             Ok(json_string) => json_string,
             Err(_) => "Failed to serialize Order struct".to_string(),
         }
+    }
+}
+
+pub fn create_position(order: &Order, date: DateTime<Utc>, params: &BacktestParams) -> Position {
+    let entry_price = order.price.expect("Order price is None!");
+
+    Position {
+        id: rand::thread_rng().gen_range(0..101).to_string(),
+        index: order.index,
+        exit_index: 0,
+        entry_timestamp: date,
+        exit_timestamp: None,
+        entry_price,
+        exit_price: None,
+        size: order.size,
+        sl: order.sl,
+        tp: order.tp,
+        side: order.side,
+        close_reason: None,
+        pnl: dec!(0.0),
+        max_dd: dec!(0.0),
+        commission: entry_price * params.commission_pct * order.size,
+        commission_pct: params.commission_pct,
     }
 }
 

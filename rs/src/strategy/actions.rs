@@ -6,7 +6,7 @@ use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct Action {
     pub desired_orders: HashMap<String, Order>,
-    pub desired_positions: Vec<Position>,
+    pub desired_positions: HashMap<String, Position>,
 }
 
 #[pymethods]
@@ -14,7 +14,7 @@ impl Action {
     #[new]
     fn new(
         desired_orders: HashMap<String, Order>,
-        desired_positions: Vec<Position>,
+        desired_positions: HashMap<String, Position>,
     ) -> PyResult<Action> {
         Ok(Action {
             desired_orders,

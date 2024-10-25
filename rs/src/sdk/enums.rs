@@ -31,6 +31,7 @@ pub enum CloseReason {
     TakeProfit,
     StopLoss,
     Signal,
+    Manual,
 }
 impl ToPyObject for CloseReason {
     fn to_object(&self, py: Python) -> PyObject {
@@ -38,6 +39,7 @@ impl ToPyObject for CloseReason {
             CloseReason::TakeProfit => PyString::new_bound(py, "TakeProfit").into_py(py),
             CloseReason::StopLoss => PyString::new_bound(py, "StopLoss").into_py(py),
             CloseReason::Signal => PyString::new_bound(py, "Signal").into_py(py),
+            CloseReason::Manual => PyString::new_bound(py, "Manual").into_py(py),
         }
     }
 }

@@ -150,31 +150,32 @@ pub fn find_signals_to_enter(
     }
 }
 
+#[allow(unused_variables)]
 pub fn find_active_positions_to_close(i: usize, backtest: &mut BacktestOld) {
-    let ohlc = &backtest.ohlc[i];
-    let mut indexes_to_remove = Vec::new();
-    let mut floating_equity = dec!(0);
-    let mut realized_equity = dec!(0);
+    // let ohlc = &backtest.ohlc[i];
+    // let mut indexes_to_remove = Vec::new();
+    // let mut floating_equity = dec!(0);
+    // let mut realized_equity = dec!(0);
 
-    for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate() {
-        let should = position.should_close(i, &ohlc);
-        if should {
-            backtest.positions.closed_positions.push(position.clone());
-            backtest.commissions += position.commission;
-            realized_equity += position.pnl;
-            indexes_to_remove.push(j);
-        } else {
-            // position.tp = backtest.trailing_tp[i];
-            position.update_pnl(ohlc.close);
-            floating_equity += position.pnl;
-        }
-    }
+    // for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate() {
+    //     let should = position.should_close(i, &ohlc);
+    //     if should {
+    //         backtest.positions.closed_positions.push(position.clone());
+    //         backtest.commissions += position.commission;
+    //         realized_equity += position.pnl;
+    //         indexes_to_remove.push(j);
+    //     } else {
+    //         // position.tp = backtest.trailing_tp[i];
+    //         position.update_pnl(ohlc.close);
+    //         floating_equity += position.pnl;
+    //     }
+    // }
 
-    for &i in indexes_to_remove.iter().rev() {
-        backtest.positions.active_positions.remove(i);
-    }
+    // for &i in indexes_to_remove.iter().rev() {
+    //     backtest.positions.active_positions.remove(i);
+    // }
 
-    update_backtest_equity(backtest, floating_equity, realized_equity);
+    // update_backtest_equity(backtest, floating_equity, realized_equity);
 }
 
 #[allow(unused_variables)]

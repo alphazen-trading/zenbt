@@ -1,4 +1,3 @@
-use crate::sdk::position::Positions;
 use numpy::ToPyArray;
 use polars::prelude::*;
 use pyo3::prelude::*;
@@ -12,9 +11,6 @@ use pyo3_polars::PyDataFrame;
 pub struct Strategy {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
-    pub equity: Py<PyList>,
-    pub floating_equity: Py<PyList>,
-    pub positions: Positions,
 }
 
 #[pymethods]
@@ -63,9 +59,6 @@ impl Strategy {
             Ok(Strategy {
                 df,
                 data: dict.into(),
-                equity: PyList::new_bound(py, vec![0]).into(),
-                floating_equity: PyList::new_bound(py, vec![0]).into(),
-                positions: Positions::new(),
             })
         })
     }

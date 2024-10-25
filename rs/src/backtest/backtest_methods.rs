@@ -1,32 +1,67 @@
-// use super::ohlc::OHLC;
-// use super::order::Order;
-// use super::position::Position;
-use crate::backtest::backtest_params::BacktestParams;
-use crate::sdk::order::Order;
+use crate::backtest::helpers::{get_date_at_index, get_value_at};
+use crate::sdk::enums::CloseReason;
 use crate::sdk::position::Position;
-use chrono::{DateTime, Utc};
-use rand::Rng; // Import the Rng trait
-use rust_decimal_macros::dec;
+use polars::frame::DataFrame;
+use pyo3::prelude::*;
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
+use std::borrow::BorrowMut;
+use std::collections::HashMap;
 
-pub fn create_position(order: &Order, date: DateTime<Utc>, params: &BacktestParams) -> Position {
-    let entry_price = order.price.expect("Order price is None!");
+use super::shared_state::SharedState;
 
-    Position {
-        id: rand::thread_rng().gen_range(0..101).to_string(),
-        index: order.index,
-        exit_index: 0,
-        entry_timestamp: date,
-        exit_timestamp: None,
-        entry_price,
-        exit_price: None,
-        size: order.size,
-        sl: order.sl,
-        tp: order.tp,
-        side: order.side,
-        close_reason: None,
-        pnl: dec!(0.0),
-        max_dd: dec!(0.0),
-        commission: entry_price * params.commission_pct * order.size,
-        commission_pct: params.commission_pct,
-    }
+pub fn check_positions_to_close(
+    i: usize,
+    df: &DataFrame,
+    // active_positions: *mut Py<PyAny>,
+    // closed_positions: *mut Py<PyAny>,
+    state: &Py<SharedState>,
+    desired_positions: HashMap<String, Position>,
+) {
+    // let mut positions_to_remove = Vec::new();
+
+    Python::with_gil(|py| {
+        let binding = state.getattr(py, "active_positions").unwrap();
+        let mut _binding = binding.bind(py);
+        let dict = _binding.borrow_mut();
+        // dict.set_item("asd", 3.2);
+
+        // for key in dict.keys() {
+        //     if !desired_positions.contains_key(&key) {}
+        // }
+
+        // for pos in active_positions {
+        //     pos.0.
+        //     if !desired_positions.contains_key(&pos.id) {
+        //         pos.close_position(
+        //             i,
+        //             get_date_at_index(&df, i),
+        //             get_value_at(&df, i + 1, "open").unwrap(),
+        //             CloseReason::Manual,
+        //         );
+        //         closed_positions.insert(pos.id.clone(), pos.clone());
+        //         positions_to_remove.push(pos.id.clone());
+        //     }
+        // }
+    })
+
+    // // Now remove the positions after iteration
+    // for id in positions_to_remove {
+    //     active_positions.remove(&id);
+    // }
 }
+
+// pub fn update_backtest_equity(
+//     backtest: &mut BacktestOld,
+//     floating_equity: Decimal,
+//     realized_equity: Decimal,
+// ) {
+//     backtest.floating_equity.push(floating_equity);
+//     backtest.equity.push(
+//         backtest
+//             .equity
+//             .last()
+//             .unwrap_or(&backtest.params.initial_capital)
+//             + realized_equity,
+//     );
+// }
