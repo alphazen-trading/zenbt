@@ -113,8 +113,8 @@ impl Backtest {
                     order.price = get_value_at(&df, i + 1, "open");
                     let new_position =
                         create_position(&order, get_date_at_index(&df, i), &self.backtest_params);
-                    self.active_positions
-                        .insert(new_position.id.clone(), new_position);
+                    // self.active_positions
+                    //     .insert(new_position.id.clone(), new_position);
 
                     // Add position to the state
                     Python::with_gil(|py| {
