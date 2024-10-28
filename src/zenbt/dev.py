@@ -92,7 +92,7 @@ class ST(BaseStrategy):
         slow_ma = self.data["slow_ma"]
 
         desired_orders = {}
-        desired_positions = {}
+        desired_positions = self.state.active_positions
         # return DefaultAction
         # print(self.state.equity)
         # print(self.state.equity[-1])
@@ -101,30 +101,34 @@ class ST(BaseStrategy):
             for key in self.state.active_positions.keys():
                 if key not in seen_pos:
                     seen_pos.append(key)
-        if self.has_position():
-            return DefaultAction
+        # if self.has_position():
+        #     return Action(
+        #         desired_positions=desired_positions, desired_orders=desired_orders
+        #     )
 
         # Check for bullish cross over
         if fast_ma[index - 1] < slow_ma[index - 1] and fast_ma[index] >= slow_ma[index]:
+            print("Going LONG at: ", index)
             order = self.create_market_order(
                 clientOrderId="Long",
                 side=Side.Long,
                 size=1,
-                sl=self.close * 0.99,
-                tp=self.close * 1.01,
+                # sl=self.close * 0.99,
+                # tp=self.close * 1.01,
             )
             desired_orders[order.clientOrderId] = order
             desired_positions = {}
 
         # Check for bearish crossover
         if fast_ma[index - 1] > slow_ma[index - 1] and fast_ma[index] <= slow_ma[index]:
+            print("Going SHORT at: ", index)
             # print("Going short")
             order = self.create_market_order(
                 clientOrderId="Short",
                 side=Side.Short,
                 size=1,
-                sl=self.close * 1.01,
-                tp=self.close * 0.99,
+                # sl=self.close * 1.01,
+                # tp=self.close * 0.99,
             )
             desired_orders[order.clientOrderId] = order
             desired_positions = {}
@@ -139,7 +143,7 @@ def dev():
     # sym = "1000PEPE"
     # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     sym = "BTC"
-    df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="okx")
+    df = read_data_pl(sym, 0, 200, resample_tf="1min", exchange="okx")
 
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)
@@ -166,6 +170,8 @@ def dev():
     bt.backtest()
     print(f"Backtest with rows: {(time.time() - start) * 1000:.2f} ms")
     print(len(seen_pos))
+    print(dir(bt.state))
+    print(bt.state.closed_positions)
     return
     bt = Backtest(df, bt_params, st)
 

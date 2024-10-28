@@ -112,5 +112,9 @@ impl Backtest {
             "Number of total positions: {:?}",
             self.state.closed_positions.len()
         );
+        println!(
+            "Number of active positions: {:?}",
+            self.state.active_positions.len()
+        );
     }
 }

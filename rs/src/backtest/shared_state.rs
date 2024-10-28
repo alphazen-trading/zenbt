@@ -19,7 +19,7 @@ pub struct PySharedState {
 #[pymethods]
 impl PySharedState {}
 
-#[pyclass()]
+#[pyclass(get_all)]
 #[derive(Debug, Clone)]
 pub struct SharedState {
     pub equity: Vec<Decimal>,

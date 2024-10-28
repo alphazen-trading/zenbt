@@ -3,6 +3,7 @@ use super::ohlc::OHLC;
 use crate::backtest::backtest_params::BacktestParams;
 use crate::backtest::helpers::{get_date_at_index, get_value_at};
 use crate::sdk::order::Order;
+use crate::strategy::actions::Action;
 use chrono::{DateTime, Utc};
 use polars::frame::DataFrame;
 use pyo3::prelude::*;
@@ -153,8 +154,28 @@ impl Position {
         }
         false
     }
-    pub fn should_close(&mut self, i: usize, df: &DataFrame) -> bool {
-        return self.was_sl_hit(i, df) || self.was_tp_hit(i, df);
+    pub fn is_position_no_longer_desired(
+        &mut self,
+        i: usize,
+        df: &DataFrame,
+        action: &Action,
+    ) -> bool {
+        if !action.desired_positions.contains_key(&self.id) {
+            let open = get_value_at(&df, i + 1, "open").unwrap();
+            if self.side == Side::Long {
+                self.pnl = (open - self.entry_price) * self.size - self.commission;
+            } else {
+                self.pnl = (self.entry_price - open) * self.size - self.commission;
+            }
+            self.close_position(i, df, open, CloseReason::Manual);
+            return true;
+        }
+        false
+    }
+    pub fn should_close(&mut self, i: usize, df: &DataFrame, action: &Action) -> bool {
+        return self.was_sl_hit(i, df)
+            || self.was_tp_hit(i, df)
+            || self.is_position_no_longer_desired(i, df, action);
     }
 
     fn __repr__(&self) -> String {

@@ -27,7 +27,7 @@ pub fn check_positions_to_close(
     let mut realized_equity = dec!(0);
 
     for position in &mut state.active_positions.values_mut() {
-        let should = position.should_close(i, df);
+        let should = position.should_close(i, df, action);
         if should {
             state
                 .closed_positions
@@ -41,7 +41,7 @@ pub fn check_positions_to_close(
         }
     }
 
-    println!("now need to look into the action's desired positions to close and close them");
+    // println!("now need to look into the action's desired positions to close and close them");
 
     if !positions_to_close.is_empty() {
         for pos_id in &positions_to_close {
