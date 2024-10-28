@@ -2,6 +2,8 @@ use crate::sdk::{order::Order, position::Position};
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
+use pyo3::types::PyType;
+
 #[pyclass(get_all, frozen)]
 #[derive(Debug, Clone)]
 pub struct Action {

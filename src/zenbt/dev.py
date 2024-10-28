@@ -9,7 +9,7 @@ from zenbt.rs import (
     Side,
     Strategy,
     BacktestParams,
-    SharedState,
+    PySharedState,
     Backtest,
     Action,
     Order,
@@ -22,14 +22,14 @@ from typing import Optional
 
 COMMISSION = 0
 COMMISSION = 0.02 / 100
-initial_capital = 2000
+initial_capital = 20000
 
 bt_params = BacktestParams(commission_pct=COMMISSION, initial_capital=initial_capital)
 
 
 class BaseStrategy(Strategy):
     index: int
-    state: SharedState
+    state: PySharedState
 
     def create_market_order(
         self,
@@ -50,7 +50,8 @@ class BaseStrategy(Strategy):
             tp=tp,
         )
 
-    def _on_candle(self, index, state: SharedState, test) -> Action:  # type: ignore
+    # def _on_candle(self, index, state: SharedState, test) -> Action:  # type: ignore
+    def _on_candle(self, index: int, state: PySharedState) -> Action:  # type: ignore
         self.index = index
         self.state = state
         self.time = self.data["time"][index]
@@ -81,6 +82,8 @@ class BaseStrategy(Strategy):
 
 DefaultAction = Action(desired_positions={}, desired_orders={})
 
+seen_pos = []
+
 
 class ST(BaseStrategy):
     def on_candle(self) -> Action:  # type: ignore
@@ -91,14 +94,24 @@ class ST(BaseStrategy):
         desired_orders = {}
         desired_positions = {}
         # return DefaultAction
+        # print(self.state.equity)
+        # print(self.state.equity[-1])
 
-        # if self.has_position():
-        #     return DefaultAction
+        if self.has_position():
+            for key in self.state.active_positions.keys():
+                if key not in seen_pos:
+                    seen_pos.append(key)
+        if self.has_position():
+            return DefaultAction
 
         # Check for bullish cross over
         if fast_ma[index - 1] < slow_ma[index - 1] and fast_ma[index] >= slow_ma[index]:
             order = self.create_market_order(
-                clientOrderId="Long", side=Side.Long, size=1
+                clientOrderId="Long",
+                side=Side.Long,
+                size=1,
+                sl=self.close * 0.99,
+                tp=self.close * 1.01,
             )
             desired_orders[order.clientOrderId] = order
             desired_positions = {}
@@ -107,7 +120,11 @@ class ST(BaseStrategy):
         if fast_ma[index - 1] > slow_ma[index - 1] and fast_ma[index] <= slow_ma[index]:
             # print("Going short")
             order = self.create_market_order(
-                clientOrderId="Short", side=Side.Short, size=1
+                clientOrderId="Short",
+                side=Side.Short,
+                size=1,
+                sl=self.close * 1.01,
+                tp=self.close * 0.99,
             )
             desired_orders[order.clientOrderId] = order
             desired_positions = {}
@@ -122,7 +139,7 @@ def dev():
     # sym = "1000PEPE"
     # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     sym = "BTC"
-    df = read_data_pl(sym, 0, 1000, resample_tf="1min", exchange="okx")
+    df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="okx")
 
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)
@@ -134,7 +151,22 @@ def dev():
         # pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
     )
 
+    # def test(self):
+    #     print(self)
+    #     print("In test")
+    # st = ST(df, test)
+
     st = ST(df)
+    # print(dir(st))
+    # a = st.test()
+    # print(a)
+    # st.backtest()
+    bt = Backtest(df, bt_params, st)
+    start = time.time()
+    bt.backtest()
+    print(f"Backtest with rows: {(time.time() - start) * 1000:.2f} ms")
+    print(len(seen_pos))
+    return
     bt = Backtest(df, bt_params, st)
 
     start = time.time()

@@ -1,16 +1,35 @@
 use numpy::ToPyArray;
 use polars::prelude::*;
+
+use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::types::PyDict;
-use pyo3::types::PyList;
-use pyo3::types::PyType;
+use pyo3::PyTypeInfo;
 use pyo3_polars::PyDataFrame;
+use std::collections::HashMap;
+
+use pyo3::prelude::*;
+use pyo3::types::{PyDict, PyList, PyType};
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
+use std::any::type_name;
+use std::borrow::Borrow;
+use std::borrow::BorrowMut;
+
+use crate::backtest::backtest_methods::test_method;
+use crate::backtest::shared_state::PySharedState;
+use crate::backtest::shared_state::SharedState;
+use crate::sdk::position::Position;
+use crate::sdk::position::Positions;
+
+use super::actions::Action;
 
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
 pub struct Strategy {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
+    pub equity: Vec<Decimal>,
+    // pub state: Py<PySharedState>,
 }
 
 #[pymethods]
@@ -56,9 +75,20 @@ impl Strategy {
                 }
             }
 
+            let pystate = Py::new(
+                py,
+                PySharedState {
+                    equity: PyList::new_bound(py, Vec::<f64>::new()).into(),
+                    active_positions: PyDict::new_bound(py).into(),
+                    closed_positions: PyDict::new_bound(py).into(),
+                },
+            )?;
+
             Ok(Strategy {
                 df,
                 data: dict.into(),
+                equity: Vec::new(),
+                // state: pystate,
             })
         })
     }
@@ -74,4 +104,125 @@ impl Strategy {
     pub fn _on_candle(cls: &Bound<'_, PyType>) -> PyResult<i32> {
         Ok(10)
     }
+
+    // #[classmethod]
+    // fn override_test(_cls: &Bound<'_, PyType>) -> PyResult<i32> {
+    //     println!("print within rust");
+    //     Ok(10)
+    // }
+
+    // fn backtest(slf: &Bound<Self>) -> PyResult<i32> {
+    //     println!("print from rust: {}", 23);
+    //     let action: Action = slf
+    //         .call_method("override_test", (), None)
+    //         .unwrap()
+    //         .extract()
+    //         .unwrap();
+    //     println!("The cls is: {:?}", action);
+    //     println!("The cls is: {:?}", action.desired_orders);
+    //     // let action: Action = slf.getattr("desired_action").unwrap().extract().unwrap();
+    //     // println!("The value of it is: {:?}", action);
+    //     // println!("The value of it is: {:?}", action.desired_orders);
+    //     Ok(32)
+    // }
+    // fn backtest(&mut self, py: Python<'_>, wraps: Py<PyAny>) {
+    //     let df = self.df.0.clone();
+    //     // let res = slf.call_method_bound(py, intern!(py, "_on_candle"), (0, self), None);
+    //     let res: Action = wraps
+    //         .call_bound(py, (0, self.state.clone()), None)
+    //         .unwrap()
+    //         .extract(py)
+    //         .unwrap();
+    //     println!("The result is: {:?}", res);
+    //     for i in 0..df.height() {
+    //         //     // for (j, position) in &mut backtest.positions.active_positions.iter_mut().enumerate() {
+    //         //     // for pos in &mut self.active_positions {
+    //         //     //     println!("{:?}", pos);
+    //         //     // }
+    //         //
+    //         // let res = slf.call_method_bound(py, intern!(py, "_on_candle"), (i,), None);
+    //         // let action = res;
+
+    //         // // let action: Action = slf
+    //         // //     .call_method_bound(py, intern!(py, "_on_candle"), (i,), None)
+    //         // //     .unwrap()
+    //         // //     .extract(py)
+    //         // //     .unwrap();
+    //         // println!("The result is: {:?}", action);
+    //     }
+    // }
+    // fn foo(slf: &Bound<Self>) -> PyResult<()> {
+    //     slf.call_method0("override_test")?;
+    //     Ok(())
+    // }
+    // fn backtest(&self, py: Python<'_>) {
+    //     Self::override_test(self.into_py(py));
+    // }
+
+    // fn backtest(&self, py: Python<'_>) {
+    //     let cls = py.get_type_bound::<Strategy>();
+    //     let df = cls.getattr("desired_action");
+    //     let result = cls
+    //         .call_method(intern!(py, "override_test"), (), None)
+    //         .unwrap();
+    //     //     // println!("The cls is: {:?}", cls);
+    //     println!("The cls is: {:?}", df);
+    // }
+
+    //     let result = cls
+    //         .call_method(intern!(py, "override_test"), (), None)
+    //         .unwrap();
+    //     println!("The cls is: {:?}", result);
+    //     // .unwrap()
+    //     // .extract(py)
+    //     // .unwrap();
+    //     // cls.call_method(py, "override_test", (self), None).unwrap();
+    //     // self.into_py(py)
+    //     //     .call_method_bound(py, "_on_candle", (), None)
+    //     //     .unwrap();
+    //     // let ret = self.wraps.call_bound(py, (self.into_py(py)), None).unwrap();
+    //     // println!("{:?}", ret);
+    //     // self.wraps.call_method_bound(
+    //     //     py,
+    //     //     // intern!(py, "_on_candle"),
+    //     //     "_on_candle",
+    //     //     (0, self),
+    //     //     None,
+    //     // )
+    //     // let cls = &Self::override_test(self.borrow
+
+    //     // py.allow_threads(move || {
+    //     //     // An example of an "expensive" Rust calculation
+    //     //     // let sum = numbers.iter().sum();
+
+    //     //     Ok(1)
+    //     // })
+    //     // Python::with_gil(|py| {
+    //     //     Self::
+    //     //     // let res = Self::test(&Self::type_object_bound(py));
+    //     //     // println!("The res is: {}", res);
+    //     //     // Self::call_method_bound(py, intern!(py, "test"), (), None).unwrap();
+
+    //     //     let result: Action = Self::test(&Self::type_object_bound(py));
+    //     //     println!("The result is: {:?}", result);
+    //     //     // .strategy
+    //     //     // .call_method_bound(
+    //     //     //     py,
+    //     //     //     intern!(py, "_on_candle"),
+    //     //     //     (i, self.state.borrow(py), test.clone()),
+    //     //     //     None,
+    //     //     // )
+    //     //     // .unwrap()
+    //     //     // .extract(py)
+    //     //     // .unwrap();
+    //     //     // result.extract::<Action>(py).unwrap()
+    //     // })
+    // }
+
+    // #[classmethod]
+    // fn backtest(cls: &Bound<'_, PyType>) {
+    //     let result = cls.call_method("override_test", (cls,), None).unwrap();
+    //     let action = cls.getattr("desired_action").unwrap();
+    //     println!("The result is: {:?}", action);
+    // }
 }

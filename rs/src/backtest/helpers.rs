@@ -6,6 +6,7 @@ use rust_decimal::Decimal;
 use std::borrow::BorrowMut;
 
 use super::backtest::Backtest;
+use super::shared_state::PySharedState;
 
 pub fn get_date_at_index(df: &DataFrame, index: usize) -> DateTime<Utc> {
     let timestamp_ms: i64 = df["time"]
@@ -26,21 +27,53 @@ pub fn get_date_at_index(df: &DataFrame, index: usize) -> DateTime<Utc> {
     date
 }
 
-pub fn append_to_list(backtest: &Backtest, list_name: &str, value: PyObject) {
+pub fn append_decimal_to_list(pystate: &Py<PySharedState>, list_name: &str, value: Decimal) {
     Python::with_gil(|py| {
-        let mut list = backtest.state.getattr(py, list_name).unwrap();
+        let mut list = pystate.getattr(py, list_name).unwrap();
         list.borrow_mut()
             .call_method_bound(py, "append", (value,), None)
             .unwrap();
     });
 }
 
-pub fn set_state_dict_item(backtest: &Backtest, dict_name: &str, key: String, value: PyObject) {
+pub fn append_to_list(pystate: &Py<PySharedState>, list_name: &str, value: PyObject) {
     Python::with_gil(|py| {
-        let binding = backtest.state.getattr(py, dict_name).unwrap();
+        let mut list = pystate.getattr(py, list_name).unwrap();
+        list.borrow_mut()
+            .call_method_bound(py, "append", (value,), None)
+            .unwrap();
+    });
+}
+
+// pub fn set_state_dict_item(backtest: &Backtest, dict_name: &str, key: String, value: PyObject) {
+//     Python::with_gil(|py| {
+//         let binding = backtest.pystate.getattr(py, dict_name).unwrap();
+//         let mut _binding = binding.bind(py);
+//         let dict = _binding.borrow_mut();
+//         dict.set_item(key, value).unwrap();
+//     });
+// }
+
+pub fn set_state_dict_item(
+    pystate: &Py<PySharedState>,
+    dict_name: &str,
+    key: String,
+    value: PyObject,
+) {
+    Python::with_gil(|py| {
+        let binding = pystate.getattr(py, dict_name).unwrap();
         let mut _binding = binding.bind(py);
         let dict = _binding.borrow_mut();
         dict.set_item(key, value).unwrap();
+    });
+}
+
+pub fn remove_state_dict_item(pystate: &Py<PySharedState>, dict_name: &str, key: &String) {
+    Python::with_gil(|py| {
+        let binding = pystate.getattr(py, dict_name).unwrap();
+        let mut _binding = binding.bind(py);
+        let dict = _binding.borrow_mut();
+        dict.del_item(key).unwrap();
     });
 }
 

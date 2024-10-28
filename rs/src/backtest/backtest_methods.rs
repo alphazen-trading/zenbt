@@ -1,67 +1,70 @@
-use crate::backtest::helpers::{get_date_at_index, get_value_at};
-use crate::sdk::enums::CloseReason;
-use crate::sdk::position::Position;
-use polars::frame::DataFrame;
-use pyo3::prelude::*;
-use rust_decimal::prelude::FromPrimitive;
-use rust_decimal::Decimal;
-use std::borrow::BorrowMut;
+use std::any::Any;
 use std::collections::HashMap;
 
-use super::shared_state::SharedState;
+use crate::strategy::actions::Action;
+use crate::strategy::strategy::Strategy;
+use polars::frame::DataFrame;
+use rust_decimal::Decimal;
+use rust_decimal_macros::dec;
 
+use super::backtest::Backtest;
+use super::shared_state::{PySharedState, SharedState};
+
+pub fn test_method(strategy: &mut Strategy) {
+    println!("IN here");
+    strategy.equity.append(&mut vec![Decimal::from(0)]);
+}
 pub fn check_positions_to_close(
     i: usize,
     df: &DataFrame,
-    // active_positions: *mut Py<PyAny>,
-    // closed_positions: *mut Py<PyAny>,
-    state: &Py<SharedState>,
-    desired_positions: HashMap<String, Position>,
+    backtest: &mut Backtest,
+    action: &Action,
+    py_actions: &mut HashMap<String, Box<dyn Any>>,
 ) {
-    // let mut positions_to_remove = Vec::new();
+    let state = &mut backtest.state;
+    let mut positions_to_close: Vec<String> = Vec::new();
+    let mut floating_equity = dec!(0);
+    let mut realized_equity = dec!(0);
 
-    Python::with_gil(|py| {
-        let binding = state.getattr(py, "active_positions").unwrap();
-        let mut _binding = binding.bind(py);
-        let dict = _binding.borrow_mut();
-        // dict.set_item("asd", 3.2);
+    for position in &mut state.active_positions.values_mut() {
+        let should = position.should_close(i, df);
+        if should {
+            state
+                .closed_positions
+                .insert(position.id.clone(), position.clone());
+            backtest.commissions += position.commission;
+            realized_equity += position.pnl;
+            positions_to_close.push(position.id.clone());
+        } else {
+            position.update_pnl(i, df);
+            floating_equity += position.pnl;
+        }
+    }
 
-        // for key in dict.keys() {
-        //     if !desired_positions.contains_key(&key) {}
-        // }
+    println!("now need to look into the action's desired positions to close and close them");
 
-        // for pos in active_positions {
-        //     pos.0.
-        //     if !desired_positions.contains_key(&pos.id) {
-        //         pos.close_position(
-        //             i,
-        //             get_date_at_index(&df, i),
-        //             get_value_at(&df, i + 1, "open").unwrap(),
-        //             CloseReason::Manual,
-        //         );
-        //         closed_positions.insert(pos.id.clone(), pos.clone());
-        //         positions_to_remove.push(pos.id.clone());
-        //     }
-        // }
-    })
+    if !positions_to_close.is_empty() {
+        for pos_id in &positions_to_close {
+            state.active_positions.remove(pos_id);
+        }
+        py_actions.insert("close_positions".to_string(), Box::new(positions_to_close));
+    }
 
-    // // Now remove the positions after iteration
-    // for id in positions_to_remove {
-    //     active_positions.remove(&id);
-    // }
+    update_backtest_equity(backtest, floating_equity, realized_equity);
 }
 
-// pub fn update_backtest_equity(
-//     backtest: &mut BacktestOld,
-//     floating_equity: Decimal,
-//     realized_equity: Decimal,
-// ) {
-//     backtest.floating_equity.push(floating_equity);
-//     backtest.equity.push(
-//         backtest
-//             .equity
-//             .last()
-//             .unwrap_or(&backtest.params.initial_capital)
-//             + realized_equity,
-//     );
-// }
+pub fn update_backtest_equity(
+    backtest: &mut Backtest,
+    floating_equity: Decimal,
+    realized_equity: Decimal,
+) {
+    backtest.state.floating_equity.push(floating_equity);
+    backtest.state.equity.push(
+        backtest
+            .state
+            .equity
+            .last()
+            .unwrap_or(&backtest.backtest_params.initial_capital)
+            + realized_equity,
+    );
+}

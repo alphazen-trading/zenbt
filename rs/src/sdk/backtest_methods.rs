@@ -120,7 +120,7 @@ pub fn find_signals_to_close(
         }
         if !long_exit && !short_exit {
             // position.tp = backtest.trailing_tp[i];
-            position.update_pnl(ohlc.close);
+            // position.update_pnl(ohlc.close);
             floating_equity += position.pnl;
         }
     }

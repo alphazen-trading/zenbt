@@ -11,7 +11,7 @@ use pyo3::prelude::*;
 // use ndarray::Ix1;
 use backtest::backtest::Backtest;
 use backtest::backtest_params::BacktestParams;
-use backtest::shared_state::SharedState;
+use backtest::shared_state::{PySharedState, SharedState};
 
 use strategy::actions::Action;
 use strategy::strategy::Strategy;
@@ -43,6 +43,7 @@ fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     m.add_class::<Backtest>()?;
     m.add_class::<SharedState>()?;
+    m.add_class::<PySharedState>()?;
     m.add_class::<BacktestOld>()?;
     // m.add_class::<BT>()?;
     // m.add_class::<Bar>()?;
