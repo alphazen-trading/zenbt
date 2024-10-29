@@ -191,7 +191,7 @@ pub fn create_position(order: &Order, date: DateTime<Utc>, params: &BacktestPara
     let entry_price = order.price.expect("Order price is None!");
 
     Position {
-        id: rand::thread_rng().gen_range(0..101).to_string(),
+        id: rand::thread_rng().gen_range(0..99999999).to_string(),
         index: order.index,
         exit_index: 0,
         entry_timestamp: date,

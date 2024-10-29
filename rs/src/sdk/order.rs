@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 use super::enums::{OrderType, Side};
 
-#[pyclass(get_all)]
+#[pyclass(get_all, set_all)]
 #[derive(Debug, Clone, Serialize)]
 pub struct Order {
     pub index: usize,

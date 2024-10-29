@@ -3,12 +3,13 @@ use super::backtest_params::BacktestParams;
 use super::helpers::{get_date_at_index, get_value_at};
 use super::shared_state::{copy_shared_state_to_pystate, PySharedState, SharedState};
 use crate::sdk::enums::OrderType;
-use crate::sdk::position::create_position;
+use crate::sdk::position::{create_position, Position};
 use crate::strategy::actions::Action;
 use crate::strategy::strategy::Strategy;
 use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
+use rust_decimal::prelude::FromPrimitive;
 use std::any::Any;
 use std::collections::HashMap;
 
@@ -45,8 +46,10 @@ impl Backtest {
                 py,
                 PySharedState {
                     equity: pyequity.into(),
+                    _equity: backtest_params.initial_capital,
                     active_positions: PyDict::new_bound(py).into(),
                     closed_positions: PyDict::new_bound(py).into(),
+                    active_position: None,
                 },
             )?;
             let mut equity = Vec::new();
@@ -71,15 +74,15 @@ impl Backtest {
 
     fn backtest(&mut self) {
         let df = self.df.0.clone();
-
         for i in 0..df.height() {
             let mut action = Python::with_gil(|py| {
                 let result: Py<Action> = self
                     .strategy
                     .call_method_bound(
                         py,
-                        intern!(py, "_on_candle"),
+                        intern!(py, "on_candle"),
                         (i, self.pystate.borrow(py)),
+                        // (),
                         None,
                     )
                     .unwrap()
@@ -105,7 +108,7 @@ impl Backtest {
             }
             // Usage example
             Python::with_gil(|py| {
-                copy_shared_state_to_pystate(py, py_actions, &self.state, &mut self.pystate);
+                copy_shared_state_to_pystate(py, i, py_actions, &self.state, &mut self.pystate);
             });
         }
         println!(

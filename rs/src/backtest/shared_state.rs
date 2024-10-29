@@ -13,8 +13,10 @@ use super::helpers::{append_decimal_to_list, append_to_list};
 #[derive(Debug)]
 pub struct PySharedState {
     pub equity: Py<PyList>,
+    pub _equity: Decimal,
     pub active_positions: Py<PyDict>,
     pub closed_positions: Py<PyDict>,
+    pub active_position: Option<Py<Position>>,
 }
 #[pymethods]
 impl PySharedState {}
@@ -32,40 +34,55 @@ impl SharedState {}
 // Function to copy values from `SharedState` to `PySharedState`
 pub fn copy_shared_state_to_pystate(
     py: Python,
-    copy_actions: HashMap<String, Box<dyn Any>>,
+    i: usize,
+    py_actions: HashMap<String, Box<dyn Any>>,
     state: &SharedState,
     _pystate: &Py<PySharedState>,
 ) {
-    // let mut pystate = _pystate.borrow_mut(py);
-    for key in copy_actions.keys() {
-        match key.as_str() {
-            "new_position" => {
-                if let Some(new_position) =
-                    copy_actions.get(key).unwrap().downcast_ref::<Position>()
-                {
-                    // Add position to the state safely
-                    set_state_dict_item(
-                        _pystate,
-                        "active_positions",
-                        new_position.id.clone(),
-                        new_position.clone().into_py(py), // Convert to a Python object
-                    );
-                } else {
-                    // Handle the case where the downcast failed
-                    println!("Error: The value associated with the key is not a `Position`.");
-                }
-            }
-            "close_positions" => {
-                if let Some(positions_to_close) =
-                    copy_actions.get(key).unwrap().downcast_ref::<Vec<String>>()
-                {
-                    for pos_id in positions_to_close {
-                        remove_state_dict_item(_pystate, "active_positions", pos_id);
-                    }
-                }
-            }
-            _ => println!("Unknown key {:?}", key),
-        }
+    // for key in py_actions.keys() {
+    //     match key.as_str() {
+    //         "new_position" => {
+    //             if let Some(new_position) = py_actions.get(key).unwrap().downcast_ref::<Position>()
+    //             {
+    //                 // // println!("The new position is: {:?}", new_position);
+    //                 // // Add position to the state safely
+    //                 // set_state_dict_item(
+    //                 //     _pystate,
+    //                 //     "active_positions",
+    //                 //     new_position.id.clone(),
+    //                 //     new_position.clone().into_py(py), // Convert to a Python object
+    //                 // );
+    //                 // let mut pystate = _pystate.borrow_mut(py);
+    //                 // pystate.active_position = Some(new_position.clone());
+    //             } else {
+    //                 // Handle the case where the downcast failed
+    //                 println!("Error: The value associated with the key is not a `Position`.");
+    //             }
+    //         }
+    //         "close_positions" => {
+    //             // if let Some(positions_to_close) =
+    //             //     py_actions.get(key).unwrap().downcast_ref::<Vec<String>>()
+    //             // {
+    //             //     // println!("The positions to close are: {:?}", positions_to_close);
+    //             //     for pos_id in positions_to_close {
+    //             //         remove_state_dict_item(_pystate, "active_positions", pos_id);
+    //             //     }
+    //             // }
+    //         }
+    //         _ => println!("Unknown key {:?}", key),
+    //     }
+    // }
+    // append_decimal_to_list(_pystate, "equity", state.equity.last().unwrap().clone());
+    let mut pystate = _pystate.borrow_mut(py);
+    pystate._equity = state.equity.last().unwrap().clone();
+
+    if !state.active_positions.is_empty() {
+        // println!(
+        //     "The active position is: {:?}",
+        //     state.active_positions.values().last()
+        // );
+        // pystate.active_position = Some(state.active_positions.values().last().unwrap().clone());
+        let pos = state.active_positions.values().last().unwrap();
+        pystate.active_position = Some(Py::new(py, pos.clone()).unwrap());
     }
-    append_decimal_to_list(_pystate, "equity", state.equity.last().unwrap().clone());
 }

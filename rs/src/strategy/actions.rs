@@ -9,6 +9,7 @@ use pyo3::types::PyType;
 pub struct Action {
     pub desired_orders: HashMap<String, Order>,
     pub desired_positions: HashMap<String, Position>,
+    pub desired_position: Option<Position>,
 }
 
 #[pymethods]
@@ -17,10 +18,12 @@ impl Action {
     fn new(
         desired_orders: HashMap<String, Order>,
         desired_positions: HashMap<String, Position>,
+        desired_position: Option<Position>,
     ) -> PyResult<Action> {
         Ok(Action {
             desired_orders,
             desired_positions,
+            desired_position,
         })
     }
 }

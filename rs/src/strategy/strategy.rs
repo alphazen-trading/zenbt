@@ -75,27 +75,21 @@ impl Strategy {
                 }
             }
 
-            let pystate = Py::new(
-                py,
-                PySharedState {
-                    equity: PyList::new_bound(py, Vec::<f64>::new()).into(),
-                    active_positions: PyDict::new_bound(py).into(),
-                    closed_positions: PyDict::new_bound(py).into(),
-                },
-            )?;
-
             Ok(Strategy {
                 df,
                 data: dict.into(),
                 equity: Vec::new(),
-                // state: pystate,
             })
         })
     }
 
     #[classmethod]
     #[allow(unused_variables)]
-    pub fn on_candle(cls: &Bound<'_, PyType>) -> PyResult<i32> {
+    pub fn on_candle(
+        cls: &Bound<'_, PyType>,
+        index: i32,
+        state: Py<PySharedState>,
+    ) -> PyResult<i32> {
         Ok(10)
     }
 

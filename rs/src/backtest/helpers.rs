@@ -73,6 +73,8 @@ pub fn remove_state_dict_item(pystate: &Py<PySharedState>, dict_name: &str, key:
         let binding = pystate.getattr(py, dict_name).unwrap();
         let mut _binding = binding.bind(py);
         let dict = _binding.borrow_mut();
+        // println!("\nThe dict: {}", dict);
+        // println!("Removing key: {}", key);
         dict.del_item(key).unwrap();
     });
 }

@@ -1,5 +1,4 @@
 from data.data import read_data, read_data_pl, download_okx_data
-import json
 import time
 import talib
 from rich import print
@@ -18,6 +17,9 @@ from zenbt.rs import (
     cross_below,
 )
 
+from .dev_old import backtest_old
+
+
 from typing import Optional
 
 COMMISSION = 0
@@ -33,6 +35,7 @@ class BaseStrategy(Strategy):
 
     def create_market_order(
         self,
+        index,
         clientOrderId: str,
         side: Side,
         size: float,
@@ -40,7 +43,7 @@ class BaseStrategy(Strategy):
         tp: Optional[float] = None,
     ) -> Order:
         return Order(
-            index=self.index,
+            index=index,
             clientOrderId=clientOrderId,
             order_type=OrderType.Market,
             side=side,
@@ -50,66 +53,40 @@ class BaseStrategy(Strategy):
             tp=tp,
         )
 
-    # def _on_candle(self, index, state: SharedState, test) -> Action:  # type: ignore
-    def _on_candle(self, index: int, state: PySharedState) -> Action:  # type: ignore
-        self.index = index
-        self.state = state
-        self.time = self.data["time"][index]
-        self.open = self.data["open"][index]
-        self.high = self.data["high"][index]
-        self.low = self.data["low"][index]
-        self.close = self.data["close"][index]
+    # def active_long_positions(self) -> list[Position]:
+    #     positions = []
+    #     for pos in self.state.active_positions:
+    #         if pos.side == Side.Long:
+    #             positions.append(pos)
+    #     return positions
 
-        return self.on_candle()
+    # def active_short_positions(self) -> list[Position]:
+    #     positions = []
+    #     for pos in self.state.active_positions:
+    #         if pos.side == Side.Short:
+    #             positions.append(pos)
+    #     return positions
 
-    def active_long_positions(self) -> list[Position]:
-        positions = []
-        for pos in self.state.active_positions:
-            if pos.side == Side.Long:
-                positions.append(pos)
-        return positions
-
-    def active_short_positions(self) -> list[Position]:
-        positions = []
-        for pos in self.state.active_positions:
-            if pos.side == Side.Short:
-                positions.append(pos)
-        return positions
-
-    def has_position(self) -> bool:
-        return len(self.state.active_positions) > 0
+    # def has_position(self) -> bool:
+    #     return len(self.state.active_positions) > 0
 
 
-DefaultAction = Action(desired_positions={}, desired_orders={})
-
+DefaultAction = Action(desired_positions={}, desired_orders={}, desired_position=None)
 seen_pos = []
 
 
 class ST(BaseStrategy):
-    def on_candle(self) -> Action:  # type: ignore
-        index = self.index
+    def on_candle_slow(self, index, state) -> Action:  # type: ignore
         fast_ma = self.data["fast_ma"]
         slow_ma = self.data["slow_ma"]
 
         desired_orders = {}
-        desired_positions = self.state.active_positions
-        # return DefaultAction
-        # print(self.state.equity)
-        # print(self.state.equity[-1])
-
-        if self.has_position():
-            for key in self.state.active_positions.keys():
-                if key not in seen_pos:
-                    seen_pos.append(key)
-        # if self.has_position():
-        #     return Action(
-        #         desired_positions=desired_positions, desired_orders=desired_orders
-        #     )
-
+        desired_positions = {}
         # Check for bullish cross over
         if fast_ma[index - 1] < slow_ma[index - 1] and fast_ma[index] >= slow_ma[index]:
-            print("Going LONG at: ", index)
+            # print("Going LONG at: ", index)
             order = self.create_market_order(
+                index,
                 clientOrderId="Long",
                 side=Side.Long,
                 size=1,
@@ -121,9 +98,10 @@ class ST(BaseStrategy):
 
         # Check for bearish crossover
         if fast_ma[index - 1] > slow_ma[index - 1] and fast_ma[index] <= slow_ma[index]:
-            print("Going SHORT at: ", index)
+            # print("Going SHORT at: ", index)
             # print("Going short")
             order = self.create_market_order(
+                index,
                 clientOrderId="Short",
                 side=Side.Short,
                 size=1,
@@ -137,41 +115,77 @@ class ST(BaseStrategy):
             desired_positions=desired_positions, desired_orders=desired_orders
         )
 
+    def on_candle(self, index, state) -> Action:  # type: ignore
+        # return self.on_candle_slow(index, state)
+        cross_above = self.data["cross_above"][index]
+        cross_below = self.data["cross_below"][index]
+        desired_orders = {}
+        desired_positions = {}
+        desired_position = None
+
+        if state.active_position:
+            desired_position = state.active_position
+
+        # Check for bullish cross over
+        if cross_above:
+            order = self.create_market_order(
+                index,
+                clientOrderId="Long",
+                side=Side.Long,
+                size=1,
+                # sl=self.close * 0.99,
+                # tp=self.close * 1.01,
+            )
+            desired_orders[order.clientOrderId] = order
+            desired_positions = {}
+            desired_position = None
+
+        # Check for bearish crossover
+        if cross_below:
+            order = self.create_market_order(
+                index,
+                clientOrderId="Short",
+                side=Side.Short,
+                size=1,
+                # sl=self.close * 1.01,
+                # tp=self.close * 0.99,
+            )
+            desired_orders[order.clientOrderId] = order
+            desired_positions = {}
+            desired_position = None
+
+        return Action(
+            desired_positions=desired_positions,
+            desired_orders=desired_orders,
+            desired_position=desired_position,
+        )
+
 
 def dev():
     # download_okx_data(days_ago=2)
-    # sym = "1000PEPE"
-    # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    sym = "1000PEPE"
+    df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     sym = "BTC"
     df = read_data_pl(sym, 0, 200, resample_tf="1min", exchange="okx")
 
+    # backtest_old(df)
+
+    start = time.time()
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)
-    atr = talib.ATR(df["high"], df["low"], df["close"], timeperiod=14)
+    # atr = talib.ATR(df["high"], df["low"], df["close"], timeperiod=14)
     df = df.with_columns(
-        pl.Series("fast_ma", fast_ma),
-        pl.Series("slow_ma", slow_ma),
-        # pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
-        # pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
+        pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
+        pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
     )
-
-    # def test(self):
-    #     print(self)
-    #     print("In test")
-    # st = ST(df, test)
-
     st = ST(df)
-    # print(dir(st))
-    # a = st.test()
-    # print(a)
-    # st.backtest()
     bt = Backtest(df, bt_params, st)
-    start = time.time()
     bt.backtest()
     print(f"Backtest with rows: {(time.time() - start) * 1000:.2f} ms")
-    print(len(seen_pos))
-    print(dir(bt.state))
-    print(bt.state.closed_positions)
+    # print(len(seen_pos))
+    # print(dir(bt.state))
+    print(len(bt.state.closed_positions))
+
     return
     bt = Backtest(df, bt_params, st)
 
