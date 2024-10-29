@@ -190,7 +190,7 @@ def dev():
     print(len(bt.state.closed_positions))
     stats = Stats(bt, df)
     stats.print()
-    print(stats.equity.plot())
+    stats.equity.plot()
 
     return
     bt = Backtest(df, bt_params, st)

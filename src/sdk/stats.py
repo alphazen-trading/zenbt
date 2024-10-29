@@ -57,9 +57,9 @@ class Stat(BaseModel):
 class Stats(BaseModel):
     closed_positions: pd.DataFrame = pd.DataFrame()
     active_positions: pd.DataFrame = pd.DataFrame()
-    equity: pl.DataFrame = pl.DataFrame()
+    equity: pd.DataFrame = pd.DataFrame()
     stats: Stat = Stat()
-    bt: Backtest = None
+    bt: Optional[Backtest] = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -109,7 +109,7 @@ class Stats(BaseModel):
             values.append(json.loads(pos.to_json()))
         self.active_positions = self.convert_df_str_to_float(pd.DataFrame(values))
 
-    def __init__(self, bt: Any, df: pl.DataFrame):
+    def __init__(self, bt: Backtest, df: pl.DataFrame):
         super().__init__()
         self.bt = bt
         # self.create_positions(bt)
@@ -117,6 +117,8 @@ class Stats(BaseModel):
         # self.stats = Stat.model_validate(json.loads(bt.stats))
 
     def print(self):
+        if self.bt is None:
+            return
         data = self.bt.get_stats()["stats"]
 
         # Create a console object
