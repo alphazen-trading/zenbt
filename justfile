@@ -35,6 +35,11 @@ local_docker:
 # ============================================= #
 # Code Section
 # ============================================= #
+clippy:
+  #!/usr/bin/env bash
+  cd ./rs
+  cargo clippy -- -W clippy::pedantic
+
 pre-commit-test:
   ruff format
   ruff check --fix

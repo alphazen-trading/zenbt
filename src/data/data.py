@@ -103,7 +103,7 @@ def read_data_pl(
             df = resample(df, tf=resample_tf, on="time")
 
         # Convert timestamp and slice
-        df = df.with_columns(pl.col("time").cast(pl.Datetime).cast(pl.Int64) // 10**6)
+        df = df.with_columns(pl.col("time").cast(pl.Datetime).cast(pl.Int64) // 10**3)
         df = df.slice(start, end - start if end != -1 else None)
 
     else:

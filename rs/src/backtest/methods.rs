@@ -1,25 +1,16 @@
-use std::any::Any;
-use std::collections::HashMap;
-
 use crate::strategy::actions::Action;
-use crate::strategy::strategy::Strategy;
 use polars::frame::DataFrame;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-use super::backtest::Backtest;
-use super::shared_state::{PySharedState, SharedState};
+use super::backtester::Backtest;
 
-pub fn test_method(strategy: &mut Strategy) {
-    println!("IN here");
-    strategy.equity.append(&mut vec![Decimal::from(0)]);
-}
 pub fn check_positions_to_close(
     i: usize,
     df: &DataFrame,
     backtest: &mut Backtest,
     action: &Action,
-    py_actions: &mut HashMap<String, Box<dyn Any>>,
+    // py_actions: &mut HashMap<String, Box<dyn Any>>,
 ) {
     let state = &mut backtest.state;
     let mut positions_to_close: Vec<String> = Vec::new();
@@ -47,7 +38,7 @@ pub fn check_positions_to_close(
         for pos_id in &positions_to_close {
             state.active_positions.remove(pos_id);
         }
-        py_actions.insert("close_positions".to_string(), Box::new(positions_to_close));
+        // py_actions.insert("close_positions".to_string(), Box::new(positions_to_close));
     }
 
     update_backtest_equity(backtest, floating_equity, realized_equity);
@@ -64,7 +55,7 @@ pub fn update_backtest_equity(
             .state
             .equity
             .last()
-            .unwrap_or(&backtest.backtest_params.initial_capital)
+            .unwrap_or(&backtest.params.initial_capital)
             + realized_equity,
     );
 }

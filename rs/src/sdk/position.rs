@@ -1,14 +1,13 @@
 use super::enums::{CloseReason, Side};
-use super::ohlc::OHLC;
-use crate::backtest::backtest_params::BacktestParams;
 use crate::backtest::helpers::{get_date_at_index, get_value_at};
+use crate::backtest::params::BacktestParams;
 use crate::sdk::order::Order;
 use crate::strategy::actions::Action;
 use chrono::{DateTime, Utc};
 use polars::frame::DataFrame;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
-use rand::Rng; // Import the Rng trait
+use rand::Rng;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use serde::Serialize;
@@ -33,6 +32,11 @@ pub struct Position {
     pub close_reason: Option<CloseReason>,
     pub commission: Decimal,
     pub commission_pct: Decimal,
+}
+impl Default for Positions {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ToPyObject for Position {
@@ -84,17 +88,16 @@ impl ToPyObject for Position {
     }
 }
 
-// #[pymethods]
 impl Position {
     pub fn update_pnl(&mut self, i: usize, df: &DataFrame) {
-        let close = get_value_at(&df, i, "close").unwrap();
+        let close = get_value_at(df, i, "close");
         if self.side == Side::Long {
             self.pnl = (close - self.entry_price) * self.size;
         } else {
             self.pnl = (self.entry_price - close) * self.size;
         }
         if self.pnl < self.max_dd {
-            self.max_dd = self.pnl
+            self.max_dd = self.pnl;
         }
     }
     pub fn close_position(
@@ -105,7 +108,7 @@ impl Position {
         close_reason: CloseReason,
         // pnl: Decimal,
     ) {
-        let date = get_date_at_index(&df, i);
+        let date = get_date_at_index(df, i);
         self.exit_timestamp = Some(date);
         self.exit_index = i;
         self.exit_price = Some(exit_price);
@@ -117,14 +120,14 @@ impl Position {
     pub fn was_sl_hit(&mut self, i: usize, df: &DataFrame) -> bool {
         if let Some(sl_price) = self.sl {
             if self.side == Side::Long {
-                let low = get_value_at(&df, i, "low").unwrap();
+                let low = get_value_at(df, i, "low");
                 if low <= sl_price {
                     self.pnl = (sl_price - self.entry_price) * self.size - self.commission;
                     self.close_position(i, df, sl_price, CloseReason::StopLoss);
                     return true;
                 }
             } else {
-                let high = get_value_at(&df, i, "high").unwrap();
+                let high = get_value_at(df, i, "high");
                 if high >= sl_price {
                     self.pnl = (self.entry_price - sl_price) * self.size - self.commission;
                     self.close_position(i, df, sl_price, CloseReason::StopLoss);
@@ -137,14 +140,14 @@ impl Position {
     pub fn was_tp_hit(&mut self, i: usize, df: &DataFrame) -> bool {
         if let Some(tp_price) = self.tp {
             if self.side == Side::Long {
-                let high = get_value_at(&df, i, "high").unwrap();
+                let high = get_value_at(df, i, "high");
                 if high >= tp_price {
                     self.pnl = (tp_price - self.entry_price) * self.size - self.commission;
                     self.close_position(i, df, tp_price, CloseReason::TakeProfit);
                     return true;
                 }
             } else {
-                let low = get_value_at(&df, i, "low").unwrap();
+                let low = get_value_at(df, i, "low");
                 if low <= tp_price {
                     self.pnl = (self.entry_price - tp_price) * self.size - self.commission;
                     self.close_position(i, df, tp_price, CloseReason::TakeProfit);
@@ -160,8 +163,8 @@ impl Position {
         df: &DataFrame,
         action: &Action,
     ) -> bool {
-        if !action.desired_positions.contains_key(&self.id) {
-            let open = get_value_at(&df, i + 1, "open").unwrap();
+        if !action.positions.contains_key(&self.id) {
+            let open = get_value_at(df, i + 1, "open");
             if self.side == Side::Long {
                 self.pnl = (open - self.entry_price) * self.size - self.commission;
             } else {
@@ -173,9 +176,9 @@ impl Position {
         false
     }
     pub fn should_close(&mut self, i: usize, df: &DataFrame, action: &Action) -> bool {
-        return self.was_sl_hit(i, df)
+        self.was_sl_hit(i, df)
             || self.was_tp_hit(i, df)
-            || self.is_position_no_longer_desired(i, df, action);
+            || self.is_position_no_longer_desired(i, df, action)
     }
 
     fn __repr__(&self) -> String {
@@ -185,28 +188,32 @@ impl Position {
             Err(_) => "Failed to serialize Order struct".to_string(),
         }
     }
-}
 
-pub fn create_position(order: &Order, date: DateTime<Utc>, params: &BacktestParams) -> Position {
-    let entry_price = order.price.expect("Order price is None!");
+    pub fn create_position(
+        order: &Order,
+        date: DateTime<Utc>,
+        params: &BacktestParams,
+    ) -> Position {
+        let entry_price = order.price.expect("Order price is None!");
 
-    Position {
-        id: rand::thread_rng().gen_range(0..99999999).to_string(),
-        index: order.index,
-        exit_index: 0,
-        entry_timestamp: date,
-        exit_timestamp: None,
-        entry_price,
-        exit_price: None,
-        size: order.size,
-        sl: order.sl,
-        tp: order.tp,
-        side: order.side,
-        close_reason: None,
-        pnl: dec!(0.0),
-        max_dd: dec!(0.0),
-        commission: entry_price * params.commission_pct * order.size,
-        commission_pct: params.commission_pct,
+        Position {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
+            index: order.index,
+            exit_index: 0,
+            entry_timestamp: date,
+            exit_timestamp: None,
+            entry_price,
+            exit_price: None,
+            size: order.size,
+            sl: order.sl,
+            tp: order.tp,
+            side: order.side,
+            close_reason: None,
+            pnl: dec!(0.0),
+            max_dd: dec!(0.0),
+            commission: entry_price * params.commission_pct * order.size,
+            commission_pct: params.commission_pct,
+        }
     }
 }
 

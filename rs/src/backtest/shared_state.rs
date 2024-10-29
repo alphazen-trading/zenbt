@@ -1,19 +1,14 @@
-use std::any::Any;
-use std::collections::HashMap;
-
-use crate::backtest::helpers::{remove_state_dict_item, set_state_dict_item};
 use crate::sdk::position::Position;
 use pyo3::prelude::*;
-use pyo3::types::{PyDict, PyList};
+use pyo3::types::PyDict;
 use rust_decimal::Decimal;
-
-use super::helpers::{append_decimal_to_list, append_to_list};
+use std::collections::HashMap;
 
 #[pyclass(get_all)]
 #[derive(Debug)]
+#[allow(clippy::module_name_repetitions)]
 pub struct PySharedState {
-    pub equity: Py<PyList>,
-    pub _equity: Decimal,
+    pub equity: Decimal,
     pub active_positions: Py<PyDict>,
     pub closed_positions: Py<PyDict>,
     pub active_position: Option<Py<Position>>,
@@ -34,10 +29,10 @@ impl SharedState {}
 // Function to copy values from `SharedState` to `PySharedState`
 pub fn copy_shared_state_to_pystate(
     py: Python,
-    i: usize,
-    py_actions: HashMap<String, Box<dyn Any>>,
+    // i: usize,
+    // py_actions: HashMap<String, Box<dyn Any>>,
     state: &SharedState,
-    _pystate: &Py<PySharedState>,
+    pystate: &Py<PySharedState>,
 ) {
     // for key in py_actions.keys() {
     //     match key.as_str() {
@@ -73,15 +68,11 @@ pub fn copy_shared_state_to_pystate(
     //     }
     // }
     // append_decimal_to_list(_pystate, "equity", state.equity.last().unwrap().clone());
-    let mut pystate = _pystate.borrow_mut(py);
-    pystate._equity = state.equity.last().unwrap().clone();
+
+    let mut pystate = pystate.borrow_mut(py);
+    pystate.equity = *state.equity.last().unwrap();
 
     if !state.active_positions.is_empty() {
-        // println!(
-        //     "The active position is: {:?}",
-        //     state.active_positions.values().last()
-        // );
-        // pystate.active_position = Some(state.active_positions.values().last().unwrap().clone());
         let pos = state.active_positions.values().last().unwrap();
         pystate.active_position = Some(Py::new(py, pos.clone()).unwrap());
     }

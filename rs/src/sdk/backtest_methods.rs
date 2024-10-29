@@ -3,7 +3,7 @@ use super::enums::Side;
 use super::ohlc::OHLC;
 // use super::order::Order;
 use super::position::Position;
-use crate::backtest::backtest_params::BacktestParams;
+use crate::backtest::params::BacktestParams;
 use rand::Rng;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
@@ -28,7 +28,7 @@ use rust_decimal_macros::dec;
 //     // }
 // }
 
-pub fn has_account_blown_up(equity: &Vec<Decimal>, floating_equity: &Vec<Decimal>) -> bool {
+pub fn has_account_blown_up(equity: &[Decimal], floating_equity: &[Decimal]) -> bool {
     return equity.last().unwrap() + floating_equity.last().unwrap() < dec!(0.0);
 }
 
@@ -52,6 +52,7 @@ pub fn has_account_blown_up(equity: &Vec<Decimal>, floating_equity: &Vec<Decimal
 // }
 // }
 
+#[allow(clippy::similar_names)]
 pub fn create_position_from_signal(
     index: usize,
     ohlc: &OHLC,
@@ -95,12 +96,12 @@ pub fn update_backtest_equity(
 }
 
 pub fn find_signals_to_close(
-    i: usize,
+    #[allow(unused_variables)] i: usize,
     backtest: &mut BacktestOld,
     long_exit: bool,
     short_exit: bool,
 ) {
-    let ohlc = backtest.ohlc[i];
+    // let ohlc = backtest.ohlc[i];
     let mut indexes_to_remove = Vec::new();
     let mut floating_equity = dec!(0);
     let mut realized_equity = dec!(0);

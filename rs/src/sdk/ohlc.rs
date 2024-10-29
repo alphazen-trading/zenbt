@@ -11,6 +11,7 @@ use serde::Serialize;
 // A representation of a time based Bar
 #[pyclass]
 #[derive(Debug, Clone, Serialize, Copy)]
+#[allow(clippy::upper_case_acronyms)]
 pub struct OHLC {
     pub date: DateTime<Utc>,
     #[pyo3(get)]
@@ -27,6 +28,7 @@ pub struct OHLC {
 
 #[pyclass]
 #[derive(Debug, Clone, Serialize, Copy)]
+#[allow(clippy::upper_case_acronyms)]
 pub struct OHLCV {
     pub date: DateTime<Utc>,
     pub open: Decimal,
@@ -47,18 +49,19 @@ pub struct OHLCs {
 #[pymethods]
 impl OHLCs {
     #[new]
+    #[allow(clippy::needless_pass_by_value)]
     fn new(data: Vec<Vec<f64>>) -> Self {
         let mut ohlcs = Vec::new();
 
-        for i in 0..data.len() {
+        for row in &data {
             let ohlc = OHLC {
-                date: DateTime::from_timestamp(data[i][0].to_i64().unwrap().div(1000), 0)
+                date: DateTime::from_timestamp(row[0].to_i64().unwrap().div(1000), 0)
                     .expect("Invalid timestamp"),
-                open: Decimal::from_f64(data[i][1]).unwrap_or(Decimal::from(0)),
-                high: Decimal::from_f64(data[i][2]).unwrap_or(Decimal::from(0)),
-                low: Decimal::from_f64(data[i][3]).unwrap_or(Decimal::from(0)),
-                close: Decimal::from_f64(data[i][4]).unwrap_or(Decimal::from(0)),
-                volume: Decimal::from_f64(data[i][5]).unwrap_or(Decimal::from(0)),
+                open: Decimal::from_f64(row[1]).unwrap_or(Decimal::from(0)),
+                high: Decimal::from_f64(row[2]).unwrap_or(Decimal::from(0)),
+                low: Decimal::from_f64(row[3]).unwrap_or(Decimal::from(0)),
+                close: Decimal::from_f64(row[4]).unwrap_or(Decimal::from(0)),
+                volume: Decimal::from_f64(row[5]).unwrap_or(Decimal::from(0)),
             };
             ohlcs.push(ohlc);
         }

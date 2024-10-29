@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use super::backtest::BacktestOld;
 use super::stats_methods::create_stats;
 use pyo3::prelude::*;
@@ -7,7 +5,6 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
 pub fn get_state(backtest: &BacktestOld, py: Python) -> PyResult<PyObject> {
-    let start = Instant::now();
     let dict = PyDict::new_bound(py);
 
     dict.set_item("commission_pct", backtest.params.commission_pct)?;
@@ -23,11 +20,7 @@ pub fn get_state(backtest: &BacktestOld, py: Python) -> PyResult<PyObject> {
     )?;
     dict.set_item("equity", backtest.equity.clone())?;
     dict.set_item("floating_equity", backtest.floating_equity.clone())?;
-    dict.set_item("stats", create_stats(&backtest))?;
-
-    let duration = start.elapsed();
-
-    println!("RS Time elapsed: {:?}", duration);
+    dict.set_item("stats", create_stats(backtest))?;
 
     Ok(dict.into())
 }

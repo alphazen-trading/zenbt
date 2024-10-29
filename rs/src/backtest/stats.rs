@@ -24,8 +24,7 @@ pub struct Stats {
     pub wins: Decimal,
     #[serde(with = "rust_decimal::serde::float")]
     pub losses: Decimal,
-    #[serde(with = "rust_decimal::serde::float")]
-    pub win_rate: Decimal,
+    pub win_rate: String,
     pub trading_days: i64,
     pub start_date: String,
     pub end_date: String,
@@ -56,7 +55,7 @@ impl ToPyObject for Stats {
         dict.set_item("commissions", self.commissions).unwrap();
         dict.set_item("wins", self.wins).unwrap();
         dict.set_item("losses", self.losses).unwrap();
-        dict.set_item("win_rate", self.win_rate).unwrap();
+        dict.set_item("win_rate", self.win_rate.clone()).unwrap();
         dict.set_item("trading_days", self.trading_days).unwrap(); // i64
         dict.set_item("start_date", self.start_date.clone())
             .unwrap(); // String
@@ -83,7 +82,7 @@ impl Default for Stats {
             commissions: dec!(0.0),
             wins: dec!(0.0),
             losses: dec!(0.0),
-            win_rate: dec!(0.0),
+            win_rate: "0%".to_string(),
             trading_days: 0,
             start_date: String::new(),
             end_date: String::new(),

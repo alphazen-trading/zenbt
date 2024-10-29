@@ -6,6 +6,7 @@ use rust_decimal_macros::dec;
 
 #[pyclass]
 #[derive(Debug, Clone)]
+#[allow(clippy::upper_case_acronyms)]
 pub struct BBO {
     pub time: DateTime<Utc>,
     pub code: String,
@@ -37,31 +38,6 @@ impl BBO {
     }
 
     #[getter]
-    fn bid_price(&self) -> PyResult<Decimal> {
-        Ok(self.bid_price)
-    }
-
-    #[getter]
-    fn ask_price(&self) -> PyResult<Decimal> {
-        Ok(self.ask_price)
-    }
-
-    #[getter]
-    fn bid_size(&self) -> PyResult<Decimal> {
-        Ok(self.bid_size)
-    }
-
-    #[getter]
-    fn ask_size(&self) -> PyResult<Decimal> {
-        Ok(self.ask_size)
-    }
-
-    #[getter]
-    fn time(&self) -> PyResult<u64> {
-        Ok(self.time.timestamp() as u64)
-    }
-
-    #[getter]
     pub fn print(&self) {
         println!(
             "{} --- ({}) BID: {} @ {} - ASK: {} @ {}",
@@ -73,17 +49,13 @@ impl BBO {
             self.ask_price
         );
     }
-
-    fn datetime(&self) -> PyResult<String> {
-        Ok(self.time.to_string())
-    }
 }
 
 impl Default for BBO {
     fn default() -> Self {
         Self {
             time: Utc::now(),
-            code: "".to_string(),
+            code: String::new(),
             bid_price: dec!(0.0),
             ask_price: dec!(0.0),
             bid_size: dec!(0.0),

@@ -23,7 +23,7 @@ pub struct Instrument {
 #[pymethods]
 impl Instrument {
     #[new]
-    fn new(contract: Contract) -> Self {
+    fn new(contract: &Contract) -> Self {
         let mut instrument = Self {
             contract: contract.clone(),
             bbo: BBO::default(),
@@ -45,36 +45,6 @@ impl Instrument {
         instrument
     }
 
-    #[getter]
-    fn min_order_quantity(&self) -> PyResult<Decimal> {
-        Ok(self.min_order_quantity)
-    }
-
-    #[getter]
-    fn contract(&self) -> PyResult<Contract> {
-        Ok(self.contract.clone())
-    }
-
-    #[getter]
-    fn bbo(&self) -> PyResult<BBO> {
-        Ok(self.bbo.clone())
-    }
-
-    #[getter]
-    fn underlyings_codes(&self) -> PyResult<Vec<String>> {
-        Ok(self.underlyings_codes.clone())
-    }
-
-    #[getter]
-    fn code(&self) -> PyResult<String> {
-        Ok(self.code.clone())
-    }
-
-    #[getter]
-    fn id(&self) -> PyResult<u64> {
-        Ok(self.id)
-    }
-
     pub fn on_new_bbo(&mut self, bbo: BBO) {
         self.last_timestamp = bbo.time;
         self.bbo = bbo;
@@ -85,15 +55,11 @@ impl Instrument {
         ) + self.contract.min_order;
     }
 
-    fn round_price(&self, value: Decimal) -> PyResult<Decimal> {
-        Ok(round_value(value, self.contract.tick_size))
+    fn round_price(&self, value: Decimal) -> Decimal {
+        round_value(value, self.contract.tick_size)
     }
 
-    pub fn round_amount(&self, value: Decimal) -> PyResult<Decimal> {
-        Ok(round_value(value, self.contract.min_order))
-    }
-
-    fn is_active(&self) -> PyResult<bool> {
-        Ok(self.contract.active)
+    pub fn round_amount(&self, value: Decimal) -> Decimal {
+        round_value(value, self.contract.min_order)
     }
 }

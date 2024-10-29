@@ -1,5 +1,4 @@
 use pyo3::prelude::*;
-use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -10,7 +9,8 @@ use super::enums::{OrderType, Side};
 #[derive(Debug, Clone, Serialize)]
 pub struct Order {
     pub index: usize,
-    pub clientOrderId: String,
+    pub client_order_id: String,
+    #[allow(clippy::struct_field_names)]
     pub order_type: OrderType,
     pub side: Side,
     pub size: Decimal,
@@ -22,26 +22,28 @@ pub struct Order {
 #[pymethods]
 impl Order {
     #[new]
+    #[allow(clippy::similar_names, clippy::too_many_arguments)]
+    #[pyo3(signature = (index, client_order_id, order_type, side, size, price=None, sl=None, tp=None))]
     fn new(
         index: usize,
-        clientOrderId: String,
+        client_order_id: String,
         order_type: OrderType,
         side: Side,
         size: Decimal,
         price: Option<Decimal>, // Optional price
         sl: Option<Decimal>,    // Optional stop-loss
         tp: Option<Decimal>,    // Optional take-profit
-    ) -> PyResult<Order> {
-        Ok(Order {
+    ) -> Order {
+        Order {
             index,
-            clientOrderId,
+            client_order_id,
             order_type,
             side,
             size,
             price,
-            sl, // Keep sl as Option<Decimal>
-            tp, // Keep tp as Option<Decimal>
-        })
+            sl,
+            tp,
+        }
     }
     fn __repr__(&self) -> String {
         // Serialize the struct to a JSON string using serde_json
@@ -70,19 +72,20 @@ impl LimitOrders {
         LimitOrders { limit_orders }
     }
 
+    #[allow(clippy::similar_names, clippy::too_many_arguments)]
     pub fn create_order(
         &mut self,
         index: usize,
         order_type: OrderType,
         side: Side,
-        price: Decimal,
         size: Decimal,
+        price: Decimal,
         sl: Decimal,
         tp: Decimal,
     ) {
         let order = Order {
             index,
-            clientOrderId: "".to_string(),
+            client_order_id: String::new(),
             order_type,
             side,
             size,

@@ -1,14 +1,13 @@
+use super::enums::Side;
 use pyo3::prelude::*;
 use rust_decimal::Decimal;
-
-use super::enums::Side;
 
 #[pyclass(get_all, set_all)]
 #[derive(Debug, Clone)]
 pub struct Signal {
     pub index: Decimal,
     pub side: Side,
-    pub signal_type: String,
+    pub stype: String,
     pub order_type: String,
 }
 

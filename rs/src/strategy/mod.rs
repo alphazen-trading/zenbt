@@ -1,2 +1,2 @@
 pub mod actions;
-pub mod strategy;
+pub mod base;
