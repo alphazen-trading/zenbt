@@ -75,5 +75,5 @@ pub fn create_stats(backtest: &BacktestOld) -> Stats {
         max_drawdown_pct: max_drawdown * dec!(100) / backtest.params.initial_capital,
     };
 
-    return stats;
+    stats
 }

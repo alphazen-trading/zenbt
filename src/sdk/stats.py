@@ -4,8 +4,13 @@ from decimal import Decimal
 from datetime import datetime
 from typing import Optional, Any
 import pandas as pd
+import polars as pl
 from rich import print as rprint
 import numpy as np
+from rich.table import Table
+from rich.console import Console
+
+from zenbt.rs import Backtest
 
 
 class Position(BaseModel):
@@ -52,8 +57,9 @@ class Stat(BaseModel):
 class Stats(BaseModel):
     closed_positions: pd.DataFrame = pd.DataFrame()
     active_positions: pd.DataFrame = pd.DataFrame()
-    equity: pd.DataFrame = pd.DataFrame()
+    equity: pl.DataFrame = pl.DataFrame()
     stats: Stat = Stat()
+    bt: Backtest = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -80,9 +86,13 @@ class Stats(BaseModel):
 
     def create_equity(self, bt: Any, df: pd.DataFrame):
         equity = pd.DataFrame()
-        equity.index = df.index[0 : len(bt.equity)]
-        equity["realized_equity"] = np.array(bt.equity).astype(np.float64)
-        equity["floating_equity"] = np.array(bt.floating_equity).astype(np.float64)
+        df["time"] = pd.to_datetime(df["time"], unit="ms")
+        equity.index = df["time"][0 : len(bt.state.equity)]
+        bt_equity = bt.state.equity[:-1]
+        equity["realized_equity"] = np.array(bt_equity).astype(np.float64)
+        equity["floating_equity"] = np.array(bt.state.floating_equity).astype(
+            np.float64
+        )
         equity["unrealized_equity"] = (
             equity["realized_equity"] + equity["floating_equity"]
         )
@@ -99,9 +109,29 @@ class Stats(BaseModel):
             values.append(json.loads(pos.to_json()))
         self.active_positions = self.convert_df_str_to_float(pd.DataFrame(values))
 
-    def __init__(self, bt: Any, df: pd.DataFrame):
+    def __init__(self, bt: Any, df: pl.DataFrame):
         super().__init__()
+        self.bt = bt
+        # self.create_positions(bt)
+        self.create_equity(bt, df.to_pandas())
+        # self.stats = Stat.model_validate(json.loads(bt.stats))
 
-        self.create_positions(bt)
-        self.create_equity(bt, df)
-        self.stats = Stat.model_validate(json.loads(bt.stats))
+    def print(self):
+        data = self.bt.get_stats()["stats"]
+
+        # Create a console object
+        console = Console()
+
+        # Create a table
+        table = Table(title="Trading Summary")
+
+        # Add columns
+        table.add_column("Metric", justify="left", style="cyan", no_wrap=True)
+        table.add_column("Value", justify="right", style="magenta")
+
+        # Add rows from data
+        for key, value in data.items():
+            table.add_row(key, str(value))
+
+        # Print the table
+        console.print(table)

@@ -4,17 +4,13 @@ mod indicators;
 mod sdk;
 mod strategy;
 
-use pyo3::prelude::*;
-// use crate::helpers::create_limit_orders::create_limit_orders;
-// use crate::helpers::create_signals::create_signals;
-// use crate::helpers::round_value::round_value;
-// use ndarray::Ix1;
-use backtest::backtest::Backtest;
-use backtest::backtest_params::BacktestParams;
+use backtest::backtester::Backtest;
+use backtest::params::BacktestParams;
 use backtest::shared_state::{PySharedState, SharedState};
+use pyo3::prelude::*;
 
 use strategy::actions::Action;
-use strategy::strategy::Strategy;
+use strategy::base::Strategy;
 
 use indicators::cross_above::cross_above;
 use indicators::cross_below::cross_below;
@@ -22,19 +18,15 @@ use sdk::backtest::BacktestOld;
 use sdk::bbo::BBO;
 use sdk::contract::Contract;
 use sdk::enums::{OrderType, Side};
-// use sdk::instrument::Instrument;
 use sdk::ohlc::OHLCs;
 use sdk::order::{LimitOrders, Order};
 use sdk::position::Position;
 use sdk::signal::Signal;
 use sdk::signals::Signals;
-// use sdk::strategy::{Bar, Foo, Strategy, BT};
 
 #[pymodule]
 fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // m.add_function(wrap_pyfunction!(round_value, m)?)?;
-    // m.add_function(wrap_pyfunction!(create_limit_orders, m)?)?;
-    // m.add_function(wrap_pyfunction!(create_signals, m)?)?;
     m.add_class::<Signal>()?;
 
     // m.add_class::<Instrument>()?;

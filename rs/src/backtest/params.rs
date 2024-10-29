@@ -4,6 +4,7 @@ use serde::Serialize;
 
 #[pyclass]
 #[derive(Debug, Clone, Serialize)]
+#[allow(clippy::module_name_repetitions)]
 pub struct BacktestParams {
     pub commission_pct: Decimal,
     pub initial_capital: Decimal,

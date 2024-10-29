@@ -11,22 +11,14 @@ use super::backtest_state::get_state;
 use super::ohlc::{OHLCs, OHLC};
 use super::order::LimitOrders;
 use super::position::Positions;
-use crate::backtest::backtest_params::BacktestParams;
-// use super::signal::Signals;
+use crate::backtest::params::BacktestParams;
 use pyo3::prelude::*;
-// use pyo3::Bound;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-#[pyclass]
-#[derive(Debug)]
-pub struct VAL {
-    #[pyo3(get)]
-    pub curr: f64,
-}
-
 #[pyclass(get_all)]
 #[derive(Debug)]
+#[allow(clippy::module_name_repetitions)]
 pub struct BacktestOld {
     pub ohlc: Vec<OHLC>,
     pub limit_orders: LimitOrders,
@@ -45,8 +37,8 @@ impl BacktestOld {
         ohlcs: OHLCs,
         backtest_params: BacktestParams,
         limit_orders: LimitOrders,
-    ) -> PyResult<BacktestOld> {
-        Ok(BacktestOld {
+    ) -> BacktestOld {
+        BacktestOld {
             ohlc: ohlcs.ohlc,
             params: backtest_params,
             limit_orders,
@@ -56,12 +48,12 @@ impl BacktestOld {
             equity: Vec::new(),
             floating_equity: Vec::new(),
             commissions: dec![0],
-        })
+        }
     }
 
     fn get_stats(&self, py: Python) -> PyResult<PyObject> {
         let dict = PyDict::new_bound(py);
-        dict.set_item("stats", create_stats(&self))?;
+        dict.set_item("stats", create_stats(self))?;
 
         Ok(dict.into())
     }

@@ -16,8 +16,4 @@ impl Signals {
             short_signals,
         }
     }
-    #[getter]
-    fn print(&self) {
-        println!("{:?}", self);
-    }
 }

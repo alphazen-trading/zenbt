@@ -1,27 +1,10 @@
 use numpy::ToPyArray;
 use polars::prelude::*;
 
-use pyo3::intern;
 use pyo3::prelude::*;
-use pyo3::PyTypeInfo;
+use pyo3::types::{PyDict, PyType};
 use pyo3_polars::PyDataFrame;
-use std::collections::HashMap;
-
-use pyo3::prelude::*;
-use pyo3::types::{PyDict, PyList, PyType};
-use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
-use std::any::type_name;
-use std::borrow::Borrow;
-use std::borrow::BorrowMut;
-
-use crate::backtest::backtest_methods::test_method;
-use crate::backtest::shared_state::PySharedState;
-use crate::backtest::shared_state::SharedState;
-use crate::sdk::position::Position;
-use crate::sdk::position::Positions;
-
-use super::actions::Action;
 
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
@@ -29,7 +12,6 @@ pub struct Strategy {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
     pub equity: Vec<Decimal>,
-    // pub state: Py<PySharedState>,
 }
 
 #[pymethods]
@@ -85,18 +67,8 @@ impl Strategy {
 
     #[classmethod]
     #[allow(unused_variables)]
-    pub fn on_candle(
-        cls: &Bound<'_, PyType>,
-        index: i32,
-        state: Py<PySharedState>,
-    ) -> PyResult<i32> {
-        Ok(10)
-    }
-
-    #[classmethod]
-    #[allow(unused_variables)]
-    pub fn _on_candle(cls: &Bound<'_, PyType>) -> PyResult<i32> {
-        Ok(10)
+    pub fn on_candle(cls: &Bound<'_, PyType>) -> i32 {
+        10
     }
 
     // #[classmethod]

@@ -16,14 +16,13 @@ pub struct Contract {
     pub exchange_base_underlying: String,
     pub exchange_counter_underlying: String,
     pub underlyings_codes: Vec<String>,
-    value: Value,
 }
 
 #[pymethods]
 impl Contract {
     #[new]
-    fn new(_json: String) -> Self {
-        let v: Value = serde_json::from_str(_json.to_string().as_str()).unwrap();
+    fn new(new_json: &str) -> Self {
+        let v: Value = serde_json::from_str(new_json.to_string().as_str()).unwrap();
         let exchange_base_underlying: String = v["exchange_base_underlying"]
             .to_string()
             .trim_matches('"')
@@ -45,7 +44,6 @@ impl Contract {
             exchange_base_underlying: exchange_base_underlying.clone(),
             exchange_counter_underlying: exchange_counter_underlying.clone(),
             underlyings_codes: vec![exchange_base_underlying, exchange_counter_underlying],
-            value: v,
         }
     }
 
@@ -92,14 +90,5 @@ impl Contract {
     #[getter]
     fn exchange_counter_underlying(&self) -> String {
         self.exchange_counter_underlying.clone()
-    }
-
-    // #[getter]
-    // fn value(&self) -> Value {
-    //     self.value.clone()
-    // }
-
-    fn print(&self) -> () {
-        println!("{}", self.value);
     }
 }
