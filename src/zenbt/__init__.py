@@ -5,7 +5,8 @@ def dev():
     # from .side_by_side import sbs
     # sbs()
     # from bench import bench
-    from .dev import dev
+    # from .dev import dev
+    from .atr import dev
 
     dev()
     # bench()

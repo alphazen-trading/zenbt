@@ -82,8 +82,8 @@ impl Backtest {
                     .call_method_bound(
                         py,
                         intern!(py, "_on_candle"),
-                        // (i, self.pystate.borrow(py)),
-                        (),
+                        (self.pystate.borrow(py),),
+                        // (),
                         None,
                     )
                     .unwrap()
