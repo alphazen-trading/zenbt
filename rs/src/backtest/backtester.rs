@@ -74,8 +74,8 @@ impl Backtest {
                     .call_method_bound(
                         py,
                         intern!(py, "on_candle"),
-                        (i, self.pystate.borrow(py)),
-                        // (),
+                        // (i, self.pystate.borrow(py)),
+                        (),
                         None,
                     )
                     .unwrap()
@@ -98,10 +98,15 @@ impl Backtest {
 
                     // py_actions.insert("new_position".to_string(), Box::new(new_position));
                 }
+                Python::with_gil(|py| {
+                    self.strategy
+                        .call_method_bound(py, intern!(py, "reset_action"), (), None)
+                        .unwrap();
+                });
             }
             // Usage example
             Python::with_gil(|py| {
-                copy_shared_state_to_pystate(py, &self.state, &self.pystate);
+                copy_shared_state_to_pystate(py, &self.state, &self.pystate, &self.params);
             });
         }
     }

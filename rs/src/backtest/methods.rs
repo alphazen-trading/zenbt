@@ -25,6 +25,8 @@ pub fn check_positions_to_close(
                 .insert(position.id.clone(), position.clone());
             backtest.commissions += position.commission;
             realized_equity += position.pnl;
+            // println!("closing position pnl {}", position.pnl);
+            // println!("closing position pnl {:?}", position.close_reason.unwrap());
             positions_to_close.push(position.id.clone());
         } else {
             position.update_pnl(i, df);

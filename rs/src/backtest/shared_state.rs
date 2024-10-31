@@ -4,6 +4,8 @@ use pyo3::types::PyDict;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 
+use super::params::BacktestParams;
+
 #[pyclass(get_all)]
 #[derive(Debug)]
 #[allow(clippy::module_name_repetitions)]
@@ -33,6 +35,7 @@ pub fn copy_shared_state_to_pystate(
     // py_actions: HashMap<String, Box<dyn Any>>,
     state: &SharedState,
     pystate: &Py<PySharedState>,
+    params: &BacktestParams,
 ) {
     // for key in py_actions.keys() {
     //     match key.as_str() {
@@ -71,9 +74,8 @@ pub fn copy_shared_state_to_pystate(
 
     let mut pystate = pystate.borrow_mut(py);
     pystate.equity = *state.equity.last().unwrap();
-
-    if !state.active_positions.is_empty() {
+    if params.provide_active_position && !state.active_positions.is_empty() {
         let pos = state.active_positions.values().last().unwrap();
         pystate.active_position = Some(Py::new(py, pos.clone()).unwrap());
-    }
+    };
 }

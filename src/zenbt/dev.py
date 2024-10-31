@@ -18,9 +18,6 @@ from zenbt.rs import (
 )
 
 from sdk.stats import Stats
-from .dev_old import backtest_old
-
-
 from typing import Optional
 
 COMMISSION = 0
@@ -78,6 +75,54 @@ seen_pos = []
 
 class ST(BaseStrategy):
     default_size = 1
+
+    def on_candle(self, index, state) -> Action:  # type: ignore
+        # return self.on_candle_slow(index, state)
+        cross_above = self.data["cross_above"][index]
+        cross_below = self.data["cross_below"][index]
+        desired_orders = {}
+        desired_positions = {}
+        desired_position = None
+        close_all_positions = False
+
+        if state.active_position:
+            desired_position = state.active_position
+
+        # Check for bullish cross over
+        if cross_above:
+            order = self.create_market_order(
+                index,
+                client_order_id="Long",
+                side=Side.Long,
+                size=self.default_size,
+                # sl=self.close * 0.99,
+                # tp=self.close * 1.01,
+            )
+            desired_orders[order.client_order_id] = order
+            desired_positions = {}
+            desired_position = None
+            close_all_positions = True
+
+        # Check for bearish crossover
+        if cross_below:
+            order = self.create_market_order(
+                index,
+                client_order_id="Short",
+                side=Side.Short,
+                size=self.default_size,
+                # sl=self.close * 1.01,
+                # tp=self.close * 0.99,
+            )
+            desired_orders[order.client_order_id] = order
+            desired_positions = {}
+            desired_position = None
+            close_all_positions = True
+
+        return Action(
+            orders=desired_orders,
+            position=desired_position,
+            close_all_positions=close_all_positions,
+        )
 
     def on_candle_slow(self, index, state) -> Action:  # type: ignore
         fast_ma = self.data["fast_ma"]

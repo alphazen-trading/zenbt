@@ -113,7 +113,7 @@ class Stats(BaseModel):
         super().__init__()
         self.bt = bt
         # self.create_positions(bt)
-        self.create_equity(bt, df.to_pandas())
+        # self.create_equity(bt, df.to_pandas())
         # self.stats = Stat.model_validate(json.loads(bt.stats))
 
     def print(self):

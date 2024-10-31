@@ -12,6 +12,11 @@ class VBT:
 
     def backtest(self):
         pf = vbt.Portfolio.from_signals(
-            self.price, self.entries, self.exits, init_cash=100
+            self.price,
+            self.entries,
+            self.exits,
+            short_entries=self.exits,
+            short_exits=self.entries,
+            init_cash=100,
         )
         return pf

@@ -6,6 +6,8 @@ use pyo3::types::{PyDict, PyType};
 use pyo3_polars::PyDataFrame;
 use rust_decimal::Decimal;
 
+use crate::backtest::helpers::get_value_at;
+
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
 pub struct Strategy {

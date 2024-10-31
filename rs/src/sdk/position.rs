@@ -12,7 +12,7 @@ use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use serde::Serialize;
 
-#[pyclass()]
+#[pyclass(get_all)]
 #[derive(Debug, Clone, Serialize)]
 pub struct Position {
     pub id: String,
@@ -25,7 +25,6 @@ pub struct Position {
     pub size: Decimal,
     pub sl: Option<Decimal>,
     pub tp: Option<Decimal>,
-    #[pyo3(get)]
     pub side: Side,
     pub pnl: Decimal,
     pub max_dd: Decimal,
@@ -163,14 +162,28 @@ impl Position {
         df: &DataFrame,
         action: &Action,
     ) -> bool {
-        if !action.positions.contains_key(&self.id) {
+        if action.close_all_positions {
+            // let mut id = "-1".to_string();
+            // if action.position.is_some() {
+            //     id = action.position.clone().unwrap().id;
+            // };
+            // // if !action.positions.contains_key(&self.id) {
+            // if self.id != id {
             let open = get_value_at(df, i + 1, "open");
+            self.pnl = (open - self.entry_price) * self.size - self.commission;
             if self.side == Side::Long {
-                self.pnl = (open - self.entry_price) * self.size - self.commission;
             } else {
                 self.pnl = (self.entry_price - open) * self.size - self.commission;
             }
             self.close_position(i, df, open, CloseReason::Manual);
+            // println!("\nself.id {}", self.id);
+            // println!("id {}", id);
+            // println!("Entry Index {}", self.index);
+            // println!("Exit Index {}", self.exit_index);
+            // println!("closing position pnl {}", self.pnl);
+            // println!("Entry price {}", self.entry_price);
+            // println!("Close price {}", open);
+            // println!("Current index{}", i);
             return true;
         }
         false
