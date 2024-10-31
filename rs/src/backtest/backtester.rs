@@ -1,9 +1,10 @@
 use super::helpers::{get_date_at_index, get_value_at};
-use super::methods::check_positions_to_close;
+use super::methods::{check_positions_to_close, was_limit_order_triggered};
 use super::params::BacktestParams;
 use super::shared_state::{copy_shared_state_to_pystate, PySharedState, SharedState};
 use super::stats_methods::create_stats;
 use crate::sdk::enums::OrderType;
+use crate::sdk::order::Order;
 use crate::sdk::position::Position;
 use crate::strategy::actions::Action;
 use crate::strategy::base::Strategy;
@@ -44,6 +45,7 @@ impl Backtest {
                     active_positions: PyDict::new_bound(py).into(),
                     closed_positions: PyDict::new_bound(py).into(),
                     active_position: None,
+                    pending_limit_orders: PyDict::new_bound(py).into(),
                 },
             )?;
             let equity = vec![params.initial_capital];
@@ -59,6 +61,7 @@ impl Backtest {
                     floating_equity: Vec::new(),
                     active_positions: HashMap::new(),
                     closed_positions: HashMap::new(),
+                    pending_limit_orders: HashMap::new(),
                 },
                 commissions: dec!(0),
             })
@@ -95,6 +98,19 @@ impl Backtest {
             // check_positions_to_close(i, &df, self, &action, &mut state);
             check_positions_to_close(i, &df, self, &action);
 
+            let mut filled_pending_orders: Vec<Order> = Vec::new();
+            let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
+            for pending_order in pending_limit_orders.values() {
+                if was_limit_order_triggered(pending_order, i, &df, self) {
+                    filled_pending_orders.push(pending_order.clone());
+                }
+            }
+            for order in filled_pending_orders {
+                self.state
+                    .pending_limit_orders
+                    .remove(&order.client_order_id);
+            }
+
             for order in action.orders.values_mut() {
                 if order.order_type == OrderType::Market {
                     order.price = Some(get_value_at(&df, i + 1, "open"));
@@ -103,7 +119,12 @@ impl Backtest {
                     self.state
                         .active_positions
                         .insert(new_position.id.clone(), new_position.clone());
+                } else if !was_limit_order_triggered(order, i, &df, self) {
+                    self.state
+                        .pending_limit_orders
+                        .insert(order.client_order_id.clone(), order.clone());
                 }
+
                 Python::with_gil(|py| {
                     self.strategy
                         .call_method_bound(py, intern!(py, "reset_action"), (), None)

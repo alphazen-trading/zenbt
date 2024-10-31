@@ -1,3 +1,4 @@
+use crate::sdk::order::Order;
 use crate::sdk::position::Position;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
@@ -14,6 +15,7 @@ pub struct PySharedState {
     pub active_positions: Py<PyDict>,
     pub closed_positions: Py<PyDict>,
     pub active_position: Option<Py<Position>>,
+    pub pending_limit_orders: Py<PyDict>,
 }
 #[pymethods]
 impl PySharedState {}
@@ -34,6 +36,7 @@ pub struct SharedState {
     pub floating_equity: Vec<Decimal>,
     pub active_positions: HashMap<String, Position>,
     pub closed_positions: HashMap<String, Position>,
+    pub pending_limit_orders: HashMap<String, Order>,
 }
 impl SharedState {}
 

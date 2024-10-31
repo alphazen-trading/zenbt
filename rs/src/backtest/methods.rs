@@ -1,9 +1,15 @@
-use crate::strategy::actions::Action;
+use crate::{
+    sdk::{enums::Side, order::Order, position::Position},
+    strategy::actions::Action,
+};
 use polars::frame::DataFrame;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-use super::backtester::Backtest;
+use super::{
+    backtester::Backtest,
+    helpers::{get_date_at_index, get_value_at},
+};
 
 pub fn check_positions_to_close(
     i: usize,
@@ -57,4 +63,56 @@ pub fn update_backtest_equity(
             .unwrap_or(&backtest.params.initial_capital)
             + realized_equity,
     );
+}
+
+pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
+    if order.side == Side::Long {
+        // if ohlc.low <= order.price {
+        //     println!("ORDER WAS HIT");
+        //     println!("{:?}", ohlc.low);
+        //     println!("{:?} {:?}", order.price, order.sl);
+        // }
+        let low = get_value_at(df, i, "low");
+        low <= order.price.unwrap()
+    } else {
+        // if ohlc.high >= order.price {
+        //     if ohlc.high >= order.sl {
+        //         println!("\nORDER WAS HIT BUT Problem with sl");
+        //         println!("{:?}", ohlc);
+        //         println!("{:?}", order);
+        //     }
+        // }
+        let high = get_value_at(df, i, "high");
+        high <= order.price.unwrap()
+    }
+}
+pub fn was_limit_order_triggered(
+    order: &Order,
+    i: usize,
+    df: &DataFrame,
+    backtest: &mut Backtest,
+) -> bool {
+    if was_order_hit(order, i, df) {
+        let mut new_position =
+            Position::create_position(order, get_date_at_index(df, i), &backtest.params);
+
+        if new_position.was_sl_hit(i, df) {
+            // If SL was hit in the same candle, update equity and move to closed positions
+            if let Some(last_equity) = backtest.state.equity.last_mut() {
+                *last_equity += new_position.pnl;
+            }
+            backtest
+                .state
+                .active_positions
+                .insert(new_position.id.clone(), new_position.clone());
+        } else {
+            // If SL wasn't hit, move the position to active positions
+            backtest
+                .state
+                .active_positions
+                .insert(new_position.id.clone(), new_position.clone());
+        }
+        return true;
+    }
+    false
 }
