@@ -2,13 +2,13 @@
 
 
 def dev():
-    from bench import bench
-    # from .dev import dev
     # from .side_by_side import sbs
-
     # sbs()
-    # dev()
-    bench()
+    # from bench import bench
+    from .dev import dev
+
+    dev()
+    # bench()
 
 
 def ma_cross():

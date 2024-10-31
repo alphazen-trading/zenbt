@@ -67,13 +67,21 @@ impl Backtest {
 
     fn backtest(&mut self) {
         let df = self.df.0.clone();
+        // let equity = vec![self.params.initial_capital];
+        // let mut state = RustState {
+        //     equity,
+        //     floating_equity: Vec::new(),
+        //     active_positions: HashMap::new(),
+        //     closed_positions: HashMap::new(),
+        // };
         for i in 0..df.height() {
+            // let mut action = self.strategy.get().fast_method_test(i, &df);
             let mut action = Python::with_gil(|py| {
                 let result: Py<Action> = self
                     .strategy
                     .call_method_bound(
                         py,
-                        intern!(py, "on_candle"),
+                        intern!(py, "_on_candle"),
                         // (i, self.pystate.borrow(py)),
                         (),
                         None,
@@ -84,7 +92,7 @@ impl Backtest {
                 result.extract::<Action>(py).unwrap()
             });
 
-            // let mut py_actions: HashMap<String, Box<dyn Any>> = HashMap::new();
+            // check_positions_to_close(i, &df, self, &action, &mut state);
             check_positions_to_close(i, &df, self, &action);
 
             for order in action.orders.values_mut() {
@@ -95,8 +103,6 @@ impl Backtest {
                     self.state
                         .active_positions
                         .insert(new_position.id.clone(), new_position.clone());
-
-                    // py_actions.insert("new_position".to_string(), Box::new(new_position));
                 }
                 Python::with_gil(|py| {
                     self.strategy

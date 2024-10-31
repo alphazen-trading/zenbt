@@ -18,6 +18,15 @@ pub struct PySharedState {
 #[pymethods]
 impl PySharedState {}
 
+// #[derive(Debug, Clone)]
+// pub struct RustState {
+//     pub equity: Vec<Decimal>,
+//     pub floating_equity: Vec<Decimal>,
+//     pub active_positions: HashMap<String, Position>,
+//     pub closed_positions: HashMap<String, Position>,
+// }
+// impl RustState {}
+
 #[pyclass(get_all)]
 #[derive(Debug, Clone)]
 pub struct SharedState {

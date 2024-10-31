@@ -1,5 +1,8 @@
+use std::collections::HashMap;
+
 use numpy::ToPyArray;
 use polars::prelude::*;
+use rust_decimal_macros::dec;
 
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyType};
@@ -7,19 +10,24 @@ use pyo3_polars::PyDataFrame;
 use rust_decimal::Decimal;
 
 use crate::backtest::helpers::get_value_at;
+use crate::sdk::enums::{OrderType, Side};
+use crate::sdk::order::Order;
 
-#[pyclass(get_all, subclass)]
+use super::actions::Action;
+
+#[pyclass(get_all, subclass, frozen)]
 #[derive(Debug)]
 pub struct Strategy {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
     pub equity: Vec<Decimal>,
+    pub default_size: Decimal,
 }
 
 #[pymethods]
 impl Strategy {
     #[new]
-    fn new(df: PyDataFrame) -> PyResult<Strategy> {
+    fn new(df: PyDataFrame, default_size: Decimal) -> PyResult<Strategy> {
         Python::with_gil(|py| {
             let dict = PyDict::new_bound(py);
             let col_names = df.0.get_column_names();
@@ -63,10 +71,16 @@ impl Strategy {
                 df,
                 data: dict.into(),
                 equity: Vec::new(),
+                default_size,
             })
         })
     }
 
+    #[classmethod]
+    #[allow(unused_variables)]
+    pub fn _on_candle(cls: &Bound<'_, PyType>) -> i32 {
+        10
+    }
     #[classmethod]
     #[allow(unused_variables)]
     pub fn on_candle(cls: &Bound<'_, PyType>) -> i32 {
@@ -193,4 +207,86 @@ impl Strategy {
     //     let action = cls.getattr("desired_action").unwrap();
     //     println!("The result is: {:?}", action);
     // }
+    #[pyo3(signature = (index, client_order_id, side, size, sl=None, tp=None))]
+    #[allow(clippy::similar_names)]
+    pub fn create_market_order(
+        &self,
+        index: usize,
+        client_order_id: String,
+        side: Side,
+        size: Decimal,
+        sl: Option<Decimal>,
+        tp: Option<Decimal>,
+    ) -> Order {
+        let _ = self;
+        Order {
+            index,
+            client_order_id,
+            order_type: OrderType::Market,
+            side,
+            size,
+            price: None,
+            sl,
+            tp,
+        }
+    }
+}
+impl Strategy {
+    #[allow(clippy::similar_names)]
+    pub fn rs_create_market_order(
+        &self,
+        index: usize,
+        client_order_id: String,
+        side: Side,
+        size: Decimal,
+        sl: Option<Decimal>,
+        tp: Option<Decimal>,
+    ) -> Order {
+        let _ = self;
+        Order {
+            index,
+            client_order_id,
+            order_type: OrderType::Market,
+            side,
+            size,
+            price: None,
+            sl,
+            tp,
+        }
+    }
+    pub fn fast_method_test(&self, i: usize, df: &DataFrame) -> Action {
+        let cross_below = get_value_at(df, i, "cross_below");
+        let cross_above = get_value_at(df, i, "cross_above");
+        let mut orders = HashMap::new();
+        let mut close_all_positions = false;
+        if cross_above == dec!(1) {
+            let order = self.rs_create_market_order(
+                i,
+                "Long".to_string(),
+                Side::Long,
+                self.default_size,
+                None,
+                None,
+            );
+            orders.insert(order.client_order_id.clone(), order);
+            close_all_positions = true;
+        }
+        if cross_below == dec!(1) {
+            let order = self.create_market_order(
+                i,
+                "Long".to_string(),
+                Side::Long,
+                self.default_size,
+                None,
+                None,
+            );
+            orders.insert(order.client_order_id.clone(), order);
+            close_all_positions = true;
+        }
+        Action {
+            orders,
+            position: None,
+            close_all_positions,
+        }
+    }
 }

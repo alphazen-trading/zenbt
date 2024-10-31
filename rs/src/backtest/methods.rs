@@ -10,7 +10,7 @@ pub fn check_positions_to_close(
     df: &DataFrame,
     backtest: &mut Backtest,
     action: &Action,
-    // py_actions: &mut HashMap<String, Box<dyn Any>>,
+    // state: &mut RustState, // py_actions: &mut HashMap<String, Box<dyn Any>>,
 ) {
     let state = &mut backtest.state;
     let mut positions_to_close: Vec<String> = Vec::new();
@@ -34,13 +34,10 @@ pub fn check_positions_to_close(
         }
     }
 
-    // println!("now need to look into the action's desired positions to close and close them");
-
     if !positions_to_close.is_empty() {
         for pos_id in &positions_to_close {
             state.active_positions.remove(pos_id);
         }
-        // py_actions.insert("close_positions".to_string(), Box::new(positions_to_close));
     }
 
     update_backtest_equity(backtest, floating_equity, realized_equity);

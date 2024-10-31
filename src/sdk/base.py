@@ -10,8 +10,16 @@ from typing import Optional
 
 
 class BaseStrategy(Strategy):
-    index: int
+    index: int = -1
     state: PySharedState
+    action = Action(orders={}, position=None, close_all_positions=False)
+
+    def reset_action(self):
+        self.action.reset()
+
+    def _on_candle(self, state=None):
+        self.index += 1
+        return self.on_candle(state)
 
     def create_market_order(
         self,
