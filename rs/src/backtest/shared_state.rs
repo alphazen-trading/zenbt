@@ -49,45 +49,14 @@ pub fn copy_shared_state_to_pystate(
     pystate: &Py<PySharedState>,
     params: &BacktestParams,
 ) {
-    // for key in py_actions.keys() {
-    //     match key.as_str() {
-    //         "new_position" => {
-    //             if let Some(new_position) = py_actions.get(key).unwrap().downcast_ref::<Position>()
-    //             {
-    //                 // // println!("The new position is: {:?}", new_position);
-    //                 // // Add position to the state safely
-    //                 // set_state_dict_item(
-    //                 //     _pystate,
-    //                 //     "active_positions",
-    //                 //     new_position.id.clone(),
-    //                 //     new_position.clone().into_py(py), // Convert to a Python object
-    //                 // );
-    //                 // let mut pystate = _pystate.borrow_mut(py);
-    //                 // pystate.active_position = Some(new_position.clone());
-    //             } else {
-    //                 // Handle the case where the downcast failed
-    //                 println!("Error: The value associated with the key is not a `Position`.");
-    //             }
-    //         }
-    //         "close_positions" => {
-    //             // if let Some(positions_to_close) =
-    //             //     py_actions.get(key).unwrap().downcast_ref::<Vec<String>>()
-    //             // {
-    //             //     // println!("The positions to close are: {:?}", positions_to_close);
-    //             //     for pos_id in positions_to_close {
-    //             //         remove_state_dict_item(_pystate, "active_positions", pos_id);
-    //             //     }
-    //             // }
-    //         }
-    //         _ => println!("Unknown key {:?}", key),
-    //     }
-    // }
-    // append_decimal_to_list(_pystate, "equity", state.equity.last().unwrap().clone());
-
     let mut pystate = pystate.borrow_mut(py);
     pystate.equity = *state.equity.last().unwrap();
-    if params.provide_active_position && !state.active_positions.is_empty() {
-        let pos = state.active_positions.values().last().unwrap();
-        pystate.active_position = Some(Py::new(py, pos.clone()).unwrap());
+    if params.provide_active_position {
+        if state.active_positions.is_empty() {
+            pystate.active_position = None;
+        } else {
+            let pos = state.active_positions.values().last().unwrap();
+            pystate.active_position = Some(Py::new(py, pos.clone()).unwrap());
+        }
     };
 }

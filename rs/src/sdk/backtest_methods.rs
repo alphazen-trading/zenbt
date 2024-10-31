@@ -54,7 +54,7 @@ pub fn has_account_blown_up(equity: &[Decimal], floating_equity: &[Decimal]) -> 
 
 #[allow(clippy::similar_names)]
 pub fn create_position_from_signal(
-    index: usize,
+    entry_index: usize,
     ohlc: &OHLC,
     params: &BacktestParams,
     size: Decimal,
@@ -62,7 +62,7 @@ pub fn create_position_from_signal(
 ) -> Position {
     Position {
         id: rand::thread_rng().gen_range(0..101).to_string(),
-        index,
+        entry_index,
         exit_index: 0,
         entry_timestamp: ohlc.date,
         exit_timestamp: None,

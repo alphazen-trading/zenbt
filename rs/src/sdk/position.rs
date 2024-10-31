@@ -16,7 +16,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, Serialize)]
 pub struct Position {
     pub id: String,
-    pub index: usize,
+    pub entry_index: usize,
     pub exit_index: usize,
     pub entry_timestamp: DateTime<Utc>,
     pub exit_timestamp: Option<DateTime<Utc>>,
@@ -43,7 +43,7 @@ impl ToPyObject for Position {
         let dict = PyDict::new_bound(py);
 
         // Convert and insert fields
-        dict.set_item("index", self.index).unwrap();
+        dict.set_item("entry_index", self.entry_index).unwrap();
         dict.set_item("exit index", self.exit_index).unwrap();
         dict.set_item("entry_timestamp", self.entry_timestamp.to_rfc3339())
             .unwrap(); // DateTime<Utc> as string
@@ -138,6 +138,7 @@ impl Position {
     }
     pub fn was_tp_hit(&mut self, i: usize, df: &DataFrame) -> bool {
         if let Some(tp_price) = self.tp {
+            println!("tp_price: {:?}", tp_price);
             if self.side == Side::Long {
                 let high = get_value_at(df, i, "high");
                 if high >= tp_price {
@@ -211,7 +212,7 @@ impl Position {
 
         Position {
             id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
-            index: order.index,
+            entry_index: order.index,
             exit_index: 0,
             entry_timestamp: date,
             exit_timestamp: None,

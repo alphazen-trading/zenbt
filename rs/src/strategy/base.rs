@@ -7,6 +7,8 @@ use rust_decimal_macros::dec;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyType};
 use pyo3_polars::PyDataFrame;
+
+use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
 use crate::backtest::helpers::get_value_at;
@@ -15,13 +17,15 @@ use crate::sdk::order::Order;
 
 use super::actions::Action;
 
-#[pyclass(get_all, subclass, frozen)]
+#[pyclass(get_all, subclass)]
 #[derive(Debug)]
 pub struct Strategy {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
     pub equity: Vec<Decimal>,
     pub default_size: Decimal,
+    pub action: Action,
+    pub index: isize,
 }
 
 #[pymethods]
@@ -72,6 +76,11 @@ impl Strategy {
                 data: dict.into(),
                 equity: Vec::new(),
                 default_size,
+                action: Action {
+                    orders: HashMap::new(),
+                    close_all_positions: false,
+                },
+                index: -1,
             })
         })
     }
@@ -95,11 +104,16 @@ impl Strategy {
         client_order_id: String,
         side: Side,
         size: Decimal,
-        price: Decimal,
+        price: f64,
         sl: Option<Decimal>,
         tp: Option<Decimal>,
     ) -> Order {
         let _ = self;
+        let price = Decimal::from_f64(price)
+            .ok_or(
+                "The price passed for the new limit order is not a valid float. (Maybe it's NaN?)",
+            )
+            .unwrap();
         Order {
             index,
             client_order_id,
@@ -110,6 +124,20 @@ impl Strategy {
             sl,
             tp,
         }
+    }
+
+    fn update_index(&mut self) {
+        self.index += 1;
+    }
+
+    fn reset_action(&mut self) {
+        self.action.reset();
+    }
+
+    fn add_order(&mut self, order: Order) {
+        self.action
+            .orders
+            .insert(order.client_order_id.clone(), order);
     }
 
     #[pyo3(signature = (index, client_order_id, side, size, sl=None, tp=None))]
@@ -190,7 +218,6 @@ impl Strategy {
         }
         Action {
             orders,
-            position: None,
             close_all_positions,
         }
     }

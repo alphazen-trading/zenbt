@@ -293,3 +293,39 @@ impl BT {
 //     let action = cls.getattr("desired_action").unwrap();
 //     println!("The result is: {:?}", action);
 // }
+
+// ==== On passing dict via py actions
+// for key in py_actions.keys() {
+//     match key.as_str() {
+//         "new_position" => {
+//             if let Some(new_position) = py_actions.get(key).unwrap().downcast_ref::<Position>()
+//             {
+//                 // // println!("The new position is: {:?}", new_position);
+//                 // // Add position to the state safely
+//                 // set_state_dict_item(
+//                 //     _pystate,
+//                 //     "active_positions",
+//                 //     new_position.id.clone(),
+//                 //     new_position.clone().into_py(py), // Convert to a Python object
+//                 // );
+//                 // let mut pystate = _pystate.borrow_mut(py);
+//                 // pystate.active_position = Some(new_position.clone());
+//             } else {
+//                 // Handle the case where the downcast failed
+//                 println!("Error: The value associated with the key is not a `Position`.");
+//             }
+//         }
+//         "close_positions" => {
+//             // if let Some(positions_to_close) =
+//             //     py_actions.get(key).unwrap().downcast_ref::<Vec<String>>()
+//             // {
+//             //     // println!("The positions to close are: {:?}", positions_to_close);
+//             //     for pos_id in positions_to_close {
+//             //         remove_state_dict_item(_pystate, "active_positions", pos_id);
+//             //     }
+//             // }
+//         }
+//         _ => println!("Unknown key {:?}", key),
+//     }
+// }
+// append_decimal_to_list(_pystate, "equity", state.equity.last().unwrap().clone());

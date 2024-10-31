@@ -7,24 +7,24 @@ use std::collections::HashMap;
 pub struct Action {
     pub orders: HashMap<String, Order>,
     // pub positions: HashMap<String, Position>,
-    pub position: Option<Position>,
+    // pub position: Option<Position>,
     pub close_all_positions: bool,
 }
 
 #[pymethods]
 impl Action {
     #[new]
-    #[pyo3(signature = (orders, position=None, close_all_positions=false))]
+    #[pyo3(signature = (orders, close_all_positions=false))]
     fn new(
         orders: HashMap<String, Order>,
         // positions: HashMap<String, Position>,
-        position: Option<Position>,
+        // position: Option<Position>,
         close_all_positions: bool,
     ) -> Action {
         Action {
             orders,
             // positions,
-            position,
+            // position,
             close_all_positions,
         }
     }
@@ -32,7 +32,7 @@ impl Action {
     pub fn reset(&mut self) {
         self.orders = HashMap::new();
         // self.positions = HashMap::new();
-        self.position = None;
+        // self.position = None;
         self.close_all_positions = false;
     }
 }
