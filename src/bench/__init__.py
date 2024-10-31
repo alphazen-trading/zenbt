@@ -6,6 +6,7 @@ from data.data import read_data_pl
 from .bt import BT
 
 from .zenbt import ZBT
+from .vbt import VBT
 
 from .zenbt_signals import ZBT_signals
 
@@ -108,13 +109,12 @@ def bench():
     # print(f"BT prepare time: {elapsed_time_ms:.2f} ms")
 
     # VBT -- need to run first to make sure numba is compiled
-    # from .vbt import VBT
 
-    # start = time.time()
-    # vbt = VBT(data.copy())
-    # vbt.backtest()
-    # elapsed_time_ms = (time.time() - start) * 1000
-    # print(f"VBT prepare time: {elapsed_time_ms:.2f} ms")
+    start = time.time()
+    vbt = VBT(data.copy())
+    vbt.backtest()
+    elapsed_time_ms = (time.time() - start) * 1000
+    print(f"VBT prepare time: {elapsed_time_ms:.2f} ms")
 
     # ZBT
     start = time.time()

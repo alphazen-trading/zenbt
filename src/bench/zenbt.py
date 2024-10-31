@@ -44,19 +44,14 @@ class ST(BaseStrategy):
                 size=self.default_size,
             )
             # self.action.orders = {order.client_order_id: order}
-        return self.action
         cross_above = False
         cross_below = False
-        if index == 100:
-            cross_below = True
-        if index == 200:
-            cross_above = True
         self.action.reset()
 
         # Check for bullish cross over
         if cross_above:
             order = self.create_market_order(
-                index,
+                self.index,
                 client_order_id="Long",
                 side=Side.Long,
                 size=self.default_size,
@@ -67,7 +62,7 @@ class ST(BaseStrategy):
         # Check for bearish crossover
         if cross_below:
             order = self.create_market_order(
-                index,
+                self.index,
                 client_order_id="Short",
                 side=Side.Short,
                 size=self.default_size,
