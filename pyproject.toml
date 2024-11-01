@@ -15,7 +15,7 @@ dependencies = [
     "mplfinance>=0.12.10b0",
     "ta-lib>=0.4.32",
     "numpy<2",
-    "tradingtoolbox>=0.18.0",
+    "tradingtoolbox>=0.44.0",
     "tqdm>=4.66.5",
     "binance-historical-data>=0.1.13",
     "python-binance>=1.0.19",

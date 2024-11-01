@@ -10,9 +10,12 @@
 #   universal: false
 
 -e file:.
+aiodns==3.2.0
+    # via ccxt
 aiohappyeyeballs==2.4.0
     # via aiohttp
 aiohttp==3.10.5
+    # via ccxt
     # via python-binance
 aiosignal==1.3.1
     # via aiohttp
@@ -27,6 +30,7 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 arrow==1.3.0
     # via isoduration
+    # via tradingtoolbox
 asttokens==2.4.1
     # via stack-data
 async-lru==2.0.4
@@ -49,7 +53,10 @@ bleach==6.1.0
     # via nbconvert
 bt==1.1.0
     # via zenbt
+ccxt==4.4.25
+    # via tradingtoolbox
 certifi==2024.8.30
+    # via ccxt
     # via clickhouse-connect
     # via httpcore
     # via httpx
@@ -57,6 +64,7 @@ certifi==2024.8.30
 cffi==1.17.0
     # via argon2-cffi-bindings
     # via cryptography
+    # via pycares
 char==0.1.2
     # via binance-historical-data
 charset-normalizer==3.3.2
@@ -71,6 +79,7 @@ constantly==23.10.4
 contourpy==1.3.0
     # via matplotlib
 cryptography==43.0.0
+    # via ccxt
     # via pyopenssl
     # via secretstorage
 cycler==0.12.1
@@ -213,6 +222,7 @@ llvmlite==0.43.0
     # via numba
 loguru==0.7.2
     # via python-okx
+    # via tradingtoolbox
 lxml==5.3.0
     # via yfinance
 lz4==4.3.3
@@ -240,6 +250,8 @@ mpire==2.10.2
     # via binance-historical-data
 mplfinance==0.12.10b0
     # via zenbt
+msgspec==0.18.6
+    # via tradingtoolbox
 multidict==6.0.5
     # via aiohttp
     # via yarl
@@ -281,6 +293,8 @@ numpy==1.26.4
     # via vectorbt
     # via yfinance
     # via zenbt
+orjson==3.10.10
+    # via tradingtoolbox
 overrides==7.7.0
     # via jupyter-server
 packaging==24.1
@@ -328,14 +342,18 @@ ptyprocess==0.7.0
 pure-eval==0.2.3
     # via stack-data
 pyarrow==17.0.0
+    # via tradingtoolbox
     # via zenbt
+pycares==4.4.0
+    # via aiodns
 pycparser==2.22
     # via cffi
 pycryptodome==3.20.0
     # via python-binance
-pydantic==2.8.2
+pydantic==2.9.2
+    # via tradingtoolbox
     # via zenbt
-pydantic-core==2.20.1
+pydantic-core==2.23.4
     # via pydantic
 pygments==2.18.0
     # via ipython
@@ -383,6 +401,7 @@ referencing==0.35.1
 regex==2024.7.24
     # via dateparser
 requests==2.32.3
+    # via ccxt
     # via jupyterlab-server
     # via python-binance
     # via python-okx
@@ -395,6 +414,7 @@ rfc3986-validator==0.1.1
     # via jsonschema
     # via jupyter-events
 rich==13.9.2
+    # via tradingtoolbox
     # via zenbt
 rpds-py==0.20.0
     # via jsonschema
@@ -413,6 +433,7 @@ secretstorage==3.3.3
 send2trash==1.8.3
     # via jupyter-server
 setuptools==74.1.0
+    # via ccxt
     # via incremental
     # via jupyterlab
     # via zope-interface
@@ -456,7 +477,7 @@ tqdm==4.66.5
     # via mpire
     # via vectorbt
     # via zenbt
-tradingtoolbox==0.18.0
+tradingtoolbox==0.44.0
     # via zenbt
 traitlets==5.14.3
     # via comm
@@ -477,6 +498,7 @@ twisted==24.7.0
 types-python-dateutil==2.9.0.20240821
     # via arrow
 typing-extensions==4.12.2
+    # via ccxt
     # via pydantic
     # via pydantic-core
     # via pyright
@@ -492,6 +514,8 @@ uri-template==1.3.0
 urllib3==2.2.2
     # via clickhouse-connect
     # via requests
+uvloop==0.21.0
+    # via tradingtoolbox
 vectorbt==0.26.2
     # via zenbt
 wcwidth==0.2.13
@@ -510,6 +534,7 @@ widgetsnbextension==3.6.9
     # via ipywidgets
 yarl==1.9.11
     # via aiohttp
+    # via ccxt
 yfinance==0.2.44
     # via ffn
 zipp==3.20.1

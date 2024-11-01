@@ -1,5 +1,6 @@
 from data.data import read_data, read_data_pl, download_okx_data
 import time
+import pandas as pd
 import talib
 from rich import print
 import polars as pl
@@ -16,6 +17,9 @@ from zenbt.rs import (
     Position,
 )
 
+from tradingtoolbox.clickhouse import ClickhouseSync
+
+
 from sdk.stats import Stats
 from typing import Optional
 
@@ -31,6 +35,8 @@ bt_params = BacktestParams(
 
 
 class ATR(BaseStrategy):
+    last_pos_id = None
+
     def on_candle(self, state: PySharedState = None, **kwargs) -> Action:  # type: ignore
         rsi = self.get("rsi")
 
@@ -62,10 +68,26 @@ class ATR(BaseStrategy):
         else:
             pos: Position = state.active_position
             atr_at_pos = self.get_at("atr", pos.entry_index)
-            # print(atr_at_pos)
+            if pos.id != self.last_pos_id:
+                self.last_pos_id = pos.id
+                print(pos.id, pos.entry_index)
+                print(atr_at_pos)
         #     print("We are in a position")
 
         return self.action
+
+
+def add_data_to_ch(df):
+    client = ClickhouseSync.create(
+        host="localhost",
+        port=8123,
+        user="default",
+        password="",
+        database="default",
+    )
+    df = df.to_pandas()
+    df["time"] = pd.to_datetime(df["time"], unit="ms")
+    client.insert_df(df, "ohlc", drop=True)
 
 
 def dev():
