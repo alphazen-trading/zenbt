@@ -29,7 +29,7 @@ local_docker:
   docker stop $(docker ps -aq)
   sudo chown -R 472:472 ./docker/grafana_data
   sudo chown -R 472:472 ./docker/provisioning
-  docker compose --env-file .env -f docker/docker-compose.yml up
+  docker compose --env-file .env -f docker/docker-compose.yml up -d
 
 
 # ============================================= #
@@ -79,6 +79,9 @@ build_pyi:
   cd ../
   mv ./rs/_rs/_rs.pyi ./src/zenbt/rs.pyi
   rm -r rs/_rs
+
+gdocker:
+  sudo chown -R $USER:$USER ./docker
 
 
 # ============================================= #

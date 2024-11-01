@@ -138,7 +138,6 @@ impl Position {
     }
     pub fn was_tp_hit(&mut self, i: usize, df: &DataFrame) -> bool {
         if let Some(tp_price) = self.tp {
-            println!("tp_price: {:?}", tp_price);
             if self.side == Side::Long {
                 let high = get_value_at(df, i, "high");
                 if high >= tp_price {
