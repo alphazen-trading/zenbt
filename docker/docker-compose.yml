@@ -1,51 +1,6 @@
 version: '3.8'
 
 services:
-  influxdb:
-    image: influxdb:latest
-    container_name: influxdb
-    volumes:
-      - influxdb_data:/var/lib/influxdb2
-    environment:
-      DOCKER_INFLUXDB_INIT_MODE: setup 
-      DOCKER_INFLUXDB_INIT_USERNAME: admin 
-      DOCKER_INFLUXDB_INIT_PASSWORD: influxpassword
-      DOCKER_INFLUXDB_INIT_ORG: myorg
-      DOCKER_INFLUXDB_INIT_DB: influx
-      DOCKER_INFLUXDB_INIT_BUCKET: telegraf
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: mytoken
-    ports:
-      - "8086:8086"
-
-
-  telegraf:
-    image: telegraf:latest
-    # network_mode: host
-    container_name: telegraf
-    privileged: true
-    environment:
-      HOST_PROC: /hostfs/proc
-      HOST_SYS: /hostfs/sys
-      HOST_ETC: /hostfs/etc
-      HOST_VAR: /hostfs/var
-      HOST_RUN: /hostfs/run
-      HOST_MOUNT_PREFIX: /hostfs
-      DOCKER_INFLUXDB_INIT_ORG: myorg
-      DOCKER_INFLUXDB_INIT_DB: influx
-      DOCKER_INFLUXDB_INIT_BUCKET: telegraf
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: mytoken
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /:/hostfs:ro
-      - /run/udev:/run/udev:ro
-    restart: always
-    depends_on:
-      - influxdb
-    links:
-      - influxdb
-
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -73,17 +28,6 @@ services:
         hard: 262144
     volumes:
       - clickhouse_data:/var/lib/clickhouse
-
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
-      - /var/log:/var/log
-      - /opt/logs:/opt/project
-    command: -config.file=/etc/promtail/promtail-config.yaml
-    ports:
-      - "9080:9080"
-
   loki:
     image: grafana/loki:latest
     container_name: loki
@@ -95,4 +39,3 @@ services:
 
 volumes:
   clickhouse_data:
-  influxdb_data:

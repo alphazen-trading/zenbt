@@ -1,0 +1,41 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "grafana",
+  "signedByOrg": "grafana",
+  "signedByOrgName": "Grafana Labs",
+  "plugin": "grafana-clickhouse-datasource",
+  "version": "4.5.0",
+  "time": 1728905777042,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "CHANGELOG.md": "ee3a5d0e18a6a37fa201d9fb88cc2ddc906f5010f75739f300348bb78aa69f96",
+    "LICENSE": "cdd15e614b50e88443fe574ad56bde5ba697d958a45376431638eea816e3bfc3",
+    "README.md": "01c2a56425fa4fb836dcb30b7575b0ed031be483567704025e160497e5002e24",
+    "dashboards/cluster-analysis.json": "7f83d4d09cc6f045768f5bf47485b864dd6da03094f8607808dec77cb96902e5",
+    "dashboards/data-analysis.json": "71695f08dfad47f3d4da4c2d331a09eb8fe5789520d5566fffeecd626079caa1",
+    "dashboards/opentelemetry-clickhouse.json": "7000bb0d91bf0474eb5da966ee65fece8a591785e4a06f8dc7c4431fef35314a",
+    "dashboards/query-analysis.json": "1b2006a3f4142e512e50156a7d2fd8cf03a178019aaccc964c0283c8559298b3",
+    "dashboards/system-dashboards.json": "a47eb47b9cd0bea82a7276fc805bba214164e677f68fb1e821b0278b17bee7f0",
+    "go_plugin_build_manifest": "7980a82c9b5646c237a4e240e3879ba6a836566b6dbe746cb68c907921188732",
+    "gpx_clickhouse_linux_amd64": "bba32fc7f59ddf5b75e6aabec538ee4f3d8d6c6dfc050b6828075712df735fd8",
+    "img/logo.svg": "838199055d86584ff105e5e91013203a6acb7d3f2061ae27678786125ab11f09",
+    "module.js": "577549843ab8a745baf9200fa16c1bc921dcdf4ab5d1d87f786bde8fefedf121",
+    "module.js.map": "55804abdecf897086c8eac13d5dc27f7d010703e66722e92c8dbd01298c65c98",
+    "plugin.json": "0f86f04105f5aa722531d7abad665d5028d68a7640e43278f4d54fc60c0ccfb5"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.11
+Comment: https://openpgpjs.org
+
+wrkEARMKAAYFAmcNAjEAIQkQfk0ManCIZucWIQTzOyW2kQdOhGNlcPN+TQxq
+cIhm51daAgkAhB+D4XLWTfgCryEIvqukczpMpgmmCPR0kqKlbspI3s5hTFKN
+hSVg1WIzyMZecL+4PS8PofEt3WpARM47b9UtDiYCCQDc1Wt6VmOMzqXa2Dmw
+uyCoRFpfz3g0nbsVaaKb0hbE51gqb8U90dQc0YUyAEut0OM8aPdescweCnXJ
+BMnAwk4v7A==
+=HjmR
+-----END PGP SIGNATURE-----
