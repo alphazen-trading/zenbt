@@ -146,7 +146,7 @@ class TokenManager(BaseModel):
 
         if service_account:
             # Generate a token for the newly created service account
-            token = manager.generate_service_account_token(
+            token = self.generate_service_account_token(
                 service_account_id=service_account["id"],
                 token_name=self.service_account_token_name,
             )

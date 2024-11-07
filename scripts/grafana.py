@@ -4,9 +4,6 @@ from requests.auth import HTTPBasicAuth
 from rich import print
 from pydantic import BaseModel, ConfigDict
 
-import json
-import requests
-from requests.auth import HTTPBasicAuth
 from typing import Optional
 
 
