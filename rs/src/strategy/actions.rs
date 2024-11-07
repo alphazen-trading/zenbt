@@ -1,4 +1,4 @@
-use crate::sdk::{order::Order, position::Position};
+use crate::sdk::order::Order;
 use pyo3::prelude::*;
 use std::collections::HashMap;
 

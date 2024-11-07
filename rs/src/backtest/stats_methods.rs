@@ -67,13 +67,6 @@ pub fn create_stats(backtest: &Backtest) -> Stats {
         losses,
         win_rate: win_rate.to_string() + "%",
         trading_days: end_date.signed_duration_since(start_date).num_days(),
-        // trading_days: backtest
-        //     .ohlc
-        //     .last()
-        //     .unwrap()
-        //     .date
-        //     .signed_duration_since(backtest.ohlc.first().unwrap().date)
-        //     .num_days(),
         start_date: start_date.to_string(),
         end_date: end_date.to_string(),
         max_drawdown,
