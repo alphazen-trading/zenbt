@@ -142,8 +142,6 @@ class TokenManager(BaseModel):
         self.headers = {"Content-Type": "application/json"}
         self.delete_service_account_by_name()
 
-
-
         service_account = self.create_service_account()
 
         if service_account:
