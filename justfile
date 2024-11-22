@@ -84,6 +84,23 @@ gdocker:
   sudo chown -R $USER:$USER ./docker
 
 
+pub:
+  #!/usr/bin/env bash
+  rye version -b minor
+  rye build --wheel --out target 
+  git add .
+  git commit -m "build: automatic rye bump of project version"
+  git push
+  rye publish --yes
+  # just pub-docs
+
+
+pub-docs:
+  rye run mike deploy --update-aliases $(rye version) latest
+  rye run mike set-default --push latest
+  git checkout gh-pages
+  git push
+  git checkout master
 # ============================================= #
 # Custom Section
 # ============================================= #
