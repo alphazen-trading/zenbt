@@ -7,3 +7,5 @@
 **/*.pyi
 logs
 .env
+
+dist
