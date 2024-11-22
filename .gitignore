@@ -3,7 +3,7 @@
 **/__pycache__
 **/target
 **/.ipynb_checkpoints
-**/*.so
+# **/*.so
 **/*.pyi
 logs
 .env

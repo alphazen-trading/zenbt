@@ -1,5 +1,7 @@
 # from benchmarks import bench
 
+import zenbt.rs
+
 
 def dev():
     # from .side_by_side import sbs
