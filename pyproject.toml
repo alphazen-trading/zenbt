@@ -1,6 +1,6 @@
 [project]
 name = "zenbt"
-version = "0.2.0"
+version = "0.5.0"
 description = "Add your description here"
 authors = [
     { name = "Alpha Zen", email = "" }
@@ -9,20 +9,13 @@ dependencies = [
     "pyarrow>=17.0.0",
     "rich>=13.9.2",
     "pydantic>=2.8.2",
-    "python-okx>=0.3.2",
     "pandas>=2.2.2",
     "numba>=0.60.0",
-    "mplfinance>=0.12.10b0",
-    "ta-lib>=0.4.32",
     "numpy<2",
     "tradingtoolbox>=0.44.0",
     "tqdm>=4.66.5",
-    "binance-historical-data>=0.1.13",
-    "python-binance>=1.0.19",
     "polars>=1.9.0",
-    "vectorbt>=0.26.2",
-    "bt>=1.1.0",
-    "pyright>=1.1.386",
+    "ta-lib>=0.5.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -42,6 +35,12 @@ build-backend = "hatchling.build"
 [tool.rye]
 managed = true
 dev-dependencies = [
+    "python-okx>=0.3.2",
+    "vectorbt>=0.26.2",
+    "bt>=1.1.0",
+    "pyright>=1.1.386",
+    "binance-historical-data>=0.1.13",
+    "python-binance>=1.0.19",
     "pytest>=8.2.2",
     "pip>=24.2",
     "loguru>=0.7.2",

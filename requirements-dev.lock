@@ -12,19 +12,19 @@
 -e file:.
 aiodns==3.2.0
     # via ccxt
-aiohappyeyeballs==2.4.0
+aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.5
+aiohttp==3.10.11
     # via ccxt
     # via python-binance
 aiosignal==1.3.1
     # via aiohttp
 annotated-types==0.7.0
     # via pydantic
-anyio==4.4.0
+anyio==4.6.2.post1
     # via httpx
     # via jupyter-server
-argcomplete==3.3.0
+argcomplete==3.5.1
     # via commitizen
 argon2-cffi==23.1.0
     # via jupyter-server
@@ -51,15 +51,13 @@ backcall==0.2.0
 beautifulsoup4==4.12.3
     # via nbconvert
     # via yfinance
-binance-historical-data==0.1.13
-    # via zenbt
-black==24.8.0
+binance-historical-data==0.1.14
+black==24.10.0
     # via ipython
-bleach==6.1.0
+bleach==6.2.0
     # via nbconvert
 bt==1.1.0
-    # via zenbt
-ccxt==4.4.25
+ccxt==4.4.33
     # via tradingtoolbox
 certifi==2024.8.30
     # via ccxt
@@ -67,7 +65,7 @@ certifi==2024.8.30
     # via httpcore
     # via httpx
     # via requests
-cffi==1.17.0
+cffi==1.17.1
     # via argon2-cffi-bindings
     # via cryptography
     # via pycares
@@ -75,24 +73,24 @@ cfgv==3.4.0
     # via pre-commit
 char==0.1.2
     # via binance-historical-data
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via commitizen
     # via requests
 click==8.1.7
     # via black
-clickhouse-connect==0.7.19
+clickhouse-connect==0.8.7
     # via tradingtoolbox
 colorama==0.4.6
     # via commitizen
 comm==0.2.2
     # via ipykernel
     # via ipywidgets
-commitizen==3.27.0
+commitizen==3.31.0
 constantly==23.10.4
     # via twisted
-contourpy==1.3.0
+contourpy==1.3.1
     # via matplotlib
-cryptography==43.0.0
+cryptography==43.0.3
     # via ccxt
     # via pyopenssl
     # via secretstorage
@@ -101,7 +99,7 @@ cycler==0.12.1
 dateparser==1.2.0
     # via python-binance
     # via vectorbt
-debugpy==1.8.5
+debugpy==1.8.9
     # via ipykernel
 decli==0.6.2
     # via commitizen
@@ -112,23 +110,23 @@ defusedxml==0.7.1
     # via nbconvert
 dill==0.3.9
     # via vectorbt
-distlib==0.3.8
+distlib==0.3.9
     # via virtualenv
 executing==2.1.0
     # via stack-data
 fastjsonschema==2.20.0
     # via nbformat
-ffn==1.1.0
+ffn==1.1.1
     # via bt
-filelock==3.15.4
+filelock==3.16.1
     # via virtualenv
-fonttools==4.53.1
+fonttools==4.55.0
     # via matplotlib
 fqdn==1.5.1
     # via jsonschema
 frozendict==2.4.6
     # via yfinance
-frozenlist==1.4.1
+frozenlist==1.5.0
     # via aiohttp
     # via aiosignal
 h11==0.14.0
@@ -139,7 +137,7 @@ hpack==4.0.0
     # via h2
 html5lib==1.1
     # via yfinance
-httpcore==1.0.5
+httpcore==1.0.7
     # via httpx
 httpx==0.27.2
     # via jupyterlab
@@ -148,9 +146,9 @@ hyperframe==6.0.1
     # via h2
 hyperlink==21.0.0
     # via twisted
-identify==2.6.0
+identify==2.6.2
     # via pre-commit
-idna==3.8
+idna==3.10
     # via anyio
     # via httpx
     # via hyperlink
@@ -159,8 +157,7 @@ idna==3.8
     # via yarl
 imageio==2.36.0
     # via vectorbt
-importlib-metadata==7.2.1
-    # via commitizen
+importlib-metadata==8.5.0
     # via python-okx
 incremental==24.7.2
     # via twisted
@@ -173,7 +170,7 @@ ipython==8.0.0
     # via ipywidgets
 ipython-genutils==0.2.0
     # via ipywidgets
-ipywidgets==7.8.4
+ipywidgets==7.8.5
     # via binance-historical-data
     # via vectorbt
 isoduration==20.11.0
@@ -182,9 +179,9 @@ jaraco-classes==3.4.0
     # via keyring
 jaraco-context==6.0.1
     # via keyring
-jaraco-functools==4.0.2
+jaraco-functools==4.1.0
     # via keyring
-jedi==0.19.1
+jedi==0.19.2
     # via ipython
 jeepney==0.8.0
     # via keyring
@@ -197,7 +194,7 @@ jinja2==3.1.4
     # via nbconvert
 joblib==1.4.2
     # via scikit-learn
-json5==0.9.25
+json5==0.9.28
     # via jupyterlab-server
 jsonpointer==3.0.0
     # via jsonschema
@@ -205,9 +202,9 @@ jsonschema==4.23.0
     # via jupyter-events
     # via jupyterlab-server
     # via nbformat
-jsonschema-specifications==2023.12.1
+jsonschema-specifications==2024.10.1
     # via jsonschema
-jupyter-client==8.6.2
+jupyter-client==8.6.3
     # via ipykernel
     # via jupyter-server
     # via nbclient
@@ -231,18 +228,18 @@ jupyter-server==2.14.2
     # via notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.2.5
+jupyterlab==4.2.6
     # via notebook
 jupyterlab-pygments==0.3.0
     # via nbconvert
 jupyterlab-server==2.27.3
     # via jupyterlab
     # via notebook
-jupyterlab-widgets==1.1.10
+jupyterlab-widgets==1.1.11
     # via ipywidgets
-keyring==25.3.0
+keyring==25.5.0
     # via python-okx
-kiwisolver==1.4.5
+kiwisolver==1.4.7
     # via matplotlib
 llvmlite==0.43.0
     # via numba
@@ -255,12 +252,11 @@ lz4==4.3.3
     # via clickhouse-connect
 markdown-it-py==3.0.0
     # via rich
-markupsafe==2.1.5
+markupsafe==3.0.2
     # via jinja2
     # via nbconvert
 matplotlib==3.9.2
     # via ffn
-    # via mplfinance
     # via vectorbt
 matplotlib-inline==0.1.7
     # via ipykernel
@@ -269,16 +265,14 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.0.2
     # via nbconvert
-more-itertools==10.4.0
+more-itertools==10.5.0
     # via jaraco-classes
     # via jaraco-functools
 mpire==2.10.2
     # via binance-historical-data
-mplfinance==0.12.10b0
-    # via zenbt
 msgspec==0.18.6
     # via tradingtoolbox
-multidict==6.0.5
+multidict==6.1.0
     # via aiohttp
     # via yarl
 multitasking==0.0.11
@@ -314,18 +308,17 @@ numpy==1.26.4
     # via matplotlib
     # via numba
     # via pandas
-    # via pyarrow
     # via scikit-learn
     # via scipy
     # via ta-lib
     # via vectorbt
     # via yfinance
     # via zenbt
-orjson==3.10.6
+orjson==3.10.11
     # via tradingtoolbox
 overrides==7.7.0
     # via jupyter-server
-packaging==24.1
+packaging==24.2
     # via black
     # via commitizen
     # via ipykernel
@@ -336,9 +329,8 @@ packaging==24.1
     # via nbconvert
     # via plotly
     # via pytest
-pandas==2.2.2
+pandas==2.2.3
     # via ffn
-    # via mplfinance
     # via tradingtoolbox
     # via vectorbt
     # via yfinance
@@ -349,17 +341,17 @@ parso==0.8.4
     # via jedi
 pathspec==0.12.1
     # via black
-peewee==3.17.7
+peewee==3.17.8
     # via yfinance
 pexpect==4.9.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==10.4.0
+pillow==11.0.0
     # via imageio
     # via matplotlib
-pip==24.2
-platformdirs==4.2.2
+pip==24.3.1
+platformdirs==4.3.6
     # via black
     # via jupyter-core
     # via virtualenv
@@ -368,34 +360,36 @@ plotly==5.24.1
     # via vectorbt
 pluggy==1.5.0
     # via pytest
-polars==1.9.0
+polars==1.14.0
     # via zenbt
-pre-commit==3.7.1
-prometheus-client==0.20.0
+pre-commit==4.0.1
+prometheus-client==0.21.0
     # via jupyter-server
 prompt-toolkit==3.0.36
     # via ipython
     # via questionary
-psutil==6.0.0
+propcache==0.2.0
+    # via yarl
+psutil==6.1.0
     # via ipykernel
 ptyprocess==0.7.0
     # via pexpect
     # via terminado
 pure-eval==0.2.3
     # via stack-data
-pyarrow==17.0.0
+pyarrow==18.0.0
     # via tradingtoolbox
     # via zenbt
 pycares==4.4.0
     # via aiodns
 pycparser==2.22
     # via cffi
-pycryptodome==3.20.0
+pycryptodome==3.21.0
     # via python-binance
-pydantic==2.9.2
+pydantic==2.10.1
     # via tradingtoolbox
     # via zenbt
-pydantic-core==2.23.4
+pydantic-core==2.27.1
     # via pydantic
 pygments==2.18.0
     # via ipython
@@ -404,16 +398,17 @@ pygments==2.18.0
     # via rich
 pyopenssl==24.2.1
     # via python-okx
-pyparsing==3.1.4
+pyparsing==3.2.0
     # via matplotlib
 pyprind==2.11.3
     # via bt
-pyright==1.1.386
-    # via zenbt
+pyright==1.1.389
 pytest==8.3.3
-python-binance==1.0.19
+    # via pytest-asyncio
+pytest-asyncio==0.24.0
     # via tradingtoolbox
-    # via zenbt
+python-binance==1.0.22
+    # via tradingtoolbox
 python-dateutil==2.9.0.post0
     # via arrow
     # via dateparser
@@ -423,15 +418,14 @@ python-dateutil==2.9.0.post0
     # via tradingtoolbox
 python-json-logger==2.0.7
     # via jupyter-events
-python-okx==0.3.2
-    # via zenbt
-pytz==2024.1
+python-okx==0.3.3
+pytz==2024.2
     # via clickhouse-connect
     # via dateparser
     # via pandas
     # via vectorbt
     # via yfinance
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via commitizen
     # via jupyter-events
     # via pre-commit
@@ -445,7 +439,7 @@ referencing==0.35.1
     # via jsonschema
     # via jsonschema-specifications
     # via jupyter-events
-regex==2024.7.24
+regex==2024.11.6
     # via dateparser
 requests==2.32.3
     # via ccxt
@@ -460,13 +454,13 @@ rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
     # via jsonschema
     # via jupyter-events
-rich==13.9.2
+rich==13.9.4
     # via tradingtoolbox
     # via zenbt
-rpds-py==0.20.0
+rpds-py==0.21.0
     # via jsonschema
     # via referencing
-ruff==0.6.8
+ruff==0.8.0
 schedule==1.2.2
     # via vectorbt
 scikit-learn==1.5.2
@@ -480,7 +474,7 @@ secretstorage==3.3.3
     # via keyring
 send2trash==1.8.3
     # via jupyter-server
-setuptools==74.1.0
+setuptools==75.6.0
     # via ccxt
     # via incremental
     # via ipython
@@ -488,7 +482,6 @@ setuptools==74.1.0
     # via zope-interface
 six==1.16.0
     # via asttokens
-    # via bleach
     # via html5lib
     # via python-binance
     # via python-dateutil
@@ -500,37 +493,37 @@ soupsieve==2.6
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-ta-lib==0.4.32
+ta-lib==0.5.1
     # via zenbt
 tabulate==0.9.0
     # via ffn
 tenacity==9.0.0
     # via plotly
-termcolor==2.4.0
+termcolor==2.5.0
     # via commitizen
 terminado==0.18.1
     # via jupyter-server
     # via jupyter-server-terminals
 threadpoolctl==3.5.0
     # via scikit-learn
-tinycss2==1.3.0
+tinycss2==1.4.0
     # via nbconvert
-tomlkit==0.13.0
+tomlkit==0.13.2
     # via commitizen
-tornado==6.4.1
+tornado==6.4.2
     # via ipykernel
     # via jupyter-client
     # via jupyter-server
     # via jupyterlab
     # via notebook
     # via terminado
-tqdm==4.66.5
+tqdm==4.67.0
     # via binance-historical-data
     # via bt
     # via mpire
     # via vectorbt
     # via zenbt
-tradingtoolbox==0.44.0
+tradingtoolbox==0.46.0
     # via zenbt
 traitlets==5.14.3
     # via comm
@@ -546,9 +539,9 @@ traitlets==5.14.3
     # via nbclient
     # via nbconvert
     # via nbformat
-twisted==24.7.0
+twisted==24.10.0
     # via python-okx
-types-python-dateutil==2.9.0.20240821
+types-python-dateutil==2.9.0.20241003
     # via arrow
 typing-extensions==4.12.2
     # via ccxt
@@ -556,7 +549,7 @@ typing-extensions==4.12.2
     # via pydantic-core
     # via pyright
     # via twisted
-tzdata==2024.1
+tzdata==2024.2
     # via pandas
 tzlocal==5.2
     # via dateparser
@@ -564,18 +557,17 @@ ujson==5.10.0
     # via python-binance
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.2.2
+urllib3==2.2.3
     # via clickhouse-connect
     # via requests
 uvloop==0.21.0
     # via tradingtoolbox
 vectorbt==0.26.2
-    # via zenbt
-virtualenv==20.26.3
+virtualenv==20.27.1
     # via pre-commit
 wcwidth==0.2.13
     # via prompt-toolkit
-webcolors==24.8.0
+webcolors==24.11.1
     # via jsonschema
 webencodings==0.5.1
     # via bleach
@@ -583,18 +575,18 @@ webencodings==0.5.1
     # via tinycss2
 websocket-client==1.8.0
     # via jupyter-server
-websockets==13.0.1
+websockets==14.1
     # via python-binance
-widgetsnbextension==3.6.9
+widgetsnbextension==3.6.10
     # via ipywidgets
-yarl==1.9.11
+yarl==1.18.0
     # via aiohttp
     # via ccxt
-yfinance==0.2.44
+yfinance==0.2.50
     # via ffn
-zipp==3.19.2
+zipp==3.21.0
     # via importlib-metadata
-zope-interface==7.0.3
+zope-interface==7.1.1
     # via twisted
 zstandard==0.23.0
     # via clickhouse-connect
