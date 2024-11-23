@@ -1,6 +1,6 @@
 [project]
 name = "zenbt"
-version = "0.6.0"
+version = "0.7.0"
 description = "Add your description here"
 authors = [
     { name = "Alpha Zen", email = "" }
@@ -22,7 +22,7 @@ requires-python = ">= 3.8"
 license = { text = "MIT" }
 
 [project.scripts]
-"dev" = "zenbt:dev"
+"dev" = "dev:dev"
 # "dev" = "zenbt:ma_cross"
 
 [tool.rye.scripts]
@@ -57,12 +57,12 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/zenbt"]
+packages = ["src/zenbt", "src/bench", "src/data", "src/sdk", "src/grafana"]
 
 [tool.maturin]
 profile = "release"
 python-source = "src"
-module-name = 'zenbt.rs'
+module-name = 'zenbt.zbt'
 manifest-path = "rs/Cargo.toml"
 features = ["pyo3/extension-module"]
 
