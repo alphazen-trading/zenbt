@@ -2,7 +2,6 @@ import time
 import talib
 import polars as pl
 from zenbt.rs import (
-    Backtest,
     cross_above,
     cross_below,
     BacktestParams,
@@ -47,16 +46,16 @@ def dev():
     # stats = Stats(bt, df)
     # stats.print()
     return
-    print(len(bt.state.closed_positions))
+    # print(len(bt.state.closed_positions))
 
-    bt = Backtest(df, bt_params, st)
+    # bt = Backtest(df, bt_params, st)
 
-    start = time.time()
+    # start = time.time()
 
-    bt.backtest()
-    # print(bt.state.closed_positions)
-    # print(bt.state.active_positions)
+    # bt.backtest()
+    # # print(bt.state.closed_positions)
+    # # print(bt.state.active_positions)
 
-    print(f"Backtest with rows: {(time.time() - start) * 1000:.2f} ms")
-    # print(df[950:971])
-    return
+    # print(f"Backtest with rows: {(time.time() - start) * 1000:.2f} ms")
+    # # print(df[950:971])
+    # return
