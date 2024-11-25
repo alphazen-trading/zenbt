@@ -1,7 +1,8 @@
-import sdk
+from . import sdk
+from . import grafana
 
 
 def dev():
-    from .dev import dev as _dev
-
-    _dev()
+    print("ASD")
+    print(dir(sdk))
+    # print(dir(grafana))

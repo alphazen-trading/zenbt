@@ -5,8 +5,8 @@ from rich import print
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
-from grafana.token_manager import TokenManager
-from grafana.dashboard import GrafanaDashboard
+from .token_manager import TokenManager
+from .dashboard import GrafanaDashboard
 
 
 # Initialize the manager with Grafana server details and admin credentials

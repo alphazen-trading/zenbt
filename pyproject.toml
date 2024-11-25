@@ -1,6 +1,6 @@
 [project]
 name = "zenbt"
-version = "0.9.0"
+version = "0.10.0"
 description = "Add your description here"
 authors = [
     { name = "Alpha Zen", email = "" }
@@ -22,7 +22,8 @@ requires-python = ">= 3.8"
 license = { text = "MIT" }
 
 [project.scripts]
-"dev" = "_dev:dev"
+# "dev" = "_dev:dev"
+"dev" = "zenbt:dev"
 # "dev" = "zenbt:ma_cross"
 
 [tool.rye.scripts]
