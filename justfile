@@ -87,10 +87,11 @@ gdocker:
 pub:
   #!/usr/bin/env bash
   rye version -b minor
-  rm ./dist
+  rm -rf ./dist
   rye build --all --wheel --clean
   rye publish --yes
 
+  just pre-commit-test
   git add .
   touch /tmp/msg
   git commit -m "build: automatic rye bump of project version"
