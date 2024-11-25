@@ -18,7 +18,7 @@ use sdk::order::{LimitOrders, Order};
 use sdk::position::Position;
 
 #[pymodule]
-fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn zbt(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Strategy>()?;
     m.add_class::<Action>()?;
 

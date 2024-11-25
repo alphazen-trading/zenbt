@@ -58,7 +58,7 @@ _rs_dev:
   just _rs_dev_pyi
 
 _rs_dev_pyi:
-  rye run python scripts/scanner.py zenbt.rs ./src/zenbt
+  rye run python scripts/scanner.py zenbt.zbt ./src/zenbt
 
 zellij:
   #!/usr/bin/env bash
@@ -87,12 +87,14 @@ gdocker:
 pub:
   #!/usr/bin/env bash
   rye version -b minor
+  rm ./dist
   rye build --all --wheel --clean
+  rye publish --yes
+
   git add .
   touch /tmp/msg
   git commit -m "build: automatic rye bump of project version"
   git push
-  rye publish --yes
   # just pub-docs
 
 
