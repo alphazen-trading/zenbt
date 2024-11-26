@@ -91,7 +91,7 @@ def bench_all():
 
 
 def bench():
-    iterations = 1
+    iterations = 100
     sym = "BTC"
     df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     df = df.to_pandas()
@@ -126,7 +126,7 @@ def bench():
     # ================================ #
     avg_time, std_dev, bt = time_execution(vbt.backtest, iterations=iterations)
     print(f"VBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
-    vbt_trades = bt.positions.records_readable
+    # vbt_trades = bt.positions.records_readable
 
     avg_time, std_dev, bt = time_execution(zbt.backtest, iterations=iterations)
     print(f"ZBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
