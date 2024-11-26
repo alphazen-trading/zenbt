@@ -104,7 +104,8 @@ pub-docs:
   rye run mike deploy --update-aliases $(rye version) latest
   rye run mike set-default --push latest
   git checkout gh-pages
-  git push
+
+  PRE_COMMIT_ALLOW_NO_CONFIG=1 git push
   git checkout master
 
 # ============================================= #
