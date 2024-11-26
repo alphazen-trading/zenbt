@@ -9,7 +9,7 @@ default:
 install:
   #!/usr/bin/env bash
   rye sync
-  rye run pre-commit install --hook-type pre-push --hook-type commit-msg
+  rye run pre-commit install --hook-type pre-push --hook-type commit-msg --allow-missing-config
   if [ ! -d "/opt/logs" ]; then
     sudo mkdir /opt/logs
   fi
