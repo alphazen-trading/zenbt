@@ -6,7 +6,7 @@ from zenbt.zbt import (
 
 
 class MaCross(BaseStrategy):
-    default_size = 100_000_0
+    default_size = 3
 
     def on_candle(self, state=None, **kwargs) -> Action:  # type: ignore
         cross_below = self.data["cross_below"][self.index]

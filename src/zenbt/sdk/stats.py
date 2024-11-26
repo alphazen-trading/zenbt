@@ -134,7 +134,7 @@ class Stats(BaseModel):
 
         # Add rows from data
         for key, value in data.items():
-            if value is Decimal or value is int:
+            if type(value) is Decimal or type(value) is int:
                 value = humanize.intcomma(round(value, 2))  # pyright: ignore
             table.add_row(key, value)
 
