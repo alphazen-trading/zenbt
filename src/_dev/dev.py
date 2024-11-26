@@ -2,17 +2,23 @@ import time
 import talib
 import polars as pl
 from zenbt import bt as zbt
-from zenbt.zbt import (
-    cross_above,
-    cross_below,
-    BacktestParams,
-    Backtest,
-)
+from zenbt.zbt import cross_above, cross_below, BacktestParams, Backtest
 from zenbt.strategies import MaCross
 from zenbt.data import read_data_pl
 
+from zenbt.sdk import create_session
+
 
 def dev():
+    from zenbt.data import get_sample_btc_data
+
+    df = get_sample_btc_data()
+    df = create_session(
+        df, session_name="eu", session_hour_start=8, session_hour_end=11
+    )
+
+
+def test_strategy():
     from zenbt.data import get_sample_btc_data
     from zenbt.strategies import MaCross
     from zenbt.sdk import Stats
