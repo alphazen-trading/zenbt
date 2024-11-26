@@ -5,7 +5,7 @@
 **/.ipynb_checkpoints
 # **/*.so
 **/*.pyi
-./site/*
+site
 logs
 .env
 

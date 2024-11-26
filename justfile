@@ -105,7 +105,7 @@ pub-docs:
   rye run mike set-default --push latest
   git checkout gh-pages
 
-  PRE_COMMIT_ALLOW_NO_CONFIG=1 git push
+  git push
   git checkout master
 
 # ============================================= #
