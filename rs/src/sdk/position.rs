@@ -14,6 +14,26 @@ use serde::Serialize;
 
 #[pyclass(get_all)]
 #[derive(Debug, Clone, Serialize)]
+/// Reprensents a Position in the backtest
+///
+/// Attributes:
+///     id (str): The id of the position
+///     entry_index (int): The index of the entry order
+///     exit_index (int): The index of the exit order
+///     entry_timestamp (datetime): The timestamp of the entry order
+///     exit_timestamp (datetime, optional): The timestamp of the exit order
+///     entry_price (decimal): The price of the entry order
+///     exit_price (decimal, optional): The price of the exit order
+///     size (decimal): The size of the position
+///     sl (decimal, optional): The stop loss price
+///     tp (decimal, optional): The take profit price
+///     side (Side): The side of the position
+///     pnl (decimal): The profit and loss of the position
+///     max_dd (decimal): The maximum drawdown of the position
+///     close_reason (CloseReason, optional): The reason for closing the position
+///     commission (decimal): The commission of the position
+///     commission_pct (decimal): The commission percentage of the position
+///
 pub struct Position {
     pub id: String,
     pub entry_index: usize,

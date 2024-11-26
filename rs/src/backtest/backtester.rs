@@ -19,6 +19,16 @@ use rust_decimal_macros::dec;
 
 #[pyclass(get_all, subclass)]
 #[derive(Debug)]
+/// A class that will run a backtest and generate stats as a result.
+///
+/// Attributes:
+///     df (PyDataFrame): The dataframe of the backtest
+///     data (PyDict): The data of the strategy
+///     params (BacktestParams): The params of the backtest
+///     strategy (Strategy): The strategy that will be backtested
+///     state (SharedState): The shared state of the backtest
+///     pystate (PySharedState): The shared state of the backtest
+///     commissions (Decimal): The commissions of the backtest
 pub struct Backtest {
     pub df: PyDataFrame,
     pub data: Py<PyDict>,
@@ -68,6 +78,7 @@ impl Backtest {
         })
     }
 
+    /// Run a backtest given the params and settings passed to the object
     fn backtest(&mut self) {
         let df = self.df.0.clone();
         // let equity = vec![self.params.initial_capital];
@@ -125,11 +136,11 @@ impl Backtest {
                         .insert(order.client_order_id.clone(), order.clone());
                 }
 
-                Python::with_gil(|py| {
-                    self.strategy
-                        .call_method_bound(py, intern!(py, "reset_action"), (), None)
-                        .unwrap();
-                });
+                // Python::with_gil(|py| {
+                //     self.strategy
+                //         .call_method_bound(py, intern!(py, "reset_action"), (), None)
+                //         .unwrap();
+                // });
             }
             // Usage example
             Python::with_gil(|py| {
@@ -138,6 +149,10 @@ impl Backtest {
         }
     }
 
+    /// Method that will return stats of the backtest
+    ///
+    /// Returns:
+    ///     stats (Stats): Dictionary with stats of the backtest
     fn get_stats(&self, py: Python) -> PyResult<PyObject> {
         let dict = PyDict::new_bound(py);
         dict.set_item("stats", create_stats(self))?;

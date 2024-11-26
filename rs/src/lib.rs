@@ -6,6 +6,7 @@ mod strategy;
 use backtest::backtester::Backtest;
 use backtest::params::BacktestParams;
 use backtest::shared_state::{PySharedState, SharedState};
+use backtest::stats::Stats;
 use pyo3::prelude::*;
 
 use strategy::actions::Action;
@@ -13,7 +14,7 @@ use strategy::base::Strategy;
 
 use indicators::cross_above::cross_above;
 use indicators::cross_below::cross_below;
-use sdk::enums::{OrderType, Side};
+use sdk::enums::{CloseReason, OrderType, Side};
 use sdk::order::{LimitOrders, Order};
 use sdk::position::Position;
 
@@ -31,8 +32,10 @@ fn zbt(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Position>()?;
     m.add_class::<LimitOrders>()?;
     m.add_class::<Side>()?;
+    m.add_class::<CloseReason>()?;
     m.add_class::<OrderType>()?;
     m.add_class::<Order>()?;
+    m.add_class::<Stats>()?;
 
     m.add_function(wrap_pyfunction!(cross_above, m)?)?;
     m.add_function(wrap_pyfunction!(cross_below, m)?)?;

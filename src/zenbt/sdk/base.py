@@ -11,6 +11,7 @@ from typing import Optional
 
 class BaseStrategy(Strategy):
     state: PySharedState
+    """The current state of the backtest"""
 
     def _on_candle(self, state=None):
         self.update_index()

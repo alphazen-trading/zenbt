@@ -6,6 +6,26 @@ use serde::{Deserialize, Serialize};
 
 #[pyclass]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// Stats of the backtest
+///
+/// Attributes:
+///     initial_capital (decimal): The initial capital of the backtest
+///     pnl (decimal): The profit and loss of the backtest
+///     pnl_pct (decimal): The profit and loss percentage of the backtest
+///     unrealized_pnl (decimal): The unrealized profit and loss of the backtest
+///     total_positions (int): The total number of positions in the backtest
+///     closed_positions (int): The number of closed positions in the backtest
+///     active_positions (int): The number of active positions in the backtest
+///     commissions (decimal): The total commissions of the backtest
+///     wins (decimal): The number of wins in the backtest
+///     losses (decimal): The number of losses in the backtest
+///     win_rate (str): The win rate of the backtest
+///     trading_days (int): The number of trading days in the backtest
+///     start_date (str): The start date of the backtest
+///     end_date (str): The end date of the backtest
+///     max_drawdown (decimal): The maximum drawdown of the backtest
+///     max_drawdown_pct (decimal): The maximum drawdown percentage of the backtest
+///
 pub struct Stats {
     #[serde(with = "rust_decimal::serde::float")]
     pub initial_capital: Decimal,

@@ -21,8 +21,8 @@ requires-python = ">= 3.9"
 license = { text = "MIT" }
 
 [project.scripts]
-# "dev" = "_dev:dev"
-"dev" = "zenbt:dev"
+"dev" = "_dev:dev"
+# "dev" = "zenbt:dev"
 # "dev" = "zenbt:ma_cross"
 
 [tool.rye.scripts]

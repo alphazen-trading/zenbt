@@ -4,6 +4,11 @@ use serde::Serialize;
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
+/// An enum representing the side of the order or position
+///
+/// Attributes:
+///     Long: Sets the side of a Position or Order to Long
+///     Short: Sets the side of a Position or Order to Short
 pub enum Side {
     Long,
     Short,
@@ -11,8 +16,11 @@ pub enum Side {
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
+/// An enum representing the order type
 pub enum OrderType {
+    /// Sets the type of a Position or Order to a Market order
     Market,
+    /// Sets the type of a Position or Order to a Limit order
     Limit,
 }
 
@@ -27,10 +35,14 @@ impl ToPyObject for Side {
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
+/// An enum representing the reason why an active position was closed
 pub enum CloseReason {
     TakeProfit,
+    /// Position was closed because of stop loss
     StopLoss,
+    /// Position was closed because an opposite signal was triggered
     Signal,
+    /// Position was closed manually
     Manual,
 }
 impl ToPyObject for CloseReason {

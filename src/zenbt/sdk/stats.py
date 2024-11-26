@@ -10,7 +10,7 @@ import numpy as np
 from rich.table import Table
 from rich.console import Console
 
-from zenbt.rs import Backtest
+from zenbt.zbt import Backtest
 
 
 class Position(BaseModel):

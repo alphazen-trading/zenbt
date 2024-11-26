@@ -5,6 +5,12 @@ use serde::Serialize;
 #[pyclass]
 #[derive(Debug, Clone, Serialize)]
 #[allow(clippy::module_name_repetitions)]
+/// Parameters for the backtest.
+///
+/// Attributes:
+///     initial_capital (decimal): The initial capital of the backtest
+///     commission_pct (decimal): The commission percentage of the backtest
+///     provide_active_position (bool): Whether to provide the active position to the strategy. If you don't need it, set this to false to make the backtest faster.
 pub struct BacktestParams {
     pub commission_pct: Decimal,
     pub initial_capital: Decimal,

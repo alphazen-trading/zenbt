@@ -130,9 +130,9 @@ impl Strategy {
         self.index += 1;
     }
 
-    fn reset_action(&mut self) {
-        self.action.reset();
-    }
+    // fn reset_action(&mut self) {
+    //     self.action.reset();
+    // }
 
     fn add_order(&mut self, order: Order) {
         self.action

@@ -10,6 +10,15 @@ use super::params::BacktestParams;
 #[pyclass(get_all)]
 #[derive(Debug)]
 #[allow(clippy::module_name_repetitions)]
+/// The shared state between python and the backtest.
+/// This one get passed back to the Strategy on the oncandle method.
+///
+/// Attributes:
+///     equity (Decimal): The current equity of the backtest
+///     active_positions (dict[str, Position]): A mapping of string keys to `Position` objects.
+///     closed_positions (dict[str, Position]): A mapping of string keys to `Position` objects.
+///     active_position (Option[Position]): The current active position of the backtest
+///     pending_limit_orders (dict[str, Order]): A mapping of string keys to `Order` objects.
 pub struct PySharedState {
     pub equity: Decimal,
     pub active_positions: Py<PyDict>,
@@ -20,17 +29,16 @@ pub struct PySharedState {
 #[pymethods]
 impl PySharedState {}
 
-// #[derive(Debug, Clone)]
-// pub struct RustState {
-//     pub equity: Vec<Decimal>,
-//     pub floating_equity: Vec<Decimal>,
-//     pub active_positions: HashMap<String, Position>,
-//     pub closed_positions: HashMap<String, Position>,
-// }
-// impl RustState {}
-
 #[pyclass(get_all)]
 #[derive(Debug, Clone)]
+/// The rust shared state, used internally by the backtester
+///
+/// Attributes:
+///     equity (Decimal): The current equity of the backtest
+///     floating_equity (Decimal): The current floating equity of the backtest
+///     active_positions (dict[str, Position]): A mapping of string keys to `Position` objects.
+///     closed_positions (dict[str, Position]): A mapping of string keys to `Position` objects.
+///     pending_limit_orders (dict[str, Order]): A mapping of string keys to `Order` objects.
 pub struct SharedState {
     pub equity: Vec<Decimal>,
     pub floating_equity: Vec<Decimal>,

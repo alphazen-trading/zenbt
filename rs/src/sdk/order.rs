@@ -7,6 +7,17 @@ use super::enums::{OrderType, Side};
 
 #[pyclass(get_all, set_all)]
 #[derive(Debug, Clone, Serialize)]
+/// Object that represents an order in the system
+///
+/// Attributes:
+///     index (int): The index of the order
+///     client_order_id (str): The client order ID
+///     order_type (OrderType): The type of the order
+///     side (Side): The side of the order
+///     size (Decimal): The size of the order
+///     price (Decimal): The price of the order
+///     sl (Decimal): The stop-loss of the order
+///     tp (Decimal): The take-profit of the order
 pub struct Order {
     pub index: usize,
     pub client_order_id: String,

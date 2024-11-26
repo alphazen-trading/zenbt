@@ -48,7 +48,7 @@ pre-commit-test:
 
 alias dev := py_dev
 py_dev:
-  nodemon -e py --exec rye run dev
+  nodemon -e py --exec uv run dev
 
 rs_dev:
   nodemon -e rs --exec just _rs_dev
