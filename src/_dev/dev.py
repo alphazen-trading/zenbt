@@ -6,7 +6,7 @@ from zenbt.zbt import cross_above, cross_below, BacktestParams, Backtest
 from zenbt.strategies import MaCross
 from zenbt.data import read_data_pl
 
-from zenbt.sdk import create_session
+from zenbt.sdk import create_session, tearsheet
 
 
 def dev():
@@ -17,8 +17,8 @@ def dev():
     import talib
 
     df = get_sample_btc_data()
-    sym = "1000PEPE"
-    df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
+    # sym = "1000PEPE"
+    # df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
 
     fast_ma = talib.SMA(df["close"], timeperiod=10)
     slow_ma = talib.SMA(df["close"], timeperiod=50)
@@ -39,8 +39,10 @@ def dev():
     bt.backtest()
     print(f"Backtest took: {(time.time() - start) * 1000:.2f} ms")
 
-    stats = Stats(bt, df)
-    stats.print()
+    # stats = Stats(bt, df)
+    # stats.print()
+
+    tearsheet(bt, df)
 
 
 def _dev():
