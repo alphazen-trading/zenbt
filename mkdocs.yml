@@ -1,0 +1,132 @@
+site_name: ZenBt
+site_url: https://zenbt.alphazen.xyz
+theme:
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+  name: material
+  custom_dir: ./docs/overrides
+  features:
+    - navigation.indexes 
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.expand
+    - navigation.path
+    - navigation.prune 
+    - navigation.indexes 
+    # For back to top
+    - navigation.top
+    # To be allowed to edit the page on github
+    - content.action.edi
+    # For search settings
+    - search.suggest
+    - search.highlight
+    - search.share
+  icon:
+    # For the github icon on top
+    repo: fontawesome/brands/github
+
+    # For the icon that edits the current page on github
+    edit: material/pencil 
+    view: material/eye
+
+plugins:
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: date
+  - git-authors
+  - search
+  - autorefs
+  - mike:
+      # These fields are all optional; the defaults are as below...
+      alias_type: symlink
+      redirect_template: null
+      deploy_prefix: ''
+      canonical_version: null
+      version_selector: true
+      css_dir: css
+      javascript_dir: js
+  # Plugins to auto-generate docstrings
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py  
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      enabled: true
+      default_handler: python
+      handlers:
+        python:
+          options:
+            parameter_headings: true
+
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_root_toc_entry: true
+            show_root_full_path: true
+            separate_signature: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+
+            show_module: false
+            show_submodules: false
+            # members: true
+            # inherited_members: true
+            summary: false # This is a paid feature
+            group_by_category: true
+            merge_init_into_class: true
+            show_labels: false
+            show_source: true
+            show_docstring_attributes: true
+            show_docstring_functions: true
+            show_docstring_classes: true
+            show_docstring_modules: True
+            show_docstring_description: true
+            show_docstring_examples: true
+            show_docstring_parameters: true
+            show_docstring_returns: true
+
+
+extra:
+  version:
+    provider: mike
+    alias: true
+    default: stable 
+
+extra_css:
+- css/mkdocstrings.css
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+
+# The github links on top
+repo_url: https://github.com/alphazen-trading/zenbt
+repo_name: alphazen-trading/zenbt
+
+
+# The Page link to edit this doc
+edit_uri: edit/master/docs/
+
+
+
+nav:
+# rest of the navigation...
+# defer to gen-files + literate-nav
+- API: reference/  
+# rest of the navigation...

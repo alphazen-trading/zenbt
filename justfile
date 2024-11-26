@@ -59,6 +59,7 @@ _rs_dev:
 
 _rs_dev_pyi:
   rye run python scripts/scanner.py zenbt.zbt ./src/zenbt
+  cp ./src/zenbt/zbt.pyi ./src/zenbt/backtester.pyi
 
 zellij:
   #!/usr/bin/env bash
@@ -105,6 +106,17 @@ pub-docs:
   git checkout gh-pages
   git push
   git checkout master
+
+# ============================================= #
+# Docs
+# ============================================= #
+docs:
+  nodemon -e *.py* --exec rye run mkdocs serve
+
+docs-build:
+  rye run mkdocs build
+
+
 # ============================================= #
 # Custom Section
 # ============================================= #

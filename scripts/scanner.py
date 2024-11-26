@@ -155,11 +155,14 @@ class Scanner:
                         doc = inspect.getdoc(attr[1])
                         file.write("    @property\n")
                         # file.write(f"    def {attr[0]}(self) -> {attr_type}: ...\n")
-                        file.write(f"    def {attr[0]}(self): ...\n")
                         if doc:
-                            file.write('    """\n')
+                            file.write(f"    def {attr[0]}(self): \n")
+                            file.write('       """\n')
                             file.write(doc)
-                            file.write('    """\n')
+                            file.write('       """\n')
+                            file.write("       ...\n")
+                        else:
+                            file.write(f"    def {attr[0]}(self): ...\n")
 
                     # always put new first if present
                     class_methods.sort(
@@ -188,14 +191,18 @@ class Scanner:
                                 )
                             if method[0] == "__new__":
                                 file.write(f" -> {class_obj.__name__}")
-                            file.write(": ...\n")
                             if not method[0].startswith("__"):
                                 doc = inspect.getdoc(method[1])
                                 if doc:
-                                    file.write('    """\n')  # type: ignore
+                                    file.write(": \n")
+                                    file.write('       """\n')
                                     file.write(doc)
-                                    file.write("\n")
-                                    file.write('    """\n')
+                                    file.write('       """\n')
+                                    file.write("       ...\n")
+                                else:
+                                    file.write(": ...\n")
+                            else:
+                                file.write(": ...\n")
 
                     file.write("\n")
 
