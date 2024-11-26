@@ -16,7 +16,7 @@ def dev():
     from zenbt.data import get_sample_btc_data
     from zenbt.strategies import MaCross
     from zenbt.sdk import Stats
-    from zenbt.zbt import Backtest, BacktestParams, cross_above, cross_below
+    from zenbt.zbt import Backtest, cross_above, cross_below
     import talib
 
     df = get_sample_btc_data()
@@ -59,6 +59,11 @@ def _dev():
     df = df.with_columns(
         pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
         pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
+    )
+    bt_params = BacktestParams(
+        commission_pct=0.02 / 100,  # This is 2 bps
+        initial_capital=100_000,
+        provide_active_position=True,
     )
     ma_cross = MaCross(df, default_size=1)
     bt = Backtest(df, bt_params, ma_cross)
