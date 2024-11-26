@@ -97,7 +97,7 @@ pub:
   touch /tmp/msg
   git commit -m "build: automatic rye bump of project version"
   git push
-  # just pub-docs
+  just pub-docs
 
 
 pub-docs:
