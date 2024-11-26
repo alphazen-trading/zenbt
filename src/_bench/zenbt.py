@@ -1,6 +1,6 @@
 import polars as pl
 from rich import print
-from zenbt.rs import (
+from zenbt.zbt import (
     Backtest,
     Action,
     BacktestParams,
@@ -9,7 +9,7 @@ from zenbt.rs import (
     cross_below,
 )
 import talib
-from sdk.base import DefaultAction, BaseStrategy
+from zenbt.sdk.base import BaseStrategy
 
 COMMISSION = 0.02 / 100
 COMMISSION = 0
@@ -23,30 +23,12 @@ bt_params = BacktestParams(
 
 
 class ST(BaseStrategy):
-    index = 0
-    default_size = 1
-    action = Action(orders={}, position=None, close_all_positions=False)
-
-    def reset_action(self):
-        self.action.reset()
+    default_size = 3
 
     # def on_candle(self, index, state) -> Action:  # type: ignore
     def on_candle(self, state=None) -> Action:  # type: ignore
-        self.index += 1
-        # return self.on_candle_slow(index, state)
-        # cross_below = self.data["cross_below"][index]
-        # cross_above = self.data["cross_above"][index]
-        if self.index == 100:
-            order = self.create_market_order(
-                self.index,
-                client_order_id="Short",
-                side=Side.Short,
-                size=self.default_size,
-            )
-            # self.action.orders = {order.client_order_id: order}
         cross_above = False
         cross_below = False
-        self.action.reset()
 
         # Check for bullish cross over
         if cross_above:
@@ -56,8 +38,9 @@ class ST(BaseStrategy):
                 side=Side.Long,
                 size=self.default_size,
             )
-            self.action.orders = {order.client_order_id: order}
-            self.action.close_all_positions = True
+            # self.action.orders = {order.client_order_id: order}
+            # self.action.close_all_positions = True
+            return Action(orders=self.action.orders, close_all_positions=True)
 
         # Check for bearish crossover
         if cross_below:
@@ -67,8 +50,9 @@ class ST(BaseStrategy):
                 side=Side.Short,
                 size=self.default_size,
             )
-            self.action.orders = {order.client_order_id: order}
-            self.action.close_all_positions = True
+            # self.action.orders = {order.client_order_id: order}
+            # self.action.close_all_positions = True
+            return Action(orders=self.action.orders, close_all_positions=True)
 
         return self.action
 
@@ -97,8 +81,7 @@ class ZBT:
             pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
             pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
         )
-        st = ST(df)
-        st.default_size = 2
+        st = ST(df, default_size=3)
         self.bt = Backtest(df, bt_params, st)
 
     def backtest(self):

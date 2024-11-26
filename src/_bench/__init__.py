@@ -1,14 +1,14 @@
 import time
 from rich import print
 import pandas as pd
-from sdk.stats import Stats
-from data.data import read_data_pl
+from zenbt.sdk.stats import Stats
+from zenbt.data.data import read_data_pl
 from .bt import BT
 
 from .zenbt import ZBT
 from .vbt import VBT
 
-from .zenbt_signals import ZBT_signals
+# from .zenbt_signals import ZBT_signals
 
 # from data.data import read_data_pl, read_data
 import numpy as np
@@ -66,11 +66,11 @@ def bench_all():
     elapsed_time_ms = (time.time() - start) * 1000
     print(f"ZBT prepare time: {elapsed_time_ms:.2f} ms")
 
-    # ZBT
-    start = time.time()
-    zbt_signals = ZBT_signals(data)
-    elapsed_time_ms = (time.time() - start) * 1000
-    print(f"ZBT From Signals prepare time: {elapsed_time_ms:.2f} ms")
+    # # ZBT
+    # start = time.time()
+    # zbt_signals = ZBT_signals(data)
+    # elapsed_time_ms = (time.time() - start) * 1000
+    # print(f"ZBT From Signals prepare time: {elapsed_time_ms:.2f} ms")
 
     # ================================ #
     #            Benchmarking
@@ -84,10 +84,10 @@ def bench_all():
     avg_time, std_dev, bt = time_execution(zbt.backtest)
     print(f"ZBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
 
-    avg_time, std_dev, bt = time_execution(zbt_signals.backtest)
-    print(
-        f"ZBT From Signals execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}"
-    )
+    # avg_time, std_dev, bt = time_execution(zbt_signals.backtest)
+    # print(
+    #     f"ZBT From Signals execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}"
+    # )
 
 
 def bench():
@@ -109,7 +109,6 @@ def bench():
     # print(f"BT prepare time: {elapsed_time_ms:.2f} ms")
 
     # VBT -- need to run first to make sure numba is compiled
-
     start = time.time()
     vbt = VBT(data.copy())
     vbt.backtest()
