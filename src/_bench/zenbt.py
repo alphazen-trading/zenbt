@@ -13,7 +13,7 @@ from zenbt.sdk.base import BaseStrategy
 
 COMMISSION = 0.02 / 100
 COMMISSION = 0
-initial_capital = 100
+initial_capital = 100_000_000
 
 bt_params = BacktestParams(
     commission_pct=COMMISSION,
@@ -23,12 +23,11 @@ bt_params = BacktestParams(
 
 
 class ST(BaseStrategy):
-    default_size = 3
+    default_size = 1
 
-    # def on_candle(self, index, state) -> Action:  # type: ignore
-    def on_candle(self, state=None) -> Action:  # type: ignore
-        cross_above = False
-        cross_below = False
+    def on_candle(self, state=None, **kwargs) -> Action:  # type: ignore
+        cross_below = self.data["cross_below"][self.index]
+        cross_above = self.data["cross_above"][self.index]
 
         # Check for bullish cross over
         if cross_above:
@@ -38,9 +37,10 @@ class ST(BaseStrategy):
                 side=Side.Long,
                 size=self.default_size,
             )
-            # self.action.orders = {order.client_order_id: order}
-            # self.action.close_all_positions = True
-            return Action(orders=self.action.orders, close_all_positions=True)
+            return Action(
+                orders={order.client_order_id: order},
+                close_all_positions=True,
+            )
 
         # Check for bearish crossover
         if cross_below:
@@ -50,9 +50,10 @@ class ST(BaseStrategy):
                 side=Side.Short,
                 size=self.default_size,
             )
-            # self.action.orders = {order.client_order_id: order}
-            # self.action.close_all_positions = True
-            return Action(orders=self.action.orders, close_all_positions=True)
+            return Action(
+                orders={order.client_order_id: order},
+                close_all_positions=True,
+            )
 
         return self.action
 
@@ -81,9 +82,12 @@ class ZBT:
             pl.Series("cross_above", cross_above(fast_ma, slow_ma)),
             pl.Series("cross_below", cross_below(fast_ma, slow_ma)),
         )
-        st = ST(df, default_size=3)
-        self.bt = Backtest(df, bt_params, st)
+        self.df = df
 
     def backtest(self):
+        st = ST(self.df, default_size=1)
+        self.bt = Backtest(self.df, bt_params, st)
         self.bt.backtest()
+        # print(self.bt.get_stats())
+
         return self.bt

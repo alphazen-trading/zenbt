@@ -92,7 +92,7 @@ def bench_all():
 
 def bench():
     iterations = 1
-    sym = "1000PEPE"
+    sym = "BTC"
     df = read_data_pl(sym, 0, -1, resample_tf="1min", exchange="binance")
     df = df.to_pandas()
     df["spy"] = df["close"]
@@ -100,13 +100,6 @@ def bench():
     df.drop(["open", "high", "low", "close", "volume", "time"], axis=1, inplace=True)
     df.set_index("Date", inplace=True)
     data = df
-    print(len(data))
-
-    # # BT
-    # start = time.time()
-    # bt = BT(data.copy())
-    # elapsed_time_ms = (time.time() - start) * 1000
-    # print(f"BT prepare time: {elapsed_time_ms:.2f} ms")
 
     # VBT -- need to run first to make sure numba is compiled
     start = time.time()
@@ -131,13 +124,14 @@ def bench():
     # ================================ #
     #            Benchmarking
     # ================================ #
-    # avg_time, std_dev, bt = time_execution(bt.backtest, iterations=iterations)
-    # print(f"BT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
+    avg_time, std_dev, bt = time_execution(vbt.backtest, iterations=iterations)
+    print(f"VBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
+    vbt_trades = bt.positions.records_readable
 
     avg_time, std_dev, bt = time_execution(zbt.backtest, iterations=iterations)
+    print(f"ZBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
     # stats = Stats(bt, data)
     # stats.print()
-    print(f"ZBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
 
     # avg_time, std_dev, bt = time_execution(zbt_signals.backtest, iterations=iterations)
     # # stats = Stats(bt, data)
@@ -146,8 +140,5 @@ def bench():
     #     f"ZBT From Signals execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}"
     # )
 
-    # avg_time, std_dev, bt = time_execution(vbt.backtest, iterations=iterations)
-    # print(f"VBT execution time: Mean time = {avg_time:.2f} ms, Std dev = {std_dev:.4f}")
-    # vbt_trades = bt.positions.records_readable
     # # print(vbt_trades)
     # # print(bt.stats())
