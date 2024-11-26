@@ -1315,6 +1315,15 @@ http2 = [
 ]
 
 [[package]]
+name = "humanize"
+version = "4.11.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/40/64a912b9330786df25e58127194d4a5a7441f818b400b155e748a270f924/humanize-4.11.0.tar.gz", hash = "sha256:e66f36020a2d5a974c504bd2555cf770621dbdbb6d82f94a6857c0b1ea2608be", size = 80374 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/75/4bc3e242ad13f2e6c12e0b0401ab2c5e5c6f0d7da37ec69bc808e24e0ccb/humanize-4.11.0-py3-none-any.whl", hash = "sha256:b53caaec8532bcb2fff70c8826f904c35943f8cecaca29d272d9df38092736c0", size = 128055 },
+]
+
+[[package]]
 name = "hyperframe"
 version = "6.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -5251,7 +5260,7 @@ wheels = [
 
 [[package]]
 name = "zenbt"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy", version = "1.23.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
@@ -5271,6 +5280,7 @@ dev = [
     { name = "binance-historical-data" },
     { name = "bt" },
     { name = "commitizen" },
+    { name = "humanize" },
     { name = "ipython" },
     { name = "loguru" },
     { name = "matplotlib" },
@@ -5316,6 +5326,7 @@ dev = [
     { name = "binance-historical-data", specifier = ">=0.1.13" },
     { name = "bt", specifier = ">=1.1.0" },
     { name = "commitizen", specifier = ">=3.27.0" },
+    { name = "humanize", specifier = ">=4.11.0" },
     { name = "ipython", specifier = "<=8.0.0" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "matplotlib", specifier = ">=3.9.2" },

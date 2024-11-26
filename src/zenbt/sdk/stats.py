@@ -10,6 +10,7 @@ import numpy as np
 from rich.table import Table
 from rich.console import Console
 
+import humanize
 from zenbt.zbt import Backtest
 
 
@@ -133,7 +134,9 @@ class Stats(BaseModel):
 
         # Add rows from data
         for key, value in data.items():
-            table.add_row(key, str(value))
+            if type(value) == Decimal or type(value) == int:
+                value = humanize.intcomma(round(value, 2))
+            table.add_row(key, value)
 
         # Print the table
         console.print(table)

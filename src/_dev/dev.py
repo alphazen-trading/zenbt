@@ -11,15 +11,6 @@ from zenbt.sdk import create_session
 
 def dev():
     from zenbt.data import get_sample_btc_data
-
-    df = get_sample_btc_data()
-    df = create_session(
-        df, session_name="eu", session_hour_start=8, session_hour_end=11
-    )
-
-
-def test_strategy():
-    from zenbt.data import get_sample_btc_data
     from zenbt.strategies import MaCross
     from zenbt.sdk import Stats
     from zenbt.zbt import Backtest, cross_above, cross_below
