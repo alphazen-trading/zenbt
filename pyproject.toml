@@ -64,6 +64,7 @@ dev = [
     "numba>=0.53.1",
     "humanize>=4.11.0",
     "quantstats==0.0.60",
+    "mplfinance>=0.12.10b0",
 ]
 
 [tool.hatch.metadata]
