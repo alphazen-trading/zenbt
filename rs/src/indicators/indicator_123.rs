@@ -9,37 +9,39 @@ pub fn indicator_123<'py>(
     window: usize,
     highs: PyReadonlyArray1<f64>,
     lows: PyReadonlyArray1<f64>,
-    max: PyReadonlyArray1<f64>,
-    min: PyReadonlyArray1<f64>,
+    maxs: PyReadonlyArray1<f64>,
+    mins: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyAny>> {
     let length = highs.len().unwrap();
     let mut point1_indices = vec![false; length];
     let mut point2_indices = vec![false; length];
     let mut point3_indices = vec![false; length];
     let mut order_values = vec![f64::NAN; length];
+    let mut sl_values = vec![f64::NAN; length];
 
     let mut direction = -1;
-    let mut trigger_1: &f64 = &0.0;
-    let mut trigger_2: &f64 = &0.0;
-    let mut trigger_3: &f64 = &0.0;
+    let mut trigger_1: f64 = 0.0;
+    let mut trigger_2: f64 = 0.0;
 
     let mut state = 0;
 
     for i in window..length - 1 {
         // Detect Point 1 (Swing High or Swing Low)
-        let high = highs.get(i).unwrap();
-        let low = lows.get(i).unwrap();
-        let prev_high = highs.get(i - 1).unwrap();
-        let prev_low = lows.get(i - 1).unwrap();
+        let high = *highs.get(i).unwrap();
+        let low = *lows.get(i).unwrap();
+        let prev_high = *highs.get(i - 1).unwrap();
+        let prev_low = *lows.get(i - 1).unwrap();
+        let max = *maxs.get(i).unwrap();
+        let min = *mins.get(i).unwrap();
         // println!("{i}: {state}");
 
         if state == 0 {
-            if high == max.get(i).unwrap() {
+            if high == max {
                 direction = 1;
                 trigger_1 = high;
                 point1_indices[i] = true;
                 state = 1;
-            } else if low == min.get(i).unwrap() {
+            } else if low == min {
                 direction = 2;
                 trigger_1 = low;
                 point1_indices[i] = true;
@@ -75,14 +77,14 @@ pub fn indicator_123<'py>(
         } else if state == 2 {
             // We are working with Red candles
             if direction == 1 {
-                // // Uptrend retracement
+                // Uptrend retracement
                 if high > trigger_1 {
                     state = 0;
                 } else if high > prev_high {
                     state = 3;
                     point3_indices[i] = true;
                 } else {
-                    trigger_2 = low;
+                    trigger_2 = trigger_2.min(low);
                     point2_indices[i] = true;
                 }
             } else if direction == 2 {
@@ -93,7 +95,7 @@ pub fn indicator_123<'py>(
                     state = 3;
                     point3_indices[i] = true;
                 } else {
-                    trigger_2 = high;
+                    trigger_2 = trigger_2.max(high);
                     point2_indices[i] = true;
                 }
             }
@@ -103,6 +105,7 @@ pub fn indicator_123<'py>(
                 // Uptrend retracement
                 if high > trigger_2 || low < trigger_2 {
                     state = 0;
+                    trigger_2 = 0.0;
                 } else {
                     point3_indices[i] = true;
                 }
@@ -110,10 +113,15 @@ pub fn indicator_123<'py>(
                 // Downtrend retracement
                 if low < trigger_1 || high > trigger_2 {
                     state = 0;
+                    trigger_2 = 0.0;
                 } else {
                     point3_indices[i] = true;
                 }
             }
+        }
+        if trigger_2 != 0.0 && state == 3 {
+            order_values[i] = trigger_2;
+            sl_values[i] = trigger_1;
         }
     }
 
@@ -125,6 +133,7 @@ pub fn indicator_123<'py>(
     dict.set_item("point_2", point2_indices)?;
     dict.set_item("point_3", point3_indices)?;
     dict.set_item("order_values", order_values)?;
+    dict.set_item("sl_values", sl_values)?;
 
     Ok(dict.into_py(py)) // Return the dictionary as a Python object
 }

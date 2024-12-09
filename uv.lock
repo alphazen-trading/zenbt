@@ -5296,15 +5296,17 @@ wheels = [
 
 [[package]]
 name = "zenbt"
-version = "0.17.0"
+version = "0.18.0"
 source = { editable = "." }
 dependencies = [
+    { name = "humanize" },
     { name = "numpy", version = "1.23.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version != '3.10.*'" },
     { name = "pandas" },
     { name = "polars" },
     { name = "pyarrow" },
     { name = "pydantic" },
+    { name = "quantstats" },
     { name = "rich" },
     { name = "ta-lib" },
     { name = "tqdm" },
@@ -5316,7 +5318,6 @@ dev = [
     { name = "binance-historical-data" },
     { name = "bt" },
     { name = "commitizen" },
-    { name = "humanize" },
     { name = "ipython" },
     { name = "loguru" },
     { name = "matplotlib" },
@@ -5341,18 +5342,19 @@ dev = [
     { name = "pytest" },
     { name = "python-binance" },
     { name = "python-okx" },
-    { name = "quantstats" },
     { name = "ruff" },
     { name = "vectorbt" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "humanize", specifier = ">=4.11.0" },
     { name = "numpy", specifier = "<2" },
     { name = "pandas", specifier = "==2.2.2" },
     { name = "polars", specifier = ">=1.9.0" },
     { name = "pyarrow", specifier = ">=17.0.0" },
     { name = "pydantic", specifier = ">=2.8.2" },
+    { name = "quantstats", specifier = "==0.0.60" },
     { name = "rich", specifier = ">=13.9.2" },
     { name = "ta-lib", specifier = ">=0.5.1" },
     { name = "tqdm", specifier = ">=4.66.5" },
@@ -5364,7 +5366,6 @@ dev = [
     { name = "binance-historical-data", specifier = ">=0.1.13" },
     { name = "bt", specifier = ">=1.1.0" },
     { name = "commitizen", specifier = ">=3.27.0" },
-    { name = "humanize", specifier = ">=4.11.0" },
     { name = "ipython", specifier = "<=8.0.0" },
     { name = "loguru", specifier = ">=0.7.2" },
     { name = "matplotlib", specifier = ">=3.9.2" },
@@ -5388,7 +5389,6 @@ dev = [
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "python-binance", specifier = ">=1.0.19" },
     { name = "python-okx", specifier = ">=0.1.2" },
-    { name = "quantstats", specifier = "==0.0.60" },
     { name = "ruff", specifier = ">=0.6.8" },
     { name = "vectorbt", specifier = ">=0.26.2" },
 ]
