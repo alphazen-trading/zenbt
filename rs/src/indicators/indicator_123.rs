@@ -1,7 +1,6 @@
 use numpy::PyReadonlyArray1;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
-use pyo3_polars::PySeries;
 
 #[pyfunction]
 pub fn indicator_123<'py>(
@@ -13,15 +12,14 @@ pub fn indicator_123<'py>(
     mins: PyReadonlyArray1<f64>,
 ) -> PyResult<Py<PyAny>> {
     let length = highs.len().unwrap();
-    let mut point1_indices = vec![false; length];
-    let mut point2_indices = vec![false; length];
-    let mut point3_indices = vec![false; length];
-    let mut order_values = vec![f64::NAN; length];
-    let mut sl_values = vec![f64::NAN; length];
+    let mut point_1 = vec![f64::NAN; length];
+    let mut point_2 = vec![f64::NAN; length];
+    let mut point_3 = vec![f64::NAN; length];
 
     let mut direction = -1;
     let mut trigger_1: f64 = 0.0;
     let mut trigger_2: f64 = 0.0;
+    let mut trigger_3: f64 = 0.0;
 
     let mut state = 0;
 
@@ -33,42 +31,35 @@ pub fn indicator_123<'py>(
         let prev_low = *lows.get(i - 1).unwrap();
         let max = *maxs.get(i).unwrap();
         let min = *mins.get(i).unwrap();
-        // println!("{i}: {state}");
 
         if state == 0 {
             if high == max {
                 direction = 1;
                 trigger_1 = high;
-                point1_indices[i] = true;
                 state = 1;
             } else if low == min {
                 direction = 2;
                 trigger_1 = low;
-                point1_indices[i] = true;
                 state = 1;
             }
         } else if state == 1 {
             // We are working with green candles
             if direction == 1 {
                 // // Uptrend retracement
-                if high > trigger_1 {
+                if high > trigger_1 || low > prev_low {
                     trigger_1 = high;
-                    point1_indices[i] = true;
                 } else if low < prev_low {
                     trigger_2 = low;
-                    point2_indices[i] = true;
                     state = 2;
                 } else {
                     state = 0;
                 }
             } else if direction == 2 {
                 // Downtrend retracement
-                if low < trigger_1 {
+                if low < trigger_1 || high < prev_high {
                     trigger_1 = low;
-                    point1_indices[i] = true;
                 } else if high > prev_high {
                     trigger_2 = high;
-                    point2_indices[i] = true;
                     state = 2;
                 } else {
                     state = 0;
@@ -80,48 +71,54 @@ pub fn indicator_123<'py>(
                 // Uptrend retracement
                 if high > trigger_1 {
                     state = 0;
-                } else if high > prev_high {
+                } else if high > prev_high && low > prev_low {
                     state = 3;
-                    point3_indices[i] = true;
+                    trigger_3 = high;
                 } else {
                     trigger_2 = trigger_2.min(low);
-                    point2_indices[i] = true;
                 }
             } else if direction == 2 {
                 // Downtrend retracement
                 if low < trigger_1 {
                     state = 0;
-                } else if low < prev_low {
+                } else if low < prev_low && high < prev_high {
                     state = 3;
-                    point3_indices[i] = true;
+                    trigger_3 = low;
                 } else {
                     trigger_2 = trigger_2.max(high);
-                    point2_indices[i] = true;
                 }
             }
         } else if state == 3 {
             // We are working with Blue candles
             if direction == 1 {
                 // Uptrend retracement
-                if high > trigger_2 || low < trigger_2 {
+                if high > trigger_1 || low < trigger_2 {
                     state = 0;
+                    trigger_1 = 0.0;
                     trigger_2 = 0.0;
                 } else {
-                    point3_indices[i] = true;
+                    trigger_3 = high;
                 }
             } else if direction == 2 {
                 // Downtrend retracement
                 if low < trigger_1 || high > trigger_2 {
                     state = 0;
+                    trigger_1 = 0.0;
                     trigger_2 = 0.0;
                 } else {
-                    point3_indices[i] = true;
+                    trigger_3 = low;
                 }
             }
         }
-        if trigger_2 != 0.0 && state == 3 {
-            order_values[i] = trigger_2;
-            sl_values[i] = trigger_1;
+
+        if state > 0 && trigger_1 != 0.0 {
+            point_1[i] = trigger_1;
+        }
+        if state > 1 && trigger_2 != 0.0 {
+            point_2[i] = trigger_2;
+        }
+        if state > 2 && trigger_3 != 0.0 {
+            point_3[i] = trigger_3;
         }
     }
 
@@ -129,11 +126,9 @@ pub fn indicator_123<'py>(
     let dict = PyDict::new_bound(py);
 
     // Insert key-value pairs
-    dict.set_item("point_1", point1_indices)?;
-    dict.set_item("point_2", point2_indices)?;
-    dict.set_item("point_3", point3_indices)?;
-    dict.set_item("order_values", order_values)?;
-    dict.set_item("sl_values", sl_values)?;
+    dict.set_item("point_1", point_1)?;
+    dict.set_item("point_2", point_2)?;
+    dict.set_item("point_3", point_3)?;
 
     Ok(dict.into_py(py)) // Return the dictionary as a Python object
 }
