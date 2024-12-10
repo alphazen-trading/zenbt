@@ -106,7 +106,7 @@ pub-docs:
   git checkout gh-pages
 
   git push
-  git checkout master
+  git checkout develop
 
 # ============================================= #
 # Docs
