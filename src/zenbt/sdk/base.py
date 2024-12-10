@@ -7,6 +7,8 @@ from zenbt.zbt import (
     Order,
 )
 from typing import Optional
+import os
+import shutil
 
 
 class BaseStrategy(Strategy):
@@ -22,6 +24,19 @@ class BaseStrategy(Strategy):
 
     def get_at(self, col: str, index: int):
         return self.data[col][index]
+
+    def pickl(self, directory):
+        os.makedirs(directory, exist_ok=True)
+
+        # Saving dataframe
+        self.df.to_pandas().to_parquet(f"{directory}/df.parquet")
+
+        # Saving strategy
+        src = os.path.abspath(__file__)
+        dst = f"{directory}/strategy.py"
+        shutil.copy(src, dst)
+
+        print("Strategy pickled to ", directory)
 
     # def create_market_order(
     #     self,
