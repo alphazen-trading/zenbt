@@ -1,7 +1,10 @@
 import os
 import shutil
+import pandas as pd
 import polars as pl
 from zenbt.sdk import Stats
+from zenbt.sdk.trade_record import get_trades_df
+from tradingtoolbox.clickhouse import ClickhouseSync
 
 
 def run(directory):
@@ -46,3 +49,9 @@ def test_pickl():
 
     stats = Stats(bt, df)
     stats.print()
+
+    trades = get_trades_df(bt)
+    print(trades)
+    # print(trades.dtypes)
+    ch = ClickhouseSync.create()
+    ch.insert_df(trades, "trades")

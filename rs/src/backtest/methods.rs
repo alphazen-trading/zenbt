@@ -66,7 +66,11 @@ pub fn update_backtest_equity(
 }
 
 pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
-    if order.side == Side::Long {
+    if i == 175 {
+        let high = get_value_at(df, i, "high");
+        println!("{high} -- {:?}", order.price.unwrap())
+    }
+    if order.side == Side::Short {
         // if ohlc.low <= order.price {
         //     println!("ORDER WAS HIT");
         //     println!("{:?}", ohlc.low);

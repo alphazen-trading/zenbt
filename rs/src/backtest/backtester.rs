@@ -123,9 +123,9 @@ impl Backtest {
                     .remove(&order.client_order_id);
             }
 
-            // if action.cancel_pending_orders {
-            //     self.state.pending_limit_orders.clear();
-            // }
+            if action.cancel_pending_orders {
+                self.state.pending_limit_orders.clear();
+            }
 
             for order in action.orders.values_mut() {
                 if order.order_type == OrderType::Market {
@@ -136,7 +136,6 @@ impl Backtest {
                         .active_positions
                         .insert(new_position.id.clone(), new_position.clone());
                 } else if !was_limit_order_triggered(order, i, &df, self) {
-                    println!("Limit order not triggered: {}", order.client_order_id);
                     self.state
                         .pending_limit_orders
                         .insert(order.client_order_id.clone(), order.clone());
@@ -152,6 +151,8 @@ impl Backtest {
             Python::with_gil(|py| {
                 copy_shared_state_to_pystate(py, &self.state, &self.pystate, &self.params);
             });
+            // println!("{i} -----------------");
+            // println!("{:?}", self.state.pending_limit_orders);
         }
     }
 
