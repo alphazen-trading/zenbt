@@ -27,6 +27,9 @@ def get_trades_df(bt):
     records = bt.state.closed_positions
     trades = []
 
+    if len(records) == 0:
+        return pd.DataFrame()
+
     for record in records.values():
         trade = TradeRecord.model_validate(record)
         trades.append(trade.model_dump())
@@ -43,4 +46,5 @@ def get_trades_df(bt):
         except Exception as e:
             pass
 
+    df.sort_values("entry_index", inplace=True)
     return df
