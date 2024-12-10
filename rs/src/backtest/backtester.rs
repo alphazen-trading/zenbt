@@ -110,6 +110,7 @@ impl Backtest {
             check_positions_to_close(i, &df, self, &action);
 
             let mut filled_pending_orders: Vec<Order> = Vec::new();
+
             let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
             for pending_order in pending_limit_orders.values() {
                 if was_limit_order_triggered(pending_order, i, &df, self) {
@@ -122,6 +123,10 @@ impl Backtest {
                     .remove(&order.client_order_id);
             }
 
+            // if action.cancel_pending_orders {
+            //     self.state.pending_limit_orders.clear();
+            // }
+
             for order in action.orders.values_mut() {
                 if order.order_type == OrderType::Market {
                     order.price = Some(get_value_at(&df, i + 1, "open"));
@@ -131,6 +136,7 @@ impl Backtest {
                         .active_positions
                         .insert(new_position.id.clone(), new_position.clone());
                 } else if !was_limit_order_triggered(order, i, &df, self) {
+                    println!("Limit order not triggered: {}", order.client_order_id);
                     self.state
                         .pending_limit_orders
                         .insert(order.client_order_id.clone(), order.clone());

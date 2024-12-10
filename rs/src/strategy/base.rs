@@ -36,29 +36,38 @@ impl Strategy {
             let dict = PyDict::new_bound(py);
             let col_names = df.0.get_column_names();
             for (i, col) in df.0.get_columns().iter().enumerate() {
+                // println!("{}: {}", col_names[i], col.dtype());
                 if col.dtype() == &DataType::Float64 {
                     let col_values: Vec<f64> = col
                         .f64()
                         .unwrap()
                         .into_iter()
-                        .collect::<Option<Vec<f64>>>()
-                        .unwrap();
+                        .map(|opt| opt.unwrap_or(f64::NAN))
+                        .collect();
                     dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
                 } else if col.dtype() == &DataType::Int64 {
                     let col_values: Vec<i64> = col
                         .i64()
                         .unwrap()
                         .into_iter()
-                        .collect::<Option<Vec<i64>>>()
-                        .unwrap();
+                        .map(|opt| opt.unwrap_or(0))
+                        .collect();
+                    dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
+                } else if col.dtype() == &DataType::UInt64 {
+                    let col_values: Vec<u64> = col
+                        .u64()
+                        .unwrap()
+                        .into_iter()
+                        .map(|opt| opt.unwrap_or(0)) // Replace None with 0
+                        .collect();
                     dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
                 } else if col.dtype() == &DataType::Boolean {
                     let col_values: Vec<bool> = col
                         .bool()
                         .unwrap()
                         .into_iter()
-                        .collect::<Option<Vec<bool>>>()
-                        .unwrap();
+                        .map(|opt| opt.unwrap_or(false))
+                        .collect();
                     dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
                 } else {
                     // Handle unsupported data types or skip
@@ -79,6 +88,7 @@ impl Strategy {
                 action: Action {
                     orders: HashMap::new(),
                     close_all_positions: false,
+                    cancel_pending_orders: false,
                 },
                 index: -1,
             })
@@ -192,6 +202,7 @@ impl Strategy {
         let cross_above = get_value_at(df, i, "cross_above");
         let mut orders = HashMap::new();
         let mut close_all_positions = false;
+        let mut cancel_pending_orders = false;
         if cross_above == dec!(1) {
             let order = self.rs_create_market_order(
                 i,
@@ -219,6 +230,7 @@ impl Strategy {
         Action {
             orders,
             close_all_positions,
+            cancel_pending_orders,
         }
     }
 }
