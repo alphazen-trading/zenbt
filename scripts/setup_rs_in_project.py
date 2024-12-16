@@ -1,26 +1,38 @@
 import os
 import sys
 import subprocess
-import requests
+import urllib.request
+import os
+
+
+def ensure_content_in_file(content, file_path=".gitignore"):
+    # Read the file if it exists, otherwise initialize as empty
+    try:
+        with open(file_path, "r") as file:
+            existing_content = file.read()
+    except FileNotFoundError:
+        existing_content = ""
+
+    # Check if the content already exists
+    if content.strip() not in existing_content:
+        with open(file_path, "a") as file:
+            file.write(content)
+        print(f"Added content")
+    else:
+        print(f"Content for already exists")
 
 
 def download_file(url, save_path):
     try:
-        # Send a GET request to the URL
-        response = requests.get(url, stream=True)
-        response.raise_for_status()  # Check for HTTP errors
-
         # Ensure the local directory exists
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
-        # Write the content to the specified file
-        with open(save_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):  # Download in chunks
-                file.write(chunk)
+        # Download the file
+        urllib.request.urlretrieve(url, save_path)
 
         print(f"File downloaded successfully to: {save_path}")
 
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         print(f"An error occurred: {e}")
 
 
@@ -33,9 +45,18 @@ def main():
     with open("./rs/src/lib.rs", "w") as lib_file:
         lib_file.write(f"""use pyo3::prelude::*;
 
+/// Formats the sum of two numbers as string.
+#[pyfunction]
+fn sum_as_string(a: usize, b: usize) -> PyResult<String> {{
+    Ok((a + b).to_string())
+}}
+
+/// A Python module implemented in Rust. The name of this function must match
+/// the `lib.name` setting in the `Cargo.toml`, else Python will not be able to
+/// import the module.
 #[pymodule]
-fn {module_name}(m: &PyModule) -> PyResult<()> {{
-    Ok(())
+fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {{
+    m.add_function(wrap_pyfunction!(sum_as_string, m)?)
 }}
 """)
 
@@ -58,18 +79,17 @@ crate-type = ["cdylib"]
     os.chdir("..")
 
     # Replace _lowlevel with the input value in pyproject.toml
-    with open("pyproject.toml", "w") as pyproject_file:
-        pyproject_file.write(f"""
+    pyproject_content = f"""
 [tool.maturin]
-python-source = "python"
-module-name = "rs.{module_name}"
+profile = "release"
+python-source = "src"
+module-name = "{module_name}.rs"
 features = ["pyo3/extension-module"]
 manifest-path = "rs/Cargo.toml"
-""")
+"""
 
     # Write the Justfile
-    with open("justfile", "w") as justfile:
-        justfile.write(f"""
+    just_file_content = f"""
 rs_dev:
   nodemon -e rs --exec just _rs_dev
 
@@ -78,14 +98,22 @@ _rs_dev:
   just _rs_dev_pyi
 
 _rs_dev_pyi:
-  rye run python scripts/scanner.py rs.{module_name} ./src/{module_name}
-  cp ./src/rs/{module_name}.pyi ./src/rs/{module_name}.pyi
-""")
+  rye run python scripts/scanner.py {module_name}.rs ./src/{module_name}
+"""
+
+    ensure_content_in_file(pyproject_content, "pyproject.toml")
+    ensure_content_in_file(just_file_content, "justfile")
+    ensure_content_in_file("""rs/target""", ".gitignore")
 
     # Add pip as a dev dependency
     subprocess.run(["uv", "add", "--dev", "pip"], check=True)
 
     print("Script execution complete.")
+
+    # Download the scanner used to created the pyi
+    url = "https://raw.githubusercontent.com/alphazen-trading/zenbt/refs/heads/master/scripts/scanner.py"
+    save_path = "./scripts/scanner.py"
+    download_file(url, save_path)
 
 
 if __name__ == "__main__":
