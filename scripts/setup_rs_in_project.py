@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 import urllib.request
-import os
 
 
 def ensure_content_in_file(content, file_path=".gitignore"):
@@ -17,9 +16,9 @@ def ensure_content_in_file(content, file_path=".gitignore"):
     if content.strip() not in existing_content:
         with open(file_path, "a") as file:
             file.write(content)
-        print(f"Added content")
+        print("Added content")
     else:
-        print(f"Content for already exists")
+        print("Content for already exists")
 
 
 def download_file(url, save_path):
@@ -43,21 +42,21 @@ def main():
 
     # Write the Rust library file
     with open("./rs/src/lib.rs", "w") as lib_file:
-        lib_file.write(f"""use pyo3::prelude::*;
+        lib_file.write("""use pyo3::prelude::*;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {{
+fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
     Ok((a + b).to_string())
-}}
+}
 
 /// A Python module implemented in Rust. The name of this function must match
 /// the `lib.name` setting in the `Cargo.toml`, else Python will not be able to
 /// import the module.
 #[pymodule]
-fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {{
+fn rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)
-}}
+}
 """)
 
     # Write the Cargo.toml file
