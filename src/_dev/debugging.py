@@ -10,7 +10,7 @@ from tradingtoolbox.clickhouse import ClickhouseSync
 def run(directory):
     script_path = os.path.abspath(__file__)
     src = f"{directory}/strategy.py"
-    dst = os.path.dirname(script_path) + "/pickl/startegy.py"
+    dst = os.path.dirname(script_path) + "/pickl/strategy.py"
     shutil.copy(src, dst)
 
     src = f"{directory}/df.parquet"
@@ -32,6 +32,7 @@ def import_pickl():
 
 
 def test_pickl():
+    # import_pickl()
     from _dev.pickl.strategy import Strategy
     from zenbt.zbt import Backtest, BacktestParams
 

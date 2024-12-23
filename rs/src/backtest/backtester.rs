@@ -109,25 +109,14 @@ impl Backtest {
             // check_positions_to_close(i, &df, self, &action, &mut state);
             check_positions_to_close(i, &df, self, &action);
 
-            let mut filled_pending_orders: Vec<Order> = Vec::new();
-
-            let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
-            for pending_order in pending_limit_orders.values() {
-                if was_limit_order_triggered(pending_order, i, &df, self) {
-                    filled_pending_orders.push(pending_order.clone());
-                }
-            }
-            for order in filled_pending_orders {
-                self.state
-                    .pending_limit_orders
-                    .remove(&order.client_order_id);
-            }
-
             if action.cancel_pending_orders {
                 self.state.pending_limit_orders.clear();
             }
 
             for order in action.orders.values_mut() {
+                if i == 156 {
+                    println!("Here are the orders: {:?}", order);
+                }
                 if order.order_type == OrderType::Market {
                     order.price = Some(get_value_at(&df, i + 1, "open"));
                     let new_position =
@@ -147,6 +136,21 @@ impl Backtest {
                 //         .unwrap();
                 // });
             }
+
+            let mut filled_pending_orders: Vec<Order> = Vec::new();
+            let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
+            for pending_order in pending_limit_orders.values() {
+                if was_limit_order_triggered(pending_order, i, &df, self) {
+                    println!("{i} Triggered order: {:?}", pending_order.clone());
+                    filled_pending_orders.push(pending_order.clone());
+                }
+            }
+            for order in filled_pending_orders {
+                self.state
+                    .pending_limit_orders
+                    .remove(&order.client_order_id);
+            }
+
             // Usage example
             Python::with_gil(|py| {
                 copy_shared_state_to_pystate(py, &self.state, &self.pystate, &self.params);

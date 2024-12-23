@@ -13,19 +13,8 @@ pub fn get_date_at_index(df: &DataFrame, index: usize) -> DateTime<Utc> {
         .try_extract::<i64>() // Extract the date as an Int64 (timestamp)
         .unwrap();
 
-    // Convert milliseconds to seconds and nanoseconds
-    let seconds = timestamp_ms / 1_000;
-    let nanoseconds = u32::try_from((timestamp_ms % 1_000) * 1_000_000).expect("Time is invalid");
-
-    // Create a NaiveDateTime from the seconds and nanoseconds
-    // let naive_dt = DateTime::from_timestamp(seconds, nanoseconds).unwrap();
-    let naive_dt = DateTime::from_timestamp(seconds, nanoseconds).unwrap();
-
-    // Convert the NaiveDateTime to DateTime<Utc>
-    // TimeZone.from_utc_datetime(&naive_dt);
-    // let date: DateTime<Utc> = DateTime::with_timezone(naive_dt, Utc);
-    let date: DateTime<Utc> = naive_dt.with_timezone(&Utc);
-    date
+    let dt: DateTime<Utc> = DateTime::from_timestamp(timestamp_ms / 1_000, 0).unwrap();
+    dt
 }
 
 pub fn get_value_at(df: &DataFrame, index: usize, column: &str) -> Decimal {
