@@ -114,9 +114,9 @@ impl Backtest {
             }
 
             for order in action.orders.values_mut() {
-                if i == 156 {
-                    println!("Here are the orders: {:?}", order);
-                }
+                // if i == 156 {
+                //     println!("Here are the orders: {:?}", order);
+                // }
                 if order.order_type == OrderType::Market {
                     order.price = Some(get_value_at(&df, i + 1, "open"));
                     let new_position =
@@ -141,7 +141,7 @@ impl Backtest {
             let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
             for pending_order in pending_limit_orders.values() {
                 if was_limit_order_triggered(pending_order, i, &df, self) {
-                    println!("{i} Triggered order: {:?}", pending_order.clone());
+                    // println!("{i} Triggered order: {:?}", pending_order.clone());
                     filled_pending_orders.push(pending_order.clone());
                 }
             }

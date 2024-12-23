@@ -133,7 +133,7 @@ impl Position {
         self.exit_price = Some(exit_price);
         self.close_reason = Some(close_reason);
         self.commission += self.commission_pct * self.exit_price.unwrap() * self.size;
-        self.update_pnl(i, df);
+        // self.update_pnl(i, df);
     }
 
     pub fn was_sl_hit(&mut self, i: usize, df: &DataFrame) -> bool {

@@ -37,10 +37,10 @@ def test_pickl():
     from zenbt.zbt import Backtest, BacktestParams
 
     df = pl.read_parquet("./src/_dev/pickl/df.parquet")
-    st = Strategy(df, default_size=1)
+    st = Strategy(df, default_size=50)
 
     bt_params = BacktestParams(
-        commission_pct=0.02 / 100,  # This is 2 bps
+        commission_pct=0,
         initial_capital=100_000,
         provide_active_position=True,
     )

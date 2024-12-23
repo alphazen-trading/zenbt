@@ -31,7 +31,7 @@ pub fn check_positions_to_close(
                 .insert(position.id.clone(), position.clone());
             backtest.commissions += position.commission;
             realized_equity += position.pnl;
-            println!("{i} -- closing position pnl {}", position.pnl);
+            // println!("{i} -- closing position pnl {}", position.pnl);
             // println!("closing position pnl {:?}", position.close_reason.unwrap());
             positions_to_close.push(position.id.clone());
         } else {
@@ -93,7 +93,7 @@ pub fn was_limit_order_triggered(
     backtest: &mut Backtest,
 ) -> bool {
     if was_order_hit(order, i, df) {
-        println!("{i} Position filled");
+        // println!("{i} Position filled");
         let mut new_position =
             Position::create_position(order, get_date_at_index(df, i), &backtest.params);
 

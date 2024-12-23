@@ -69,6 +69,14 @@ impl Strategy {
                         .map(|opt| opt.unwrap_or(false))
                         .collect();
                     dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
+                } else if col.dtype() == &DataType::String {
+                    let col_values: Vec<bool> = col
+                        .str()
+                        .unwrap() // Safely access the Utf8Column.
+                        .into_iter()
+                        .map(|opt| opt.map(|s| !s.is_empty()).unwrap_or(false)) // Check if string is non-empty.
+                        .collect();
+                    dict.set_item(col_names[i].to_string(), col_values.to_pyarray_bound(py))?;
                 } else {
                     // Handle unsupported data types or skip
                     eprintln!(
