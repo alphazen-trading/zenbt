@@ -74,9 +74,11 @@ def create_session(
     session_max_np, session_min_np = compute_session_max_min(
         session_np, high_np, low_np
     )
-    df = df.with_columns([
-        pl.Series(f"{session_name}_max", session_max_np),
-        pl.Series(f"{session_name}_min", session_min_np),
-    ])
+    df = df.with_columns(
+        [
+            pl.Series(f"{session_name}_max", session_max_np),
+            pl.Series(f"{session_name}_min", session_min_np),
+        ]
+    )
 
     return df
