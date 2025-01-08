@@ -80,11 +80,11 @@ pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
         }
     } else if order.order_type == OrderType::Stop {
         if order.side == Side::Short {
-            let low = get_value_at(df, i, "low");
-            low >= order.price.unwrap()
-        } else {
             let high = get_value_at(df, i, "high");
             high >= order.price.unwrap()
+        } else {
+            let low = get_value_at(df, i, "low");
+            low >= order.price.unwrap()
         }
     } else {
         false
