@@ -37,9 +37,17 @@ def test_pickl():
     from zenbt.zbt import Backtest, BacktestParams
 
     df = pl.read_parquet("./src/_dev/pickl/df.parquet")
+    df = df.to_pandas()
+    df["time"] = pd.to_datetime(df["time"], unit="ms")
+    df = df[-950:-400]
+    print(df)
+
+    return
     st = Strategy(df, default_size=50)
+    print(df.columns)
 
     bt_params = BacktestParams(
+        verbose=False,
         commission_pct=0,
         initial_capital=100_000,
         provide_active_position=True,
@@ -53,6 +61,6 @@ def test_pickl():
 
     trades = get_trades_df(bt)
     print(trades)
-    # print(trades.dtypes)
-    ch = ClickhouseSync.create()
-    ch.insert_df(trades, "trades")
+    # # print(trades.dtypes)
+    # ch = ClickhouseSync.create()
+    # ch.insert_df(trades, "trades")

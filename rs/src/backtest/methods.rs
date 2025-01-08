@@ -1,5 +1,9 @@
 use crate::{
-    sdk::{enums::Side, order::Order, position::Position},
+    sdk::{
+        enums::{OrderType, Side},
+        order::Order,
+        position::Position,
+    },
     strategy::actions::Action,
 };
 use polars::frame::DataFrame;
@@ -66,27 +70,27 @@ pub fn update_backtest_equity(
 }
 
 pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
-    if order.side == Side::Short {
-        // if ohlc.low <= order.price {
-        //     println!("ORDER WAS HIT");
-        //     println!("{:?}", ohlc.low);
-        //     println!("{:?} {:?}", order.price, order.sl);
-        // }
-        let low = get_value_at(df, i, "low");
-        low <= order.price.unwrap()
+    if order.order_type == OrderType::Limit {
+        if order.side == Side::Short {
+            let low = get_value_at(df, i, "low");
+            low <= order.price.unwrap()
+        } else {
+            let high = get_value_at(df, i, "high");
+            high <= order.price.unwrap()
+        }
+    } else if order.order_type == OrderType::Stop {
+        if order.side == Side::Short {
+            let low = get_value_at(df, i, "low");
+            low >= order.price.unwrap()
+        } else {
+            let high = get_value_at(df, i, "high");
+            high >= order.price.unwrap()
+        }
     } else {
-        // if ohlc.high >= order.price {
-        //     if ohlc.high >= order.sl {
-        //         println!("\nORDER WAS HIT BUT Problem with sl");
-        //         println!("{:?}", ohlc);
-        //         println!("{:?}", order);
-        //     }
-        // }
-        let high = get_value_at(df, i, "high");
-        high <= order.price.unwrap()
+        false
     }
 }
-pub fn was_limit_order_triggered(
+pub fn was_pending_order_triggered(
     order: &Order,
     i: usize,
     df: &DataFrame,
@@ -99,6 +103,10 @@ pub fn was_limit_order_triggered(
 
         if new_position.was_sl_hit(i, df) {
             // If SL was hit in the same candle, update equity and move to closed positions
+
+            if backtest.params.verbose {
+                println!("{i} Wanting to fill a limit order, but SL was hit.");
+            }
             if let Some(last_equity) = backtest.state.equity.last_mut() {
                 *last_equity += new_position.pnl;
             }
@@ -108,6 +116,9 @@ pub fn was_limit_order_triggered(
                 .insert(new_position.id.clone(), new_position.clone());
         } else {
             // If SL wasn't hit, move the position to active positions
+            if backtest.params.verbose {
+                println!("{i} Wanting to fill a limit order, but SL was hit.");
+            }
             backtest
                 .state
                 .active_positions

@@ -144,6 +144,36 @@ impl Strategy {
         }
     }
 
+    #[pyo3(signature = (index, client_order_id, side, size, price, sl=None, tp=None))]
+    #[allow(clippy::similar_names, clippy::too_many_arguments)]
+    pub fn create_stop_order(
+        &self,
+        index: usize,
+        client_order_id: String,
+        side: Side,
+        size: Decimal,
+        price: f64,
+        sl: Option<Decimal>,
+        tp: Option<Decimal>,
+    ) -> Order {
+        let _ = self;
+        let price = Decimal::from_f64(price)
+            .ok_or(
+                "The price passed for the new stop order is not a valid float. (Maybe it's NaN?)",
+            )
+            .unwrap();
+        Order {
+            index,
+            client_order_id,
+            order_type: OrderType::Stop,
+            side,
+            size,
+            price: Some(price),
+            sl,
+            tp,
+        }
+    }
+
     fn update_index(&mut self) {
         self.index += 1;
     }

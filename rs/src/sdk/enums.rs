@@ -22,6 +22,8 @@ pub enum OrderType {
     Market,
     /// Sets the type of a Position or Order to a Limit order
     Limit,
+    /// Sets the type of a Position or Order to a Stop order
+    Stop,
 }
 
 impl ToPyObject for Side {

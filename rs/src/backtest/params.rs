@@ -12,6 +12,7 @@ use serde::Serialize;
 ///     commission_pct (decimal): The commission percentage of the backtest
 ///     provide_active_position (bool): Whether to provide the active position to the strategy. If you don't need it, set this to false to make the backtest faster.
 pub struct BacktestParams {
+    pub verbose: bool,
     pub commission_pct: Decimal,
     pub initial_capital: Decimal,
     pub provide_active_position: bool,
@@ -21,11 +22,13 @@ pub struct BacktestParams {
 impl BacktestParams {
     #[new]
     pub fn new(
+        verbose: bool,
         commission_pct: Decimal,
         initial_capital: Decimal,
         provide_active_position: bool,
     ) -> Self {
         BacktestParams {
+            verbose,
             commission_pct,
             initial_capital,
             provide_active_position,

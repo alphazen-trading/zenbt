@@ -108,6 +108,14 @@ pub-docs:
   git push
   git checkout develop
 
+
+import_pickl:
+  uv run import_pickl
+
+test:
+  nodemon -e py --exec uv run test_pickl
+
+
 # ============================================= #
 # Docs
 # ============================================= #

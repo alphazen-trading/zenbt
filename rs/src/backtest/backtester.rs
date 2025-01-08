@@ -1,5 +1,5 @@
 use super::helpers::{get_date_at_index, get_value_at};
-use super::methods::{check_positions_to_close, was_limit_order_triggered};
+use super::methods::{check_positions_to_close, was_pending_order_triggered};
 use super::params::BacktestParams;
 use super::shared_state::{copy_shared_state_to_pystate, PySharedState, SharedState};
 use super::stats_methods::create_stats;
@@ -12,6 +12,8 @@ use pyo3::intern;
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use std::collections::HashMap;
+use std::fmt::Debug;
+use std::fmt::Display;
 
 use pyo3_polars::PyDataFrame;
 use rust_decimal::Decimal;
@@ -113,35 +115,13 @@ impl Backtest {
                 self.state.pending_limit_orders.clear();
             }
 
-            for order in action.orders.values_mut() {
-                // if i == 156 {
-                //     println!("Here are the orders: {:?}", order);
-                // }
-                if order.order_type == OrderType::Market {
-                    order.price = Some(get_value_at(&df, i + 1, "open"));
-                    let new_position =
-                        Position::create_position(order, get_date_at_index(&df, i), &self.params);
-                    self.state
-                        .active_positions
-                        .insert(new_position.id.clone(), new_position.clone());
-                } else if !was_limit_order_triggered(order, i, &df, self) {
-                    self.state
-                        .pending_limit_orders
-                        .insert(order.client_order_id.clone(), order.clone());
-                }
-
-                // Python::with_gil(|py| {
-                //     self.strategy
-                //         .call_method_bound(py, intern!(py, "reset_action"), (), None)
-                //         .unwrap();
-                // });
-            }
-
             let mut filled_pending_orders: Vec<Order> = Vec::new();
             let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
             for pending_order in pending_limit_orders.values() {
-                if was_limit_order_triggered(pending_order, i, &df, self) {
-                    // println!("{i} Triggered order: {:?}", pending_order.clone());
+                if was_pending_order_triggered(pending_order, i, &df, self) {
+                    if self.params.verbose {
+                        println!("{i} Triggered order: {:?}", pending_order.clone());
+                    }
                     filled_pending_orders.push(pending_order.clone());
                 }
             }
@@ -149,6 +129,40 @@ impl Backtest {
                 self.state
                     .pending_limit_orders
                     .remove(&order.client_order_id);
+            }
+
+            // Add orders from the position into here
+            for order in action.orders.values_mut() {
+                if self.params.verbose {
+                    println!("{i} Placing a {:?} order", order.order_type);
+                }
+
+                match order.order_type {
+                    OrderType::Market => {
+                        order.price = Some(get_value_at(&df, i + 1, "open"));
+                        let new_position = Position::create_position(
+                            order,
+                            get_date_at_index(&df, i),
+                            &self.params,
+                        );
+                        self.state
+                            .active_positions
+                            .insert(new_position.id.clone(), new_position);
+                    }
+                    OrderType::Limit | OrderType::Stop => {
+                        if !was_pending_order_triggered(order, i, &df, self) {
+                            self.state
+                                .pending_limit_orders
+                                .insert(order.client_order_id.clone(), order.clone());
+                        }
+                    }
+                }
+
+                // Python::with_gil(|py| {
+                //     self.strategy
+                //         .call_method_bound(py, intern!(py, "reset_action"), (), None)
+                //         .unwrap();
+                // });
             }
 
             // Usage example
