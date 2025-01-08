@@ -111,10 +111,6 @@ impl Backtest {
             // check_positions_to_close(i, &df, self, &action, &mut state);
             check_positions_to_close(i, &df, self, &action);
 
-            if action.cancel_pending_orders {
-                self.state.pending_limit_orders.clear();
-            }
-
             let mut filled_pending_orders: Vec<Order> = Vec::new();
             let pending_limit_orders = self.state.pending_limit_orders.clone(); // Clone here to avoid borrowing issues
             for pending_order in pending_limit_orders.values() {
@@ -129,6 +125,10 @@ impl Backtest {
                 self.state
                     .pending_limit_orders
                     .remove(&order.client_order_id);
+            }
+
+            if action.cancel_pending_orders {
+                self.state.pending_limit_orders.clear();
             }
 
             // Add orders from the position into here

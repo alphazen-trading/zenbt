@@ -92,3 +92,5 @@ def create_session(
             pl.Series(f"{session_name}_min", session_min_np),
         ]
     )
+
+    return df

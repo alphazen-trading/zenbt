@@ -112,7 +112,7 @@ pub-docs:
 import_pickl:
   uv run import_pickl
 
-test:
+test_pickl:
   nodemon -e py --exec uv run test_pickl
 
 

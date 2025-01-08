@@ -105,7 +105,7 @@ pub fn was_pending_order_triggered(
             // If SL was hit in the same candle, update equity and move to closed positions
 
             if backtest.params.verbose {
-                println!("{i} Wanting to fill a limit order, but SL was hit.");
+                println!("{i} Wanting to fill a pending order, but SL was hit.");
             }
             if let Some(last_equity) = backtest.state.equity.last_mut() {
                 *last_equity += new_position.pnl;
@@ -117,7 +117,7 @@ pub fn was_pending_order_triggered(
         } else {
             // If SL wasn't hit, move the position to active positions
             if backtest.params.verbose {
-                println!("{i} Wanting to fill a limit order, but SL was hit.");
+                println!("{i} Adding new order.");
             }
             backtest
                 .state
