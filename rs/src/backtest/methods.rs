@@ -112,7 +112,7 @@ pub fn was_pending_order_triggered(
             }
             backtest
                 .state
-                .active_positions
+                .closed_positions
                 .insert(new_position.id.clone(), new_position.clone());
         } else {
             // If SL wasn't hit, move the position to active positions

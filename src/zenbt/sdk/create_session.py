@@ -23,8 +23,6 @@ def compute_session_max_min(session, high, low):
             session_min = min(session_min, low[i])
         else:
             is_out_of_session = True
-            session_max = np.nan
-            session_min = np.inf
 
         maxs[i] = session_max
         mins[i] = session_min
@@ -46,14 +44,28 @@ def create_session(
     df = df.with_columns(
         (
             (
-                pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
-                >= session_hour_start
-            )
-            & (
-                pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
-                < session_hour_end
-            )
-        ).alias(session_name)
+                (
+                    pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
+                    >= session_hour_start
+                )
+                | (
+                    pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
+                    < session_hour_end
+                )
+                if session_hour_start
+                > session_hour_end  # For sessions crossing midnight
+                else (
+                    (
+                        pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
+                        >= session_hour_start
+                    )
+                    & (
+                        pl.col(time_col_name).cast(pl.Datetime("ms")).dt.hour()
+                        < session_hour_end
+                    )
+                )
+            ).alias(session_name)
+        )
     )
 
     # Set the session_name value based on the condition
@@ -80,5 +92,3 @@ def create_session(
             pl.Series(f"{session_name}_min", session_min_np),
         ]
     )
-
-    return df
