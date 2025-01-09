@@ -70,26 +70,34 @@ pub fn update_backtest_equity(
 }
 
 pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
-    if order.order_type == OrderType::Limit {
-        if order.side == Side::Short {
-            let low = get_value_at(df, i, "low");
-            low <= order.price.unwrap()
-        } else {
-            let high = get_value_at(df, i, "high");
-            high <= order.price.unwrap()
-        }
-    } else if order.order_type == OrderType::Stop {
-        if order.side == Side::Short {
-            let high = get_value_at(df, i, "high");
-            high >= order.price.unwrap()
-        } else {
-            let low = get_value_at(df, i, "low");
-            low >= order.price.unwrap()
-        }
-    } else {
-        false
+    let low = get_value_at(df, i, "low");
+    let high = get_value_at(df, i, "high");
+    let price = order.price.unwrap();
+    if price > low && price < high {
+        return true;
     }
+    false
+    // if order.order_type == OrderType::Limit {
+    //     if order.side == Side::Short {
+    //         let low = get_value_at(df, i, "low");
+    //         low <= order.price.unwrap()
+    //     } else {
+    //         let high = get_value_at(df, i, "high");
+    //         high <= order.price.unwrap()
+    //     }
+    // } else if order.order_type == OrderType::Stop {
+    //     if order.side == Side::Short {
+    //         let low = get_value_at(df, i, "low");
+    //         low <= order.price.unwrap()
+    //     } else {
+    //         let high = get_value_at(df, i, "high");
+    //         high <= order.price.unwrap()
+    //     }
+    // } else {
+    //     false
+    // }
 }
+
 pub fn was_pending_order_triggered(
     order: &Order,
     i: usize,
