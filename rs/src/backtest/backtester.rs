@@ -134,7 +134,7 @@ impl Backtest {
             // Add orders from the position into here
             for order in action.orders.values_mut() {
                 if self.params.verbose {
-                    println!("{i} Placing a {:?} order", order.order_type);
+                    println!("{i} Placing a {:?} order: {:?}", order.order_type, order);
                 }
 
                 match order.order_type {
