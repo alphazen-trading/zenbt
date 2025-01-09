@@ -117,7 +117,7 @@ pub fn was_pending_order_triggered(
         } else {
             // If SL wasn't hit, move the position to active positions
             if backtest.params.verbose {
-                println!("{i} Adding new order.");
+                println!("{i} Adding new order: {:#?}", order);
             }
             backtest
                 .state
