@@ -73,7 +73,7 @@ impl Backtest {
                     floating_equity: Vec::new(),
                     active_positions: HashMap::new(),
                     closed_positions: HashMap::new(),
-                    orders: Vec::new(),
+                    orders: HashMap::new(),
                     pending_limit_orders: HashMap::new(),
                 },
                 commissions: dec!(0),
@@ -151,7 +151,7 @@ impl Backtest {
                             .insert(new_position.id.clone(), new_position);
 
                         order.status = OrderStatus::Filled;
-                        self.state.orders.push(order.clone());
+                        self.state.orders.insert(order.id.clone(), order.clone());
                     }
                     OrderType::Limit | OrderType::Stop => {
                         if !was_pending_order_triggered(order, i, &df, self) {

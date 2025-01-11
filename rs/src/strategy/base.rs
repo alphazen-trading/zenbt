@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use rand::Rng;
 use std::collections::HashMap;
 
 use numpy::ToPyArray;
@@ -136,6 +137,7 @@ impl Strategy {
             )
             .unwrap();
         Order {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
             index,
             place_timestamp,
             status: OrderStatus::Placed,
@@ -170,6 +172,7 @@ impl Strategy {
             .unwrap();
         let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
             index,
             client_order_id,
             place_timestamp,
@@ -212,6 +215,7 @@ impl Strategy {
         let _ = self;
         let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
             index,
             client_order_id,
             place_timestamp,
@@ -240,6 +244,7 @@ impl Strategy {
         let _ = self;
         let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
             index,
             client_order_id,
             place_timestamp,

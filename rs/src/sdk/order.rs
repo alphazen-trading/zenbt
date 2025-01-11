@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
+use rand::Rng;
 use rust_decimal::Decimal;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -20,6 +21,7 @@ use super::enums::{OrderStatus, OrderType, Side};
 ///     sl (Decimal): The stop-loss of the order
 ///     tp (Decimal): The take-profit of the order
 pub struct Order {
+    pub id: String,
     pub index: usize,
     pub place_timestamp: DateTime<Utc>,
     pub fill_timestamp: Option<DateTime<Utc>>,
@@ -53,6 +55,7 @@ impl Order {
         tp: Option<Decimal>,    // Optional take-profit
     ) -> Order {
         Order {
+            id: rand::thread_rng().gen_range(0..999_999_999).to_string(),
             index,
             place_timestamp,
             fill_timestamp,

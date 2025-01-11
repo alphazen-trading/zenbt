@@ -124,7 +124,10 @@ pub fn was_pending_order_triggered(
                 .insert(new_position.id.clone(), new_position.clone());
 
             order.status = OrderStatus::Filled;
-            backtest.state.orders.push(order.clone());
+            backtest
+                .state
+                .orders
+                .insert(order.id.clone(), order.clone());
         } else {
             // If SL wasn't hit, move the position to active positions
             if backtest.params.verbose {
@@ -136,7 +139,10 @@ pub fn was_pending_order_triggered(
                 .insert(new_position.id.clone(), new_position.clone());
 
             order.status = OrderStatus::Filled;
-            backtest.state.orders.push(order.clone());
+            backtest
+                .state
+                .orders
+                .insert(order.id.clone(), order.clone());
         }
         return true;
     }
