@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 
 use numpy::ToPyArray;
@@ -11,8 +12,8 @@ use pyo3_polars::PyDataFrame;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
 
-use crate::backtest::helpers::get_value_at;
-use crate::sdk::enums::{OrderType, Side};
+use crate::backtest::helpers::{get_date_at_index, get_value_at};
+use crate::sdk::enums::{OrderStatus, OrderType, Side};
 use crate::sdk::order::Order;
 
 use super::actions::Action;
@@ -127,6 +128,8 @@ impl Strategy {
         tp: Option<Decimal>,
     ) -> Order {
         let _ = self;
+
+        let place_timestamp = get_date_at_index(&self.df.0, index);
         let price = Decimal::from_f64(price)
             .ok_or(
                 "The price passed for the new limit order is not a valid float. (Maybe it's NaN?)",
@@ -134,6 +137,9 @@ impl Strategy {
             .unwrap();
         Order {
             index,
+            place_timestamp,
+            status: OrderStatus::Placed,
+            fill_timestamp: None,
             client_order_id,
             order_type: OrderType::Limit,
             side,
@@ -162,9 +168,13 @@ impl Strategy {
                 "The price passed for the new stop order is not a valid float. (Maybe it's NaN?)",
             )
             .unwrap();
+        let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
             index,
             client_order_id,
+            place_timestamp,
+            status: OrderStatus::Placed,
+            fill_timestamp: None,
             order_type: OrderType::Stop,
             side,
             size,
@@ -200,9 +210,13 @@ impl Strategy {
         tp: Option<Decimal>,
     ) -> Order {
         let _ = self;
+        let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
             index,
             client_order_id,
+            place_timestamp,
+            status: OrderStatus::Placed,
+            fill_timestamp: None,
             order_type: OrderType::Market,
             side,
             size,
@@ -224,9 +238,13 @@ impl Strategy {
         tp: Option<Decimal>,
     ) -> Order {
         let _ = self;
+        let place_timestamp = get_date_at_index(&self.df.0, index);
         Order {
             index,
             client_order_id,
+            place_timestamp,
+            fill_timestamp: None,
+            status: OrderStatus::Placed,
             order_type: OrderType::Market,
             side,
             size,

@@ -44,6 +44,7 @@ pub struct SharedState {
     pub floating_equity: Vec<Decimal>,
     pub active_positions: HashMap<String, Position>,
     pub closed_positions: HashMap<String, Position>,
+    pub orders: Vec<Position>,
     pub pending_limit_orders: HashMap<String, Order>,
 }
 impl SharedState {}

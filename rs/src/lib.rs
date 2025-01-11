@@ -16,7 +16,7 @@ use indicators::cross_above::cross_above;
 use indicators::cross_below::cross_below;
 use indicators::indicator_123::indicator_123;
 use sdk::enums::{CloseReason, OrderType, Side};
-use sdk::order::{LimitOrders, Order};
+use sdk::order::Order;
 use sdk::position::Position;
 
 fn register_child_module(parent_module: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -41,7 +41,7 @@ fn zbt(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Backtest>()?;
     m.add_class::<BacktestParams>()?;
     m.add_class::<Position>()?;
-    m.add_class::<LimitOrders>()?;
+    // m.add_class::<LimitOrders>()?;
     m.add_class::<Side>()?;
     m.add_class::<CloseReason>()?;
     m.add_class::<OrderType>()?;

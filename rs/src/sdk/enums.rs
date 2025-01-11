@@ -16,6 +16,15 @@ pub enum Side {
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
+/// An enum representing the status of the order
+pub enum OrderStatus {
+    Placed,
+    Filled,
+    Cancelled,
+}
+
+#[pyclass(eq, eq_int)]
+#[derive(Copy, Debug, Clone, PartialEq, Serialize)]
 /// An enum representing the order type
 pub enum OrderType {
     /// Sets the type of a Position or Order to a Market order

@@ -73,6 +73,7 @@ impl Backtest {
                     floating_equity: Vec::new(),
                     active_positions: HashMap::new(),
                     closed_positions: HashMap::new(),
+                    orders: Vec::new(),
                     pending_limit_orders: HashMap::new(),
                 },
                 commissions: dec!(0),
