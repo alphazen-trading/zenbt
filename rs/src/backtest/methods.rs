@@ -1,6 +1,6 @@
 use crate::{
     sdk::{
-        enums::{OrderType, Side},
+        enums::{OrderStatus, OrderType, Side},
         order::Order,
         position::Position,
     },
@@ -99,7 +99,7 @@ pub fn was_order_hit(order: &Order, i: usize, df: &DataFrame) -> bool {
 }
 
 pub fn was_pending_order_triggered(
-    order: &Order,
+    order: &mut Order,
     i: usize,
     df: &DataFrame,
     backtest: &mut Backtest,
@@ -122,6 +122,9 @@ pub fn was_pending_order_triggered(
                 .state
                 .closed_positions
                 .insert(new_position.id.clone(), new_position.clone());
+
+            order.status = OrderStatus::Filled;
+            backtest.state.orders.push(order.clone());
         } else {
             // If SL wasn't hit, move the position to active positions
             if backtest.params.verbose {
@@ -131,6 +134,9 @@ pub fn was_pending_order_triggered(
                 .state
                 .active_positions
                 .insert(new_position.id.clone(), new_position.clone());
+
+            order.status = OrderStatus::Filled;
+            backtest.state.orders.push(order.clone());
         }
         return true;
     }
