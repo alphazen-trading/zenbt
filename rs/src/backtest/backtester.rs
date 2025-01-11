@@ -19,7 +19,7 @@ use pyo3_polars::PyDataFrame;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-#[pyclass(get_all, subclass)]
+#[pyclass(get_all, set_all, subclass)]
 #[derive(Debug)]
 /// A class that will run a backtest and generate stats as a result.
 ///
