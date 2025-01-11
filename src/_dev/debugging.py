@@ -2,7 +2,7 @@ import os
 import shutil
 import pandas as pd
 import polars as pl
-from zenbt.sdk import Stats
+from zenbt.sdk.stats import Stats
 from zenbt.sdk.trade_record import get_trades_df
 from tradingtoolbox.clickhouse import ClickhouseSync
 

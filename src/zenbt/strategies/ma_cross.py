@@ -1,8 +1,8 @@
-from zenbt.sdk.base import BaseStrategy
 from zenbt.zbt import (
     Side,
     Action,
 )
+from zenbt.sdk.base import BaseStrategy
 
 
 class MaCross(BaseStrategy):

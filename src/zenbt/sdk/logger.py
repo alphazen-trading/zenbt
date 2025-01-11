@@ -128,7 +128,9 @@ class Logger:
 
 pprint = print
 
-logger = Logger()
+
+def get_logger():
+    logger = Logger()
 
 
 # print = logger.logger.info

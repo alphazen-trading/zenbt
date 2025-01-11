@@ -14,17 +14,18 @@ dependencies = [
     "tradingtoolbox>=0.44.0",
     "tqdm>=4.66.5",
     "polars>=1.9.0",
-    "ta-lib>=0.5.1",
+    "ta-lib>=0.6.0",
     "humanize>=4.11.0",
-    "quantstats==0.0.60",
+    "numba>=0.60.0",
+    "quantstats==0.0.60"
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
 license = { text = "MIT" }
 
 [project.scripts]
-# "dev" = "_dev:dev"
-"dev" = "_dev:test_pickl"
+"dev" = "_dev:dev"
+# "dev" = "_dev:test_pickl"
 "bench" = "_bench:bench"
 "bench_all" = "_bench:bench_all"
 "import_pickl" = "_dev:import_pickl"
@@ -42,7 +43,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "python-okx>=0.1.2",
-    "vectorbt>=0.26.2",
+    "vectorbt>=0.25.1",
     "bt>=1.1.0",
     "pyright>=1.1.386",
     "binance-historical-data>=0.1.13",
@@ -67,7 +68,6 @@ dev = [
     "mkdocs-literate-nav>=0.6.1",
     "mkdocs-section-index>=0.3.9",
     "mkdocs-autorefs>=1.2.0",
-    "numba>=0.53.1",
     "mplfinance>=0.12.10b0",
 ]
 

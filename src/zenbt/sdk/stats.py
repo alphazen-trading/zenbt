@@ -3,13 +3,9 @@ from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
 from datetime import datetime
 from typing import Optional, Any
-import pandas as pd
-import polars as pl
-from rich import print as rprint
-import numpy as np
-from rich.table import Table
-from rich.console import Console
 
+import pandas as pd
+import numpy as np
 import humanize
 from zenbt.zbt import Backtest
 
@@ -51,7 +47,6 @@ class Stat(BaseModel):
     wins: float = 0
     losses: float = 0
     win_rate: float = 0
-
     model_config = ConfigDict(extra="allow")
 
 
@@ -110,7 +105,7 @@ class Stats(BaseModel):
             values.append(json.loads(pos.to_json()))
         self.active_positions = self.convert_df_str_to_float(pd.DataFrame(values))
 
-    def __init__(self, bt: Backtest, df: pl.DataFrame):
+    def __init__(self, bt: Backtest):
         super().__init__()
         self.bt = bt
         # self.create_positions(bt)
@@ -118,6 +113,9 @@ class Stats(BaseModel):
         # self.stats = Stat.model_validate(json.loads(bt.stats))
 
     def print(self):
+        from rich.table import Table
+        from rich.console import Console
+
         if self.bt is None:
             return
         data = self.bt.get_stats()["stats"]
