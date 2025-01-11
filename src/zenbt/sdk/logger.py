@@ -129,8 +129,7 @@ class Logger:
 pprint = print
 
 
-def get_logger():
-    logger = Logger()
+logger = Logger()
 
 
 # print = logger.logger.info
