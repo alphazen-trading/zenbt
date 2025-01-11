@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
+use pyo3::types::PyDict;
 use rand::Rng;
 use rust_decimal::Decimal;
 use serde::Serialize;
@@ -34,6 +35,56 @@ pub struct Order {
     pub price: Option<Decimal>, // Optional price
     pub sl: Option<Decimal>,    // Optional stop-loss
     pub tp: Option<Decimal>,    // Optional take-profit
+}
+
+impl ToPyObject for Order {
+    fn to_object(&self, py: Python) -> PyObject {
+        let dict = PyDict::new_bound(py);
+
+        // Insert required fields into the dictionary
+        dict.set_item("id", &self.id).unwrap();
+        dict.set_item("index", self.index).unwrap();
+        dict.set_item("place_timestamp", self.place_timestamp.to_rfc3339())
+            .unwrap();
+
+        // Option handling for fill_timestamp
+        if let Some(fill_ts) = &self.fill_timestamp {
+            dict.set_item("fill_timestamp", fill_ts.to_rfc3339())
+                .unwrap();
+        } else {
+            dict.set_item("fill_timestamp", py.None()).unwrap();
+        }
+
+        dict.set_item("status", &self.status).unwrap();
+        dict.set_item("client_order_id", &self.client_order_id)
+            .unwrap();
+        dict.set_item("order_type", &self.order_type).unwrap();
+        dict.set_item("side", &self.side).unwrap();
+        dict.set_item("size", self.size).unwrap();
+
+        // Option handling for price
+        if let Some(price) = &self.price {
+            dict.set_item("price", price).unwrap();
+        } else {
+            dict.set_item("price", py.None()).unwrap();
+        }
+
+        // Option handling for stop-loss (sl)
+        if let Some(sl) = &self.sl {
+            dict.set_item("sl", sl).unwrap();
+        } else {
+            dict.set_item("sl", py.None()).unwrap();
+        }
+
+        // Option handling for take-profit (tp)
+        if let Some(tp) = &self.tp {
+            dict.set_item("tp", tp).unwrap();
+        } else {
+            dict.set_item("tp", py.None()).unwrap();
+        }
+
+        dict.to_object(py)
+    }
 }
 
 #[pymethods]

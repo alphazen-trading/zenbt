@@ -13,6 +13,14 @@ pub enum Side {
     Long,
     Short,
 }
+impl ToPyObject for Side {
+    fn to_object(&self, py: Python) -> PyObject {
+        match self {
+            Side::Long => PyString::new_bound(py, "Long").into_py(py),
+            Side::Short => PyString::new_bound(py, "Short").into_py(py),
+        }
+    }
+}
 
 #[pyclass(eq, eq_int)]
 #[derive(Copy, Debug, Clone, PartialEq, Serialize)]
@@ -21,6 +29,16 @@ pub enum OrderStatus {
     Placed,
     Filled,
     Cancelled,
+}
+impl ToPyObject for OrderStatus {
+    fn to_object(&self, py: Python) -> PyObject {
+        let status_str = match self {
+            OrderStatus::Placed => "Placed",
+            OrderStatus::Filled => "Filled",
+            OrderStatus::Cancelled => "Cancelled",
+        };
+        PyString::new_bound(py, status_str).into_py(py)
+    }
 }
 
 #[pyclass(eq, eq_int)]
@@ -34,13 +52,14 @@ pub enum OrderType {
     /// Sets the type of a Position or Order to a Stop order
     Stop,
 }
-
-impl ToPyObject for Side {
+impl ToPyObject for OrderType {
     fn to_object(&self, py: Python) -> PyObject {
-        match self {
-            Side::Long => PyString::new_bound(py, "Long").into_py(py),
-            Side::Short => PyString::new_bound(py, "Short").into_py(py),
-        }
+        let type_str = match self {
+            OrderType::Market => "Market",
+            OrderType::Limit => "Limit",
+            OrderType::Stop => "Stop",
+        };
+        PyString::new_bound(py, type_str).into_py(py)
     }
 }
 
