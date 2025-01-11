@@ -1,10 +1,14 @@
+use crate::sdk::enums::OrderStatus;
 use crate::sdk::order::Order;
 use crate::sdk::position::Position;
+use polars::frame::DataFrame;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 
+use super::backtester::Backtest;
+use super::helpers::get_date_at_index;
 use super::params::BacktestParams;
 
 #[pyclass(get_all)]
@@ -47,7 +51,14 @@ pub struct SharedState {
     pub orders: HashMap<String, Order>,
     pub pending_limit_orders: HashMap<String, Order>,
 }
-impl SharedState {}
+impl SharedState {
+    pub fn add_filled_order(&mut self, index: usize, order: &mut Order, df: &DataFrame) {
+        order.status = OrderStatus::Filled;
+        let fill_timestamp = get_date_at_index(&df, index);
+        order.fill_timestamp = Some(fill_timestamp);
+        self.orders.insert(order.id.clone(), order.clone());
+    }
+}
 
 // Function to copy values from `SharedState` to `PySharedState`
 pub fn copy_shared_state_to_pystate(

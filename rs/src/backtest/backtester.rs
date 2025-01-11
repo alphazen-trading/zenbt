@@ -150,8 +150,7 @@ impl Backtest {
                             .active_positions
                             .insert(new_position.id.clone(), new_position);
 
-                        order.status = OrderStatus::Filled;
-                        self.state.orders.insert(order.id.clone(), order.clone());
+                        self.state.add_filled_order(i, order, &df);
                     }
                     OrderType::Limit | OrderType::Stop => {
                         if !was_pending_order_triggered(order, i, &df, self) {
