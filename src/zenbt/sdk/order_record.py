@@ -1,21 +1,24 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 import pandas as pd
 from typing import get_args
+from rich import print
 
 
 class OrderRecord(BaseModel):
+    id: str
     index: int
-    place_timestamp: datetime
-    fill_timestamp: datetime
+    place_timestamp: str
+    fill_timestamp: str
     status: str
     client_order_id: str
     order_type: str
-    size: float
-    sl: Optional[float] = 0
-    tp: Optional[float] = 0
     side: str
+    size: float
+    price: float
+    sl: Optional[float] = None
+    tp: Optional[float] = None
 
 
 def get_orders_df(bt):
@@ -41,5 +44,5 @@ def get_orders_df(bt):
         except Exception as e:
             pass
 
-    df.sort_values("entry_index", inplace=True)
+    df.sort_values("index", inplace=True)
     return df

@@ -33,7 +33,7 @@ pub struct Strategy {
 #[pymethods]
 impl Strategy {
     #[new]
-    fn new(df: PyDataFrame, default_size: Decimal) -> PyResult<Strategy> {
+    fn new(df: PyDataFrame, default_size: Decimal, action: Action) -> PyResult<Strategy> {
         Python::with_gil(|py| {
             let dict = PyDict::new_bound(py);
             let col_names = df.0.get_column_names();
@@ -95,11 +95,7 @@ impl Strategy {
                 data: dict.into(),
                 equity: Vec::new(),
                 default_size,
-                action: Action {
-                    orders: HashMap::new(),
-                    close_all_positions: false,
-                    cancel_pending_orders: false,
-                },
+                action,
                 index: -1,
             })
         })

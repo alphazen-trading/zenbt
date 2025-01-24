@@ -42,11 +42,11 @@
       "name": "Grafana Labs"
     },
     "build": {
-      "time": 1732723429280,
+      "time": 1737562708147,
       "repo": "https://github.com/grafana/clickhouse-datasource",
       "branch": "main",
-      "hash": "1d56c57c04de91749cff198f86292e04c4e1138d",
-      "build": 2565
+      "hash": "ff2ba6deba4ee5d73fdba8ea49a3b6bef467947b",
+      "build": 2667
     },
     "description": "ClickHouse datasource plugin for Grafana",
     "keywords": [
@@ -67,8 +67,8 @@
       "small": "img/logo.svg"
     },
     "screenshots": [],
-    "updated": "2024-11-27",
-    "version": "4.5.1"
+    "updated": "2025-01-22",
+    "version": "4.6.0"
   },
   "logs": true,
   "metrics": true,
