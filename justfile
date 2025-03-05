@@ -8,18 +8,18 @@ default:
 # ============================================= #
 install:
   #!/usr/bin/env bash
-  rye sync
-  rye run pre-commit install --hook-type pre-push --hook-type commit-msg --allow-missing-config
+  uv sync
+  uv run pre-commit install --hook-type pre-push --hook-type commit-msg --allow-missing-config
   if [ ! -d "/opt/logs" ]; then
     sudo mkdir /opt/logs
   fi
   sudo chown -R $USER:$USER /opt/logs
 
 cz:
-  rye run cz commit --write-message-to-file /tmp/msg
+  uv run cz commit --write-message-to-file /tmp/msg
 
 czr:
-  rye run cz commit --write-message-to-file /tmp/msg --retry
+  uv run cz commit --write-message-to-file /tmp/msg --retry
 
 cleanup:
   rm -f /tmp/msg
@@ -43,8 +43,8 @@ clippy:
 pre-commit-test:
   ruff format
   ruff check --fix
-  rye run pyright
-  rye run pre-commit run
+  uv run pyright
+  uv run pre-commit run
 
 alias dev := py_dev
 py_dev:
@@ -58,7 +58,7 @@ _rs_dev:
   just _rs_dev_pyi
 
 _rs_dev_pyi:
-  rye run python scripts/scanner.py zenbt.zbt ./src/zenbt
+  uv run python scripts/scanner.py zenbt.zbt ./src/zenbt
   cp ./src/zenbt/zbt.pyi ./src/zenbt/backtester.pyi
 
 zellij:
@@ -87,22 +87,22 @@ gdocker:
 
 pub:
   #!/usr/bin/env bash
-  rye version -b minor
+  uv version -b minor
   rm -rf ./dist
-  rye build --all --wheel --clean
-  rye publish --yes
+  uv build --all --wheel --clean
+  uv publish --yes
 
   just pre-commit-test
   git add .
   touch /tmp/msg
-  git commit -m "build: automatic rye bump of project version"
+  git commit -m "build: automatic uv bump of project version"
   git push
   just pub-docs
 
 
 pub-docs:
-  rye run mike deploy --update-aliases $(rye version) latest
-  rye run mike set-default --push latest
+  uv run mike deploy --update-aliases $(uv version) latest
+  uv run mike set-default --push latest
   git checkout gh-pages
 
   git push
@@ -120,10 +120,10 @@ test_pickl:
 # Docs
 # ============================================= #
 docs:
-  nodemon -e *.py* --exec rye run mkdocs serve
+  nodemon -e *.py* --exec uv run mkdocs serve
 
 docs-build:
-  rye run mkdocs build
+  uv run mkdocs build
 
 
 # ============================================= #
