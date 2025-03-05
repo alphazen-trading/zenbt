@@ -1,10 +1,18 @@
 [
   {
+    "version": "uv",
+    "title": "uv",
+    "aliases": [
+      "2025-02-24)",
+      "(Homebrew",
+      "latest",
+      "0.6.3"
+    ]
+  },
+  {
     "version": "0.41.0",
     "title": "0.41.0",
-    "aliases": [
-      "latest"
-    ]
+    "aliases": []
   },
   {
     "version": "0.40.0",
