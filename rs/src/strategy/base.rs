@@ -101,6 +101,16 @@ impl Strategy {
         })
     }
 
+    #[setter]
+    fn set_index(&mut self, index: isize) {
+        self.index = index;
+    }
+
+    // Add a method to set index directly
+    pub fn set_index_value(&mut self, index: isize) {
+        self.index = index;
+    }
+
     #[classmethod]
     #[allow(unused_variables)]
     pub fn _on_candle(cls: &Bound<'_, PyType>) -> i32 {

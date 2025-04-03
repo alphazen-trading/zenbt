@@ -64,7 +64,6 @@ build-all-platforms:
   # Build pure Python package with hatch
   hatch build
   
-  echo "All platform builds complete! Check the 'target/wheels' and 'dist' directories for the output."
 
 # Build only for Linux platforms
 build-all-linux:
@@ -86,14 +85,13 @@ build-linux-docker:
   #!/usr/bin/env bash
   echo "Building Linux wheels using Docker..."
   maturin build --release --compatibility manylinux2014 --target x86_64-unknown-linux-gnu --docker
-  echo "Linux build complete! Check the 'target/wheels' directory for the output."
 
 # Build wheels for all platforms using Docker (more reliable)
 build-all-docker:
   #!/usr/bin/env bash
   echo "Building wheels for all platforms using Docker..."
   
-  # This uses maturin's built-in Docker support for cross-compilation
+  # This uses maturins built-in Docker support for cross-compilation
   # It requires Docker to be installed and running
   
   # Build for all supported platforms using manylinux
@@ -170,10 +168,10 @@ gdocker:
 
 pub:
   #!/usr/bin/env bash
-  uv version -b minor
+  rye version -b minor
   rm -rf ./dist
-  uv build --all --wheel --clean
-  uv publish --yes
+  uv build --all --wheel 
+  uv publish 
 
   just pre-commit-test
   git add .
