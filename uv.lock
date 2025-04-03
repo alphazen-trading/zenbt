@@ -3870,6 +3870,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pyobjc-core"
+version = "11.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/94/a111239b98260869780a5767e5d74bfd3a8c13a40457f479c28dcd91f89d/pyobjc_core-11.0.tar.gz", hash = "sha256:63bced211cb8a8fb5c8ff46473603da30e51112861bd02c438fbbbc8578d9a70", size = 994931 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bc/21/ccc992b38670176a615fb67686d709e03be989511da687f6f49ddc4ff6c8/pyobjc_core-11.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:10866b3a734d47caf48e456eea0d4815c2c9b21856157db5917b61dee06893a1", size = 732162 },
+    { url = "https://files.pythonhosted.org/packages/52/05/fa97309c3b1bc1ec90d701db89902e0bd5e1024023aa2c5387b889458b1b/pyobjc_core-11.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:50675c0bb8696fe960a28466f9baf6943df2928a1fd85625d678fa2f428bd0bd", size = 727295 },
+    { url = "https://files.pythonhosted.org/packages/56/ce/bf3ff9a9347721a398c3dfb83e29b43fb166b7ef590f3f7b7ddcd283df39/pyobjc_core-11.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:a03061d4955c62ddd7754224a80cdadfdf17b6b5f60df1d9169a3b1b02923f0b", size = 739750 },
+    { url = "https://files.pythonhosted.org/packages/72/16/0c468e73dbecb821e3da8819236fe832dfc53eb5f66a11775b055a7589ea/pyobjc_core-11.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:c338c1deb7ab2e9436d4175d1127da2eeed4a1b564b3d83b9f3ae4844ba97e86", size = 743900 },
+    { url = "https://files.pythonhosted.org/packages/f3/88/cecec88fd51f62a6cd7775cc4fb6bfde16652f97df88d28c84fb77ca0c18/pyobjc_core-11.0-cp313-cp313t-macosx_10_13_universal2.whl", hash = "sha256:b4e9dc4296110f251a4033ff3f40320b35873ea7f876bd29a1c9705bb5e08c59", size = 791905 },
+    { url = "https://files.pythonhosted.org/packages/14/ba/1c459d0f1fc4c80314040ea6efea433c0641adffa6701679ec3a917b51a3/pyobjc_core-11.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:02406ece449d0f41b31e579e47ca77ced3eb57533df955281bfcecc99da74fba", size = 732648 },
+]
+
+[[package]]
 name = "pyopenssl"
 version = "25.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3999,6 +4013,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/4c/24/73929988bfaeffa9883379cbad402ef3fcc4829cf93d3746f70c99ac42e1/python_okx-0.3.5.tar.gz", hash = "sha256:4fe7862a4ba07ef9d44e11d539a4998fac71fcce640f732ef9803873bb50d9a8", size = 23873 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/9b/5d1da0aca759e78ab3a15de08e8b3ff03d5e4f586d905f0b739b5013e1ea/python_okx-0.3.5-py3-none-any.whl", hash = "sha256:22177b6c49bea8f8b6cd0127402835911de18370519cc06cdaf1132e5d7c8a2d", size = 32647 },
+]
+
+[[package]]
+name = "python-xlib"
+version = "0.33"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/f5/8c0653e5bb54e0cbdfe27bf32d41f27bc4e12faa8742778c17f2a71be2c0/python-xlib-0.33.tar.gz", hash = "sha256:55af7906a2c75ce6cb280a584776080602444f75815a7aff4d287bb2d7018b32", size = 269068 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/b8/ff33610932e0ee81ae7f1269c890f697d56ff74b9f5b2ee5d9b7fa2c5355/python_xlib-0.33-py2.py3-none-any.whl", hash = "sha256:c3534038d42e0df2f1392a1b30a15a4ff5fdc2b86cfa94f072bf11b10a164398", size = 182185 },
 ]
 
 [[package]]
@@ -4395,6 +4421,7 @@ wheels = [
 name = "rpds-py"
 version = "0.23.0"
 source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ca/0e/4c797078d00dbf1f63af96e4b3beffb67f71230f58442272b4b1962a61c8/rpds_py-0.23.0.tar.gz", hash = "sha256:ffac3b13182dc1bf648cde2982148dc9caf60f3eedec7ae639e05636389ebf5d", size = 26808 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9c/39/c2b2337f0dd0494a7e66eb3f114dde2a08c613b9374f52fdec8c38890def/rpds_py-0.23.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:1b36e993b95f0744a94a5add7624cfaf77b91805819c1a960026bc452f95841e", size = 372147 },
     { url = "https://files.pythonhosted.org/packages/1c/19/cd8c3bc46b5151db48b9f411cc7cd957766220f93d0edcb8cb81cdc8b192/rpds_py-0.23.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:72a0dd4d599fadaf519d4e4b8092e5d7940057c61e70f9f06c1d004a47895204", size = 356821 },
@@ -5444,7 +5471,7 @@ wheels = [
 
 [[package]]
 name = "zenbt"
-version = "0.41.0"
+version = "0.42.0"
 source = { editable = "." }
 dependencies = [
     { name = "humanize" },
@@ -5455,6 +5482,9 @@ dependencies = [
     { name = "polars" },
     { name = "pyarrow" },
     { name = "pydantic" },
+    { name = "pyobjc-core", marker = "sys_platform == 'darwin'" },
+    { name = "python-xlib", marker = "sys_platform == 'linux'" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "quantstats" },
     { name = "rich" },
     { name = "ta-lib" },
@@ -5503,6 +5533,9 @@ requires-dist = [
     { name = "polars", specifier = ">=1.9.0" },
     { name = "pyarrow", specifier = ">=17.0.0" },
     { name = "pydantic", specifier = ">=2.8.2" },
+    { name = "pyobjc-core", marker = "sys_platform == 'darwin'", specifier = ">=10.1" },
+    { name = "python-xlib", marker = "sys_platform == 'linux'", specifier = ">=0.33" },
+    { name = "pywin32", marker = "sys_platform == 'win32'", specifier = ">=306" },
     { name = "quantstats", specifier = "==0.0.60" },
     { name = "rich", specifier = ">=13.9.2" },
     { name = "ta-lib", specifier = ">=0.6.0" },
