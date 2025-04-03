@@ -3,7 +3,7 @@ name = "zenbt"
 version = "0.41.0"
 description = "Add your description here"
 authors = [
-    { name = "Alpha Zen", email = "" }
+    { name = "Alpha Zen", email = "alpha@example.com" }
 ]
 dependencies = [
     "pyarrow>=17.0.0",
@@ -17,7 +17,11 @@ dependencies = [
     "ta-lib>=0.6.0",
     "humanize>=4.11.0",
     "numba>=0.60.0",
-    "quantstats==0.0.60"
+    "quantstats==0.0.60",
+    # Platform-specific dependencies using environment markers
+    "pywin32>=306; sys_platform == 'win32'",  # Windows-only dependency
+    "python-xlib>=0.33; sys_platform == 'linux'",  # Linux-only dependency
+    "pyobjc-core>=10.1; sys_platform == 'darwin'",  # macOS-only dependency
 ]
 readme = "README.md"
 requires-python = ">= 3.9"
@@ -76,6 +80,28 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zenbt", "src/data", "src/sdk", "src/grafana"]
+
+# Platform-specific configurations
+[tool.hatch.envs.default]
+dependencies = []
+
+[tool.hatch.envs.linux]
+platform = "linux"
+dependencies = [
+  "linux-specific-package>=1.0.0",
+]
+
+[tool.hatch.envs.macos]
+platform = "darwin"
+dependencies = [
+  "macos-specific-package>=1.0.0",
+]
+
+[tool.hatch.envs.windows]
+platform = "windows"
+dependencies = [
+  "windows-specific-package>=1.0.0",
+]
 
 [tool.maturin]
 profile = "release"

@@ -40,6 +40,89 @@ clippy:
   cd ./rs
   cargo clippy -- -W clippy::pedantic
 
+# Build wheels for all platforms in one command
+build-all-platforms:
+  #!/usr/bin/env bash
+  echo "Building wheels for all platforms..."
+  
+  # Make sure we have the right tooling
+  pip install -U maturin hatch
+  
+  # macOS targets (Intel and Apple Silicon)
+  maturin build --release --target x86_64-apple-darwin
+  maturin build --release --target aarch64-apple-darwin
+  
+  # Windows targets
+  maturin build --release --target x86_64-pc-windows-msvc
+  maturin build --release --target i686-pc-windows-msvc
+  
+  # Linux targets
+  maturin build --release --target x86_64-unknown-linux-gnu
+  maturin build --release --target i686-unknown-linux-gnu
+  maturin build --release --target aarch64-unknown-linux-gnu
+  
+  # Build pure Python package with hatch
+  hatch build
+  
+  echo "All platform builds complete! Check the 'target/wheels' and 'dist' directories for the output."
+
+# Build only for Linux platforms
+build-all-linux:
+  #!/usr/bin/env bash
+  echo "Building wheels for Linux platforms..."
+  
+  # Build for Linux using manylinux2014 for better compatibility
+  maturin build --release --compatibility manylinux2014 --target x86_64-unknown-linux-gnu
+  
+  # Optionally build for other Linux architectures
+  # Uncomment these if you need them:
+  # maturin build --release --compatibility manylinux2014 --target i686-unknown-linux-gnu
+  # maturin build --release --compatibility manylinux2014 --target aarch64-unknown-linux-gnu
+  
+  echo "Linux builds complete! Check the 'target/wheels' directory for the output."
+
+# Build Linux wheels using Docker (more reliable)
+build-linux-docker:
+  #!/usr/bin/env bash
+  echo "Building Linux wheels using Docker..."
+  maturin build --release --compatibility manylinux2014 --target x86_64-unknown-linux-gnu --docker
+  echo "Linux build complete! Check the 'target/wheels' directory for the output."
+
+# Build wheels for all platforms using Docker (more reliable)
+build-all-docker:
+  #!/usr/bin/env bash
+  echo "Building wheels for all platforms using Docker..."
+  
+  # This uses maturin's built-in Docker support for cross-compilation
+  # It requires Docker to be installed and running
+  
+  # Build for all supported platforms using manylinux
+  maturin build --release --compatibility manylinux2014 --target x86_64-unknown-linux-gnu
+  maturin build --release --compatibility manylinux2014 --target i686-unknown-linux-gnu
+  maturin build --release --compatibility manylinux2014 --target aarch64-unknown-linux-gnu
+  
+  # MacOS/Windows builds (requires additional Docker setup)
+  if command -v docker &> /dev/null; then
+    # Use the cross platform builder if available
+    maturin build --release --target x86_64-apple-darwin --docker
+    maturin build --release --target aarch64-apple-darwin --docker
+    maturin build --release --target x86_64-pc-windows-msvc --docker
+  else
+    echo "Docker not found, skipping MacOS/Windows cross-builds"
+  fi
+  
+  # Build pure Python package with hatch
+  hatch build
+  
+  echo "All platform builds complete! Check the 'target/wheels' and 'dist' directories for the output."
+
+# Simplified one-liner that builds for all platforms
+build-all: 
+  maturin build --release --all-features --compatibility manylinux2014 --sdist --strip
+
+# Set default build-all alias
+alias build := build-all
+
 pre-commit-test:
   ruff format
   ruff check --fix
