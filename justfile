@@ -171,14 +171,14 @@ pub:
   rye version -b minor
   rm -rf ./dist
   uv build --all --wheel 
-  uv publish 
+  # uv publish 
 
-  just pre-commit-test
-  git add .
-  touch /tmp/msg
-  git commit -m "build: automatic uv bump of project version"
-  git push
-  just pub-docs
+  # just pre-commit-test
+  # git add .
+  # touch /tmp/msg
+  # git commit -m "build: automatic uv bump of project version"
+  # git push
+  # just pub-docs
 
 
 pub-docs:

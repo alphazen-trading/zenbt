@@ -19,7 +19,7 @@ use crate::sdk::order::Order;
 
 use super::actions::Action;
 
-#[pyclass(get_all, subclass)]
+#[pyclass(get_all, set_all, subclass)]
 #[derive(Debug)]
 pub struct Strategy {
     pub df: PyDataFrame,
@@ -99,16 +99,6 @@ impl Strategy {
                 index: -1,
             })
         })
-    }
-
-    #[setter]
-    fn set_index(&mut self, index: isize) {
-        self.index = index;
-    }
-
-    // Add a method to set index directly
-    pub fn set_index_value(&mut self, index: isize) {
-        self.index = index;
     }
 
     #[classmethod]
