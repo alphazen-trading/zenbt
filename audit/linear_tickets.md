@@ -1,9 +1,9 @@
 # ZenBT Codebase Improvements - Linear Tickets
 
-## 🔴 Critical Priority Tickets
+## 🔴 Critical Tickets
 
 ### SECURITY-001: Remove Hardcoded Credentials
-**Priority**: Critical | **Estimate**: 2 points | **Team**: Security
+**Labels**: security, credentials
 
 **Description**: Remove all hardcoded credentials and implement secure credential management.
 
@@ -23,7 +23,7 @@
 ---
 
 ### SECURITY-002: Fix Rust Array Bounds Vulnerabilities
-**Priority**: Critical | **Estimate**: 3 points | **Team**: Backend
+**Labels**: security, rust, backend
 
 **Description**: Fix potential array bounds violations in Rust indicators that could cause panics.
 
@@ -41,7 +41,7 @@
 ---
 
 ### SECURITY-003: Implement Input Validation
-**Priority**: Critical | **Estimate**: 3 points | **Team**: Backend
+**Labels**: security, validation, backend
 
 **Description**: Add comprehensive input validation for all external API calls and user inputs.
 
@@ -62,7 +62,7 @@
 ---
 
 ### TESTING-001: Implement Comprehensive Test Suite
-**Priority**: Critical | **Estimate**: 8 points | **Team**: QA
+**Labels**: testing, qa, coverage
 
 **Description**: Replace trivial test with comprehensive test coverage for core functionality.
 
@@ -83,10 +83,10 @@
 
 ---
 
-## 🟡 High Priority Tickets
+## 🟡 High Tickets
 
 ### ARCH-001: Fix Package Import Structure
-**Priority**: High | **Estimate**: 2 points | **Team**: Backend
+**Labels**: architecture, imports, backend
 
 **Description**: Fix broken package imports by properly implementing `__init__.py` files.
 
@@ -107,7 +107,7 @@
 ---
 
 ### ARCH-002: Standardize Data Processing Libraries
-**Priority**: High | **Estimate**: 5 points | **Team**: Backend
+**Labels**: architecture, data-processing, backend
 
 **Description**: Choose either pandas or polars for data processing and standardize usage.
 
@@ -128,7 +128,7 @@
 ---
 
 ### QUALITY-001: Reduce Rust Panic Points
-**Priority**: High | **Estimate**: 5 points | **Team**: Backend
+**Labels**: quality, rust, error-handling
 
 **Description**: Replace `.unwrap()` calls with proper error handling in Rust code.
 
@@ -148,7 +148,7 @@
 ---
 
 ### QUALITY-002: Fix Logic Errors
-**Priority**: High | **Estimate**: 2 points | **Team**: Backend
+**Labels**: quality, bugfix, backend
 
 **Description**: Fix identified logic errors in trading strategy implementation.
 
@@ -165,7 +165,7 @@
 ---
 
 ### QUALITY-003: Clean Up Development Code
-**Priority**: High | **Estimate**: 3 points | **Team**: Backend
+**Labels**: quality, cleanup, backend
 
 **Description**: Remove development and debug code from production modules.
 
@@ -183,10 +183,10 @@
 
 ---
 
-## 🟢 Medium Priority Tickets
+## 🟢 Medium Tickets
 
 ### PERF-001: Optimize Data Processing Performance
-**Priority**: Medium | **Estimate**: 5 points | **Team**: Backend
+**Labels**: performance, optimization, backend
 
 **Description**: Improve performance of data processing operations.
 
@@ -205,7 +205,7 @@
 ---
 
 ### PERF-002: Optimize Rust Memory Usage
-**Priority**: Medium | **Estimate**: 3 points | **Team**: Backend
+**Labels**: performance, memory, rust
 
 **Description**: Reduce unnecessary memory allocations and cloning in Rust code.
 
@@ -222,7 +222,7 @@
 ---
 
 ### ARCH-003: Implement Dependency Injection
-**Priority**: Medium | **Estimate**: 8 points | **Team**: Backend
+**Labels**: architecture, refactoring, backend
 
 **Description**: Add dependency injection for better testability and maintainability.
 
@@ -241,7 +241,7 @@
 ---
 
 ### QUALITY-004: Refactor Large Functions
-**Priority**: Medium | **Estimate**: 5 points | **Team**: Backend
+**Labels**: quality, refactoring, backend
 
 **Description**: Break down large functions into smaller, more manageable components.
 
@@ -258,7 +258,7 @@
 ---
 
 ### DOCS-001: Improve Documentation
-**Priority**: Medium | **Estimate**: 5 points | **Team**: Documentation
+**Labels**: documentation, readme, api-docs
 
 **Description**: Add comprehensive documentation for the codebase.
 
@@ -277,10 +277,10 @@
 
 ---
 
-## 🔵 Low Priority Tickets
+## 🔵 Low Tickets
 
 ### INFRA-001: Improve CI/CD Pipeline
-**Priority**: Low | **Estimate**: 3 points | **Team**: DevOps
+**Labels**: infrastructure, ci-cd, devops
 
 **Description**: Add quality gates and validation to build pipeline.
 
@@ -299,7 +299,7 @@
 ---
 
 ### INFRA-002: Fix Cargo.toml Typo
-**Priority**: Low | **Estimate**: 1 point | **Team**: Backend
+**Labels**: infrastructure, typo, rust
 
 **Description**: Fix typo in Cargo.toml dependency configuration.
 
@@ -313,7 +313,7 @@
 ---
 
 ### QUALITY-005: Improve Git Workflow
-**Priority**: Low | **Estimate**: 2 points | **Team**: Process
+**Labels**: quality, git, process
 
 **Description**: Improve git commit messages and branch strategy.
 
@@ -352,8 +352,6 @@
 - PERF-002: Optimize Rust Memory Usage
 - ARCH-003: Implement Dependency Injection
 - INFRA-001: Improve CI/CD Pipeline
-
-**Total Estimated Points**: 67 points (~4 sprints for a team of 3-4 developers)
 
 ---
 
