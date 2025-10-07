@@ -9,4 +9,9 @@ site
 logs
 .env
 
+# Rye (deprecated - using uv instead)
+requirements.lock
+requirements-dev.lock
+.python-version
+
 dist

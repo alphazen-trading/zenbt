@@ -14,7 +14,7 @@ dependencies = [
     "tradingtoolbox>=0.44.0",
     "tqdm>=4.66.5",
     "polars>=1.9.0",
-    "ta-lib>=0.6.0",
+    "ta-lib>=0.6.7",
     "humanize>=4.11.0",
     "numba>=0.60.0",
     "quantstats==0.0.60",
@@ -35,9 +35,6 @@ license = { text = "MIT" }
 "import_pickl" = "_dev:import_pickl"
 "test_pickl" = "_dev:test_pickl"
 # "dev" = "zenbt:dev"
-
-[tool.rye.scripts]
-rye_script = {cmd = 'echo hello world'}
 
 [build-system]
 requires = ["hatchling==1.26.3"]  # Without a version spec, hatchling==1.27.0 is used which fails to publish. Ref: https://github.com/astral-sh/rye/issues/1446#issuecomment-2545154562
