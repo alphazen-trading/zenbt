@@ -30,6 +30,7 @@ import 'justfiles/tools/cargo-update.just'
 import 'justfiles/tools/cargo-outdated.just'
 import 'justfiles/tools/install-cargo-outdated.just'
 import 'justfiles/tools/rust-update.just'
+import 'justfiles/tools/uv-upgrade.just'
 import 'justfiles/tools/uv-sync-deps.just'
 
 # ============================================================================
