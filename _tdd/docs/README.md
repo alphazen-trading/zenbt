@@ -112,6 +112,74 @@ These files demonstrate **how strategies are implemented in VectorBT** so they c
 
 ---
 
+### 06_multi_asset.py
+**Multi-Asset Portfolio Strategies**
+
+- Basic multi-asset strategy
+- Cash sharing portfolios
+- Equal weight portfolios
+- Correlation-based selection
+- Sector rotation
+- Mean-variance optimization
+- Dynamic position sizing across assets
+
+**Key VectorBT Features:**
+- Multi-column DataFrames
+- `group_by=True` for portfolio aggregation
+- `cash_sharing=True` parameter
+- PyPortfolioOpt integration
+- Correlation analysis
+
+**Migration Complexity:** Medium-High
+**Challenges:** Portfolio-level state management, rebalancing logic
+
+---
+
+### 07_pairs_trading.py
+**Pairs Trading and Statistical Arbitrage**
+
+- Find cointegrated pairs
+- Basic pairs trading
+- Hedge ratio optimization
+- Rolling hedge ratio
+- Multiple pairs portfolio
+- Kalman filter pairs trading
+- Distance method
+
+**Key VectorBT Features:**
+- Cointegration testing (statsmodels)
+- Spread calculation
+- Z-score trading
+- Simultaneous long/short positions
+- Kalman Filter integration
+
+**Migration Complexity:** High
+**Challenges:** Simultaneous long/short execution, hedge ratio calculation
+
+---
+
+### 08_walk_forward.py
+**Walk-Forward Optimization & Cross-Validation**
+
+- Basic walk-forward
+- Anchored walk-forward (expanding window)
+- Combinatorial cross-validation
+- Out-of-sample decay analysis
+- Monte Carlo walk-forward
+- Parameter stability testing
+
+**Key VectorBT Features:**
+- Time-based splits
+- Rolling/expanding windows
+- Multiple validation methods
+- Overfitting detection
+- Parameter stability analysis
+
+**Migration Complexity:** Medium
+**Challenges:** Requires multi_backtest framework, split management
+
+---
+
 ## Running the Examples
 
 ### Prerequisites

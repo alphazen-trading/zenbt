@@ -341,11 +341,11 @@ When adding new strategy examples:
 
 ## Summary Statistics
 
-- **Total Strategy Files**: 5
-- **Total Strategy Variations**: 29
-- **Total Lines of Code**: ~2,100
+- **Total Strategy Files**: 8
+- **Total Strategy Variations**: 49
+- **Total Lines of Code**: ~3,500
 - **Coverage**: Entry-level to advanced
-- **Estimated Migration Time**: 30-50 hours for all
+- **Estimated Migration Time**: 50-80 hours for all
 
 ---
 
