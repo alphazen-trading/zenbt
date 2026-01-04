@@ -109,7 +109,7 @@
 ### ARCH-002: Standardize Data Processing Libraries
 **Labels**: architecture, data-processing, backend
 
-**Description**: Choose either pandas or polars for data processing and standardize usage.
+**Description**: use Polars for data processing
 
 **Acceptance Criteria**:
 - [ ] Analyze current usage of pandas vs polars
