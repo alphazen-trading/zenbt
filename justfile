@@ -40,16 +40,6 @@ import 'justfiles/qa/clippy.just'
 import 'justfiles/qa/pre-commit-test.just'
 
 # ============================================================================
-# Build Commands
-# ============================================================================
-import 'justfiles/build/build-all-platforms.just'
-import 'justfiles/build/build-all-linux.just'
-import 'justfiles/build/build-linux-docker.just'
-import 'justfiles/build/build-all-docker.just'
-import 'justfiles/build/build-all.just'
-import 'justfiles/build/build_pyi.just'
-
-# ============================================================================
 # Publish Commands
 # ============================================================================
 import 'justfiles/publish/pub.just'
